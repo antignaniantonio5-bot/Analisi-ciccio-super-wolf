@@ -1,0 +1,1795 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WOLF — Wolfspeed Inc. | Terminal Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Syne:wght@400;600;700;800&display=swap');
+
+  :root {
+    --bg: #080b0f;
+    --bg2: #0d1117;
+    --bg3: #111820;
+    --bg4: #161e28;
+    --border: #1e2d3d;
+    --border2: #243447;
+    --accent: #00d4ff;
+    --accent2: #0099cc;
+    --green: #00e5a0;
+    --red: #ff4560;
+    --yellow: #ffd60a;
+    --orange: #ff8c42;
+    --purple: #a78bfa;
+    --text: #e2eaf4;
+    --text2: #8ba3bc;
+    --text3: #4a6275;
+    --glow: rgba(0, 212, 255, 0.15);
+    --glow-green: rgba(0, 229, 160, 0.12);
+    --glow-red: rgba(255, 69, 96, 0.12);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: #04070a;
+    color: var(--text);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  .page-wrapper {
+    max-width: 1400px;
+    margin: 0 auto;
+    background: var(--bg);
+    box-shadow: 0 0 60px rgba(0,0,0,0.8);
+    min-height: 100vh;
+  }
+
+  /* SCANLINE EFFECT */
+  body::before {
+    content: '';
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.03) 2px, rgba(0,0,0,0.03) 4px);
+    pointer-events: none;
+    z-index: 9999;
+  }
+
+  /* TOP HEADER */
+  .header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .ticker-badge {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 800;
+    color: var(--accent);
+    letter-spacing: 2px;
+    text-shadow: 0 0 20px var(--accent), 0 0 40px rgba(0,212,255,0.3);
+  }
+
+  .company-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text2);
+    letter-spacing: 0.5px;
+  }
+
+  .exchange-badge {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--text3);
+    padding: 2px 8px;
+    font-size: 10px;
+    letter-spacing: 1px;
+    border-radius: 2px;
+  }
+
+  .price-display {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .current-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+  }
+
+  .price-change {
+    font-size: 13px;
+    padding: 4px 10px;
+    border-radius: 3px;
+  }
+
+  .price-change.neg {
+    background: rgba(255,69,96,0.15);
+    color: var(--red);
+    border: 1px solid rgba(255,69,96,0.3);
+  }
+
+  .price-change.pos {
+    background: rgba(0,229,160,0.15);
+    color: var(--green);
+    border: 1px solid rgba(0,229,160,0.3);
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .status-dot {
+    width: 8px; height: 8px;
+    background: var(--green);
+    border-radius: 50%;
+    box-shadow: 0 0 8px var(--green);
+    animation: pulse 2s infinite;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.4; }
+  }
+
+  .status-text {
+    color: var(--text2);
+    font-size: 11px;
+    letter-spacing: 1px;
+  }
+
+  .timestamp {
+    color: var(--text3);
+    font-size: 11px;
+  }
+
+  /* TABS */
+  .tab-bar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    gap: 0;
+  }
+
+  .tab {
+    padding: 12px 22px;
+    cursor: pointer;
+    color: var(--text3);
+    font-size: 11px;
+    font-weight: 500;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    white-space: nowrap;
+  }
+
+  .tab:hover { color: var(--text2); }
+
+  .tab.active {
+    color: var(--accent);
+    border-bottom-color: var(--accent);
+    text-shadow: 0 0 10px rgba(0,212,255,0.5);
+  }
+
+  /* MAIN CONTENT */
+  .main { padding: 20px 24px; }
+
+  .tab-content { display: none; }
+  .tab-content.active { display: block; }
+
+  /* GRID LAYOUTS */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 16px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; margin-bottom: 16px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 16px; margin-bottom: 16px; }
+
+  /* CARDS */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .card::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 1px;
+    background: linear-gradient(90deg, transparent, var(--border2), transparent);
+  }
+
+  .card-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .card-value {
+    font-family: 'Syne', sans-serif;
+    font-size: 22px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .card-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+
+  .card-badge {
+    display: inline-block;
+    padding: 2px 8px;
+    border-radius: 2px;
+    font-size: 11px;
+    font-weight: 600;
+    margin-top: 6px;
+  }
+
+  .badge-green { background: rgba(0,229,160,0.15); color: var(--green); border: 1px solid rgba(0,229,160,0.25); }
+  .badge-red { background: rgba(255,69,96,0.15); color: var(--red); border: 1px solid rgba(255,69,96,0.25); }
+  .badge-yellow { background: rgba(255,214,10,0.15); color: var(--yellow); border: 1px solid rgba(255,214,10,0.25); }
+  .badge-purple { background: rgba(167,139,250,0.15); color: var(--purple); border: 1px solid rgba(167,139,250,0.25); }
+  .badge-accent { background: rgba(0,212,255,0.15); color: var(--accent); border: 1px solid rgba(0,212,255,0.25); }
+
+  .card-accent { border-color: rgba(0,212,255,0.3); }
+  .card-green { border-color: rgba(0,229,160,0.2); }
+  .card-red { border-color: rgba(255,69,96,0.2); }
+
+  /* SECTION TITLE */
+  .section-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .section-title::before {
+    content: '';
+    width: 3px;
+    height: 14px;
+    background: var(--accent);
+    box-shadow: 0 0 6px var(--accent);
+    display: block;
+  }
+
+  /* CHART CONTAINERS */
+  .chart-container {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 16px;
+    margin-bottom: 16px;
+  }
+
+  .chart-title {
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 14px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  canvas { max-width: 100%; }
+
+  /* OSCILLATOR ROWS */
+  .oscillator-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    margin-bottom: 6px;
+  }
+
+  .osc-name { font-weight: 600; color: var(--text); font-size: 12px; min-width: 120px; }
+  .osc-value { color: var(--accent); font-size: 13px; font-weight: 700; min-width: 80px; text-align: center; }
+  .osc-bar-container { flex: 1; height: 6px; background: var(--bg4); border-radius: 3px; margin: 0 16px; position: relative; overflow: hidden; }
+  .osc-bar { height: 100%; border-radius: 3px; transition: width 0.6s ease; }
+
+  /* MA TABLE */
+  .ma-table { width: 100%; border-collapse: collapse; }
+  .ma-table th {
+    padding: 8px 12px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    border-bottom: 1px solid var(--border);
+    background: var(--bg3);
+  }
+
+  .ma-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid rgba(30,45,61,0.5);
+    font-size: 12px;
+  }
+
+  .ma-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .signal-buy { color: var(--green); font-weight: 700; }
+  .signal-sell { color: var(--red); font-weight: 700; }
+  .signal-neutral { color: var(--yellow); font-weight: 700; }
+
+  /* SUPPORT/RESISTANCE */
+  .sr-level {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: 8px 12px;
+    background: var(--bg3);
+    border-radius: 3px;
+    margin-bottom: 4px;
+    border-left: 3px solid;
+  }
+
+  .sr-level.resistance { border-left-color: var(--red); }
+  .sr-level.support { border-left-color: var(--green); }
+  .sr-level.current { border-left-color: var(--accent); }
+
+  .sr-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    min-width: 70px;
+  }
+
+  .sr-label { color: var(--text2); font-size: 11px; flex: 1; }
+  .sr-strength { font-size: 11px; }
+
+  /* PATTERN CARDS */
+  .pattern-card {
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    border-radius: 4px;
+    padding: 16px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .pattern-card::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%;
+    height: 2px;
+  }
+
+  .pattern-card.bullish::after { background: linear-gradient(90deg, var(--green), transparent); }
+  .pattern-card.bearish::after { background: linear-gradient(90deg, var(--red), transparent); }
+  .pattern-card.neutral::after { background: linear-gradient(90deg, var(--yellow), transparent); }
+
+  .pattern-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+
+  .pattern-desc {
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.7;
+  }
+
+  .pattern-meta {
+    display: flex;
+    gap: 8px;
+    margin-top: 10px;
+    flex-wrap: wrap;
+  }
+
+  /* SCREENER TABLE */
+  .screener-table { width: 100%; border-collapse: collapse; }
+  .screener-table th {
+    padding: 10px 12px;
+    text-align: left;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    border-bottom: 2px solid var(--border2);
+    background: var(--bg3);
+    cursor: pointer;
+  }
+
+  .screener-table th:hover { color: var(--accent); }
+
+  .screener-table td {
+    padding: 11px 12px;
+    border-bottom: 1px solid rgba(30,45,61,0.4);
+    font-size: 12px;
+  }
+
+  .screener-table tr.active-row td { background: rgba(0,212,255,0.04); }
+  .screener-table tr:hover td { background: rgba(255,255,255,0.025); }
+
+  .ticker-cell {
+    font-family: 'Syne', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+  }
+
+  /* FILTER BUTTONS */
+  .filter-bar {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    background: var(--bg3);
+    border: 1px solid var(--border2);
+    color: var(--text2);
+    border-radius: 3px;
+    cursor: pointer;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    letter-spacing: 1px;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { border-color: var(--accent); color: var(--accent); }
+  .filter-btn.active { background: rgba(0,212,255,0.1); border-color: var(--accent); color: var(--accent); }
+
+  /* RADAR */
+  .radar-wrap {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px 0;
+  }
+
+  /* REPORT */
+  .report-section {
+    margin-bottom: 24px;
+  }
+
+  .report-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--accent);
+    margin-bottom: 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .scenario-block {
+    border-radius: 4px;
+    padding: 16px 20px;
+    margin-bottom: 12px;
+    border-left: 4px solid;
+  }
+
+  .scenario-block.bull { 
+    background: rgba(0,229,160,0.06); 
+    border-left-color: var(--green); 
+  }
+
+  .scenario-block.base { 
+    background: rgba(0,212,255,0.06); 
+    border-left-color: var(--accent); 
+  }
+
+  .scenario-block.bear { 
+    background: rgba(255,69,96,0.06); 
+    border-left-color: var(--red); 
+  }
+
+  .scenario-title {
+    font-family: 'Syne', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    margin-bottom: 8px;
+  }
+
+  .scenario-body {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.8;
+  }
+
+  .scenario-target {
+    font-size: 18px;
+    font-weight: 700;
+    font-family: 'Syne', sans-serif;
+    margin-top: 8px;
+  }
+
+  .report-text {
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.9;
+    margin-bottom: 10px;
+  }
+
+  .report-text strong {
+    color: var(--text);
+    font-weight: 600;
+  }
+
+  .kv-row {
+    display: flex;
+    justify-content: space-between;
+    padding: 7px 0;
+    border-bottom: 1px solid rgba(30,45,61,0.4);
+    font-size: 12px;
+  }
+
+  .kv-key { color: var(--text3); }
+  .kv-val { color: var(--text); font-weight: 500; }
+
+  /* OVERALL SIGNAL */
+  .signal-gauge {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    padding: 20px;
+  }
+
+  .gauge-label {
+    font-family: 'Syne', sans-serif;
+    font-size: 28px;
+    font-weight: 800;
+    letter-spacing: 3px;
+    margin-bottom: 4px;
+  }
+
+  .gauge-sub {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 1px;
+  }
+
+  .gauge-numbers {
+    display: flex;
+    gap: 20px;
+    margin-top: 16px;
+    font-size: 12px;
+  }
+
+  .gauge-num { text-align: center; }
+  .gauge-num-val { font-family: 'Syne', sans-serif; font-size: 20px; font-weight: 700; }
+  .gauge-num-label { color: var(--text3); font-size: 10px; letter-spacing: 1px; }
+
+  /* MINI SPARKLINE AREA */
+  .mini-chart { height: 40px; position: relative; }
+
+  /* WEEK PERFORMANCE */
+  .perf-bar-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 8px;
+    font-size: 11px;
+  }
+  .perf-label { min-width: 80px; color: var(--text3); }
+  .perf-bar-bg { flex: 1; height: 8px; background: var(--bg4); border-radius: 4px; overflow: hidden; }
+  .perf-bar-fill { height: 100%; border-radius: 4px; }
+  .perf-val { min-width: 55px; text-align: right; font-weight: 600; }
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: var(--bg2); }
+  ::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 3px; }
+  ::-webkit-scrollbar-thumb:hover { background: var(--accent2); }
+
+  /* RISK LABEL */
+  .risk-strip {
+    background: rgba(255,69,96,0.08);
+    border: 1px solid rgba(255,69,96,0.2);
+    border-radius: 3px;
+    padding: 8px 14px;
+    font-size: 11px;
+    color: var(--red);
+    letter-spacing: 0.5px;
+    margin-bottom: 16px;
+  }
+
+  @media (max-width: 900px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+    .grid-3 { grid-template-columns: repeat(2, 1fr); }
+    .grid-2, .grid-2-1 { grid-template-columns: 1fr; }
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="ticker-badge">WOLF</div>
+    <div>
+      <div class="company-name">Wolfspeed, Inc.</div>
+      <div style="display:flex;gap:6px;margin-top:3px;">
+        <span class="exchange-badge">NYSE</span>
+        <span class="exchange-badge">SiC SEMICONDUCTOR</span>
+        <span class="exchange-badge">POST-CH11</span>
+      </div>
+    </div>
+  </div>
+  <div class="price-display">
+    <div class="current-price">$23.22</div>
+    <div class="price-change neg">▼ −4.95% (24h)</div>
+    <div class="price-change neg">▼ −1.21 vs prev. close</div>
+  </div>
+  <div class="header-right">
+    <div class="status-dot"></div>
+    <span class="status-text">MARKET CLOSED</span>
+    <span class="timestamp">14 APR 2026 — 22:00 CET</span>
+  </div>
+</div>
+
+<!-- TAB BAR -->
+<div class="tab-bar">
+  <div class="tab active" onclick="showTab('dashboard', this)">Dashboard</div>
+  <div class="tab" onclick="showTab('technical', this)">Analisi Tecnica</div>
+  <div class="tab" onclick="showTab('screener', this)">Screener</div>
+  <div class="tab" onclick="showTab('report', this)">Report</div>
+</div>
+
+<div class="main">
+
+<!-- ==================== TAB 1: DASHBOARD ==================== -->
+<div id="dashboard" class="tab-content active">
+
+  <div class="risk-strip">⚠ ATTENZIONE: Titolo ad altissimo rischio speculativo — post-Chapter 11 (set. 2025). Fondamentali negativi. Non costituisce consulenza finanziaria.</div>
+
+  <!-- KPI CARDS -->
+  <div class="section-title">KPI Overview</div>
+  <div class="grid-4">
+    <div class="card card-accent">
+      <div class="card-label">Prezzo Attuale</div>
+      <div class="card-value" style="color:var(--accent)">$23.22</div>
+      <div class="card-sub">Prev. Close: $24.43</div>
+      <span class="card-badge badge-red">−4.95% oggi</span>
+    </div>
+    <div class="card">
+      <div class="card-label">52W Range</div>
+      <div class="card-value" style="font-size:17px">$0.39 – $36.60</div>
+      <div class="card-sub">Post-restructuring</div>
+      <span class="card-badge badge-yellow">Alta volatilità</span>
+    </div>
+    <div class="card">
+      <div class="card-label">Market Cap</div>
+      <div class="card-value">$795M</div>
+      <div class="card-sub">Shares: ~34.2M</div>
+      <span class="card-badge badge-purple">Small Cap</span>
+    </div>
+    <div class="card card-green">
+      <div class="card-label">Performance 1M</div>
+      <div class="card-value" style="color:var(--green)">+39.8%</div>
+      <div class="card-sub">1W: +49.04%</div>
+      <span class="card-badge badge-green">Strong momentum</span>
+    </div>
+  </div>
+
+  <div class="grid-4">
+    <div class="card">
+      <div class="card-label">Revenue TTM</div>
+      <div class="card-value" style="font-size:18px">$757.6M</div>
+      <div class="card-sub">−6.6% QoQ</div>
+      <span class="card-badge badge-red">In calo</span>
+    </div>
+    <div class="card card-red">
+      <div class="card-label">Net Income TTM</div>
+      <div class="card-value" style="font-size:18px; color:var(--red)">−$1.6B</div>
+      <div class="card-sub">Margin: −212%</div>
+      <span class="card-badge badge-red">Deep loss</span>
+    </div>
+    <div class="card">
+      <div class="card-label">EPS (TTM)</div>
+      <div class="card-value" style="font-size:18px; color:var(--red)">−$11.39</div>
+      <div class="card-sub">Q2 FY26: −$6.11</div>
+      <span class="card-badge badge-red">Miss −893%</span>
+    </div>
+    <div class="card">
+      <div class="card-label">Prossimo Earnings</div>
+      <div class="card-value" style="font-size:17px; color:var(--yellow)">6 MAG</div>
+      <div class="card-sub">Est. EPS: −$3.78</div>
+      <span class="card-badge badge-yellow">Catalizzatore</span>
+    </div>
+  </div>
+
+  <!-- PRICE CHART 2025–2026 -->
+  <div class="chart-container">
+    <div class="chart-title">
+      <span>ANDAMENTO PREZZO D1 — 2025/2026 (post-restructuring)</span>
+      <span style="color:var(--green)">+49% 1W ▲</span>
+    </div>
+    <canvas id="priceChart" height="100"></canvas>
+  </div>
+
+  <div class="grid-2">
+    <!-- REVENUE TRIMESTRALE -->
+    <div class="chart-container" style="margin-bottom:0">
+      <div class="chart-title"><span>Revenue Trimestrale (M$)</span></div>
+      <canvas id="revenueChart" height="160"></canvas>
+    </div>
+
+    <!-- PERFORMANCE COMPARATA -->
+    <div class="chart-container" style="margin-bottom:0">
+      <div class="chart-title"><span>Performance Comparata 3M (%)</span></div>
+      <canvas id="perfChart" height="160"></canvas>
+    </div>
+  </div>
+
+  <div style="height:16px"></div>
+
+  <div class="grid-2">
+    <!-- MIX RICAVI -->
+    <div class="chart-container" style="margin-bottom:0">
+      <div class="chart-title"><span>Mix Ricavi Q2 FY2026</span></div>
+      <canvas id="mixChart" height="160"></canvas>
+    </div>
+
+    <!-- SEGNALE TECNICO COMPLESSIVO -->
+    <div class="card" style="margin-bottom:0; display:flex; flex-direction:column; justify-content:space-between;">
+      <div class="card-label">Segnale Tecnico Complessivo</div>
+      <div class="signal-gauge">
+        <div class="gauge-label" style="color:var(--yellow)">NEUTRALE</div>
+        <div class="gauge-sub">BIAS BULLISH A BREVE TERMINE</div>
+        <div class="gauge-numbers">
+          <div class="gauge-num">
+            <div class="gauge-num-val" style="color:var(--green)">10</div>
+            <div class="gauge-num-label">BUY</div>
+          </div>
+          <div class="gauge-num">
+            <div class="gauge-num-val" style="color:var(--yellow)">5</div>
+            <div class="gauge-num-label">NEUTRAL</div>
+          </div>
+          <div class="gauge-num">
+            <div class="gauge-num-val" style="color:var(--red)">2</div>
+            <div class="gauge-num-label">SELL</div>
+          </div>
+        </div>
+      </div>
+      <div>
+        <div class="perf-bar-row" style="margin-top:8px">
+          <span class="perf-label">Moving Avg</span>
+          <div class="perf-bar-bg"><div class="perf-bar-fill" style="width:75%;background:var(--green)"></div></div>
+          <span class="perf-val" style="color:var(--green)">BUY</span>
+        </div>
+        <div class="perf-bar-row">
+          <span class="perf-label">Oscillatori</span>
+          <div class="perf-bar-bg"><div class="perf-bar-fill" style="width:50%;background:var(--yellow)"></div></div>
+          <span class="perf-val" style="color:var(--yellow)">NEUTR.</span>
+        </div>
+        <div class="perf-bar-row">
+          <span class="perf-label">Momentum</span>
+          <div class="perf-bar-bg"><div class="perf-bar-fill" style="width:65%;background:var(--green)"></div></div>
+          <span class="perf-val" style="color:var(--green)">BUY</span>
+        </div>
+        <div class="perf-bar-row">
+          <span class="perf-label">Volatilità</span>
+          <div class="perf-bar-bg"><div class="perf-bar-fill" style="width:90%;background:var(--red)"></div></div>
+          <span class="perf-val" style="color:var(--red)">ALTA</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== TAB 2: ANALISI TECNICA ==================== -->
+<div id="technical" class="tab-content">
+
+  <!-- OSCILLATORI -->
+  <div class="section-title">Oscillatori — D1</div>
+  <div class="grid-2">
+    <div>
+      <!-- RSI -->
+      <div class="oscillator-row">
+        <div class="osc-name">RSI (14)</div>
+        <div class="osc-value">49.67</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:49.67%;background:linear-gradient(90deg,var(--green),var(--yellow))"></div>
+          <div style="position:absolute;left:30%;top:0;width:1px;height:100%;background:rgba(255,69,96,0.5)"></div>
+          <div style="position:absolute;left:70%;top:0;width:1px;height:100%;background:rgba(255,69,96,0.5)"></div>
+        </div>
+        <span class="card-badge badge-yellow">NEUTRALE</span>
+      </div>
+
+      <!-- MACD -->
+      <div class="oscillator-row">
+        <div class="osc-name">MACD (12,26,9)</div>
+        <div class="osc-value" style="color:var(--green)">+2.34</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:68%;background:var(--green)"></div>
+        </div>
+        <span class="card-badge badge-green">BUY</span>
+      </div>
+
+      <!-- STOCHASTIC -->
+      <div class="oscillator-row">
+        <div class="osc-name">Stoch %K/%D</div>
+        <div class="osc-value">58.3 / 52.1</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:58%;background:var(--accent)"></div>
+        </div>
+        <span class="card-badge badge-accent">NEUTRALE</span>
+      </div>
+
+      <!-- CCI -->
+      <div class="oscillator-row">
+        <div class="osc-name">CCI (14)</div>
+        <div class="osc-value">41.94</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:52%;background:var(--yellow)"></div>
+        </div>
+        <span class="card-badge badge-yellow">NEUTRALE</span>
+      </div>
+
+      <!-- Williams %R -->
+      <div class="oscillator-row">
+        <div class="osc-name">Williams %R</div>
+        <div class="osc-value" style="color:var(--green)">−32.4</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:68%;background:var(--green)"></div>
+        </div>
+        <span class="card-badge badge-green">BUY</span>
+      </div>
+    </div>
+
+    <div>
+      <!-- ADX -->
+      <div class="oscillator-row">
+        <div class="osc-name">ADX (14)</div>
+        <div class="osc-value" style="color:var(--orange)">38.2</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:38%;background:var(--orange)"></div>
+        </div>
+        <span class="card-badge" style="background:rgba(255,140,66,0.15);color:var(--orange);border:1px solid rgba(255,140,66,0.3)">TREND FORTE</span>
+      </div>
+
+      <!-- ATR -->
+      <div class="oscillator-row">
+        <div class="osc-name">ATR (14)</div>
+        <div class="osc-value" style="color:var(--red)">$2.84</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:85%;background:var(--red)"></div>
+        </div>
+        <span class="card-badge badge-red">ALTA VOL.</span>
+      </div>
+
+      <!-- MFI -->
+      <div class="oscillator-row">
+        <div class="osc-name">MFI (14)</div>
+        <div class="osc-value">54.2</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:54%;background:var(--accent)"></div>
+        </div>
+        <span class="card-badge badge-accent">NEUTRALE</span>
+      </div>
+
+      <!-- ROC -->
+      <div class="oscillator-row">
+        <div class="osc-name">ROC (10)</div>
+        <div class="osc-value" style="color:var(--green)">+31.4%</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:75%;background:var(--green)"></div>
+        </div>
+        <span class="card-badge badge-green">FORTE BUY</span>
+      </div>
+
+      <!-- BBWIDTH -->
+      <div class="oscillator-row">
+        <div class="osc-name">BB Width (20)</div>
+        <div class="osc-value" style="color:var(--orange)">0.78</div>
+        <div class="osc-bar-container">
+          <div class="osc-bar" style="width:78%;background:var(--orange)"></div>
+        </div>
+        <span class="card-badge" style="background:rgba(255,140,66,0.15);color:var(--orange);border:1px solid rgba(255,140,66,0.3)">ESPANSIONE</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- OSCILLATORS CHART -->
+  <div class="chart-container">
+    <div class="chart-title"><span>RSI + MACD — D1</span></div>
+    <canvas id="rsiChart" height="80"></canvas>
+  </div>
+
+  <!-- MEDIE MOBILI -->
+  <div class="section-title">Medie Mobili — Segnali</div>
+  <div class="chart-container">
+    <div class="chart-title"><span>Prezzo vs MA — D1</span></div>
+    <canvas id="maChart" height="100"></canvas>
+  </div>
+
+  <table class="ma-table" style="margin-bottom:16px">
+    <thead>
+      <tr>
+        <th>Media Mobile</th>
+        <th>Valore</th>
+        <th>Prezzo vs MA</th>
+        <th>Segnale</th>
+        <th>Note</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>SMA 10</td>
+        <td>$19.84</td>
+        <td style="color:var(--green)">SOPRA +16.9%</td>
+        <td class="signal-buy">▲ BUY</td>
+        <td style="color:var(--text3)">Supporto dinamico short-term</td>
+      </tr>
+      <tr>
+        <td>SMA 20</td>
+        <td>$17.62</td>
+        <td style="color:var(--green)">SOPRA +31.8%</td>
+        <td class="signal-buy">▲ BUY</td>
+        <td style="color:var(--text3)">Golden cross con SMA50</td>
+      </tr>
+      <tr>
+        <td>SMA 50</td>
+        <td>$14.69</td>
+        <td style="color:var(--green)">SOPRA +58.1%</td>
+        <td class="signal-buy">▲ BUY</td>
+        <td style="color:var(--text3)">Break sopra confermato</td>
+      </tr>
+      <tr>
+        <td>SMA 200</td>
+        <td>$12.36</td>
+        <td style="color:var(--green)">SOPRA +87.9%</td>
+        <td class="signal-buy">▲ STRONG BUY</td>
+        <td style="color:var(--text3)">Bull confirmation long-term</td>
+      </tr>
+      <tr>
+        <td>EMA 9</td>
+        <td>$21.40</td>
+        <td style="color:var(--green)">SOPRA +8.5%</td>
+        <td class="signal-buy">▲ BUY</td>
+        <td style="color:var(--text3)">Momentum di breve confermato</td>
+      </tr>
+      <tr>
+        <td>EMA 21</td>
+        <td>$18.30</td>
+        <td style="color:var(--green)">SOPRA +26.9%</td>
+        <td class="signal-buy">▲ BUY</td>
+        <td style="color:var(--text3)">Supporto dinamico medio</td>
+      </tr>
+      <tr>
+        <td>VWAP (30d)</td>
+        <td>$16.85</td>
+        <td style="color:var(--green)">SOPRA +37.8%</td>
+        <td class="signal-buy">▲ BUY</td>
+        <td style="color:var(--text3)">Accumulazione istituzionale</td>
+      </tr>
+    </tbody>
+  </table>
+
+  <!-- SUPPORTI E RESISTENZE -->
+  <div class="section-title">Supporti & Resistenze — Mappa Visiva D1</div>
+
+  <div class="grid-2">
+    <div>
+      <div class="sr-level resistance"><span class="sr-price" style="color:var(--red)">$35.00</span><span class="sr-label">Resistenza forte — trigger Elliott W3</span><span class="sr-strength" style="color:var(--red)">████ FORTE</span></div>
+      <div class="sr-level resistance"><span class="sr-price" style="color:var(--red)">$28.50</span><span class="sr-label">Resistenza — cluster volume 2026</span><span class="sr-strength" style="color:var(--red)">███ MED</span></div>
+      <div class="sr-level resistance"><span class="sr-price" style="color:rgba(255,69,96,0.7)">$25.90</span><span class="sr-label">High di ieri — resistenza immediata</span><span class="sr-strength" style="color:rgba(255,69,96,0.7)">██ MED</span></div>
+      <div class="sr-level current"><span class="sr-price" style="color:var(--accent)">$23.22</span><span class="sr-label">▶ PREZZO CORRENTE</span><span class="sr-strength" style="color:var(--accent)">—</span></div>
+      <div class="sr-level support"><span class="sr-price" style="color:rgba(0,229,160,0.7)">$22.20</span><span class="sr-label">Low di ieri — supporto immediato</span><span class="sr-strength" style="color:rgba(0,229,160,0.7)">██ MED</span></div>
+      <div class="sr-level support"><span class="sr-price" style="color:var(--green)">$19.84</span><span class="sr-label">SMA10 / supporto dinamico</span><span class="sr-strength" style="color:var(--green)">███ MED</span></div>
+      <div class="sr-level support"><span class="sr-price" style="color:var(--green)">$18.30</span><span class="sr-label">EMA21 / pivot Feb 2026</span><span class="sr-strength" style="color:var(--green)">███ MED</span></div>
+      <div class="sr-level support"><span class="sr-price" style="color:var(--green)">$15.13</span><span class="sr-label">Supporto forte — accumulazione</span><span class="sr-strength" style="color:var(--green)">████ FORTE</span></div>
+    </div>
+
+    <!-- SR VISUAL CHART -->
+    <div class="chart-container" style="margin-bottom:0">
+      <div class="chart-title"><span>Mappa S/R — Vista Scala Lineare</span></div>
+      <canvas id="srChart" height="220"></canvas>
+    </div>
+  </div>
+
+  <div style="height:16px"></div>
+
+  <!-- PATTERN TECNICI -->
+  <div class="section-title">Pattern Tecnici Identificati — D1</div>
+  <div class="grid-2">
+    <div class="pattern-card bullish">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="pattern-name" style="color:var(--green)">V-Shape Recovery</div>
+        <span class="card-badge badge-green">BULLISH</span>
+      </div>
+      <div class="pattern-desc">
+        Pattern classico post-restructuring. Il titolo ha formato un minimo assoluto a <strong>$0.39</strong> (fondo del Chapter 11, set. 2025) per poi rimbalzare impulsivamente con un'inversione a "V" violenta. 
+        Il recupero del 49% in una settimana indica forte domanda speculativa. La forma è tipica dei titoli che emergono da procedure fallimentari con nuova struttura del capitale.
+        <br><br>
+        <strong>Implicazione operativa:</strong> possibile pullback alla EMA9/SMA10 (~$19–22) prima di ulteriore rialzo. Il livello $22.20 è lo spartiacque immediato.
+      </div>
+      <div class="pattern-meta">
+        <span class="card-badge badge-green">Affidabilità: 65%</span>
+        <span class="card-badge badge-accent">Timeframe: D1/W1</span>
+        <span class="card-badge badge-yellow">Target: $35</span>
+      </div>
+    </div>
+
+    <div class="pattern-card bullish">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="pattern-name" style="color:var(--green)">Elliott Wave — Wave 3 in Progress?</div>
+        <span class="card-badge badge-green">BULLISH</span>
+      </div>
+      <div class="pattern-desc">
+        La community TradingView identifica un conteggio elliottiano con <strong>Wave 1</strong> completata dal minimo e <strong>Wave 2</strong> come correzione in flat (WXY) già assorbita. 
+        La struttura suggerisce l'inizio di <strong>Wave 3</strong> — tipicamente la più impulsiva — con target proiettati a $14–$18 già raggiunti. 
+        Breakout sopra <strong>$35</strong> attiverebbe proiezioni di W3 estesa verso $50–$60 (stime speculative).
+        <br><br>
+        <strong>Invalidazione:</strong> chiusura sotto $18.30 (EMA21) negherebbe la struttura rialzista.
+      </div>
+      <div class="pattern-meta">
+        <span class="card-badge badge-yellow">Affidabilità: 50%</span>
+        <span class="card-badge badge-accent">Timeframe: W1/M1</span>
+        <span class="card-badge badge-yellow">Trigger: $35</span>
+      </div>
+    </div>
+
+    <div class="pattern-card neutral">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="pattern-name" style="color:var(--yellow)">Spike & Pullback da Resistenza</div>
+        <span class="card-badge badge-yellow">NEUTRALE</span>
+      </div>
+      <div class="pattern-desc">
+        Dopo lo spike violento (+49% in 7 giorni), il titolo incontra la prima resistenza significativa a <strong>$25.90</strong> (high di seduta del 13 aprile) e corregge. 
+        Questo pattern di "shooting star" o "bearish engulfing" su timeframe D1 suggerisce una pausa/consolidamento nell'area <strong>$21–$25</strong> prima del prossimo movimento direzionale.
+        <br><br>
+        <strong>Scenario:</strong> consolidamento laterale con eventuale re-test del supporto $22.20 o rimbalzo verso $25.90 se il volume supporta.
+      </div>
+      <div class="pattern-meta">
+        <span class="card-badge badge-accent">Affidabilità: 70%</span>
+        <span class="card-badge badge-accent">Timeframe: D1</span>
+        <span class="card-badge badge-yellow">Zona: $21–$26</span>
+      </div>
+    </div>
+
+    <div class="pattern-card bearish">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start">
+        <div class="pattern-name" style="color:var(--red)">Divergenza Bearish Nascosta (RSI)</div>
+        <span class="card-badge badge-red">BEARISH WARNING</span>
+      </div>
+      <div class="pattern-desc">
+        Il RSI a 49.67, nella zona mediana, non ha confermato i nuovi massimi di prezzo con un RSI altrettanto elevato. 
+        Questo crea una <strong>divergenza bearish nascosta</strong>: il prezzo sale ma il momentum non segue con la stessa forza. 
+        In combinazione con il BBWidth in espansione (0.78) e l'ATR elevato ($2.84), si ha un segnale di esaurimento dello spike in corso.
+        <br><br>
+        <strong>Implicazione:</strong> l'assenza di RSI > 65–70 durante un +49% settimanale suggerisce bassa partecipazione. Attenzione a posizioni long aggressive.
+      </div>
+      <div class="pattern-meta">
+        <span class="card-badge badge-red">Affidabilità: 60%</span>
+        <span class="card-badge badge-accent">Timeframe: D1</span>
+        <span class="card-badge badge-red">Warning: RSI < 50</span>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== TAB 3: SCREENER ==================== -->
+<div id="screener" class="tab-content">
+
+  <div class="section-title">Comparative Screener — SiC / Wide Bandgap Semiconductors</div>
+
+  <div class="filter-bar">
+    <button class="filter-btn active" onclick="filterTable('all', this)">Tutti</button>
+    <button class="filter-btn" onclick="filterTable('buy', this)">▲ Buy</button>
+    <button class="filter-btn" onclick="filterTable('hold', this)">◆ Hold</button>
+    <button class="filter-btn" onclick="filterTable('sell', this)">▼ Sell</button>
+    <button class="filter-btn" onclick="sortTable('mktcap')">Sort: Cap ↓</button>
+    <button class="filter-btn" onclick="sortTable('perf')">Sort: Perf ↓</button>
+  </div>
+
+  <div style="overflow-x:auto">
+    <table class="screener-table" id="mainTable">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Azienda</th>
+          <th>Prezzo</th>
+          <th>Mkt Cap</th>
+          <th>P/S</th>
+          <th>P/B</th>
+          <th>Gross Margin</th>
+          <th>Revenue Growth</th>
+          <th>RSI</th>
+          <th>Segnale</th>
+          <th>Segment</th>
+        </tr>
+      </thead>
+      <tbody id="tableBody">
+        <tr class="active-row" data-signal="neutral" data-mktcap="795" data-perf="39.8">
+          <td class="ticker-cell">WOLF</td>
+          <td>Wolfspeed</td>
+          <td>$23.22</td>
+          <td>$795M</td>
+          <td>1.05x</td>
+          <td>N/M</td>
+          <td style="color:var(--red)">−16.1%</td>
+          <td style="color:var(--red)">−6.6%</td>
+          <td>49.7</td>
+          <td><span class="card-badge badge-yellow">HOLD</span></td>
+          <td style="color:var(--text3)">Pure-play SiC</td>
+        </tr>
+        <tr data-signal="buy" data-mktcap="42000" data-perf="8.2">
+          <td class="ticker-cell">ONON</td>
+          <td>ON Semiconductor</td>
+          <td>$34.80</td>
+          <td>$15.2B</td>
+          <td>2.8x</td>
+          <td>2.1x</td>
+          <td style="color:var(--green)">46.2%</td>
+          <td style="color:var(--red)">−8.1%</td>
+          <td>54.3</td>
+          <td><span class="card-badge badge-green">BUY</span></td>
+          <td style="color:var(--text3)">SiC + Si</td>
+        </tr>
+        <tr data-signal="buy" data-mktcap="890000" data-perf="15.3">
+          <td class="ticker-cell">NXPI</td>
+          <td>NXP Semiconductors</td>
+          <td>$248.60</td>
+          <td>$58.4B</td>
+          <td>4.2x</td>
+          <td>8.1x</td>
+          <td style="color:var(--green)">51.8%</td>
+          <td style="color:var(--green)">+3.2%</td>
+          <td>58.1</td>
+          <td><span class="card-badge badge-green">BUY</span></td>
+          <td style="color:var(--text3)">Auto / IoT</td>
+        </tr>
+        <tr data-signal="hold" data-mktcap="9200" data-perf="−4.1">
+          <td class="ticker-cell">SWKS</td>
+          <td>Skyworks Solutions</td>
+          <td>$61.40</td>
+          <td>$9.2B</td>
+          <td>2.6x</td>
+          <td>3.4x</td>
+          <td style="color:var(--green)">48.9%</td>
+          <td style="color:var(--red)">−5.4%</td>
+          <td>44.2</td>
+          <td><span class="card-badge badge-yellow">HOLD</span></td>
+          <td style="color:var(--text3)">RF / 5G</td>
+        </tr>
+        <tr data-signal="buy" data-mktcap="11000" data-perf="22.1">
+          <td class="ticker-cell">SLAB</td>
+          <td>Silicon Laboratories</td>
+          <td>$118.20</td>
+          <td>$4.1B</td>
+          <td>5.1x</td>
+          <td>4.8x</td>
+          <td style="color:var(--green)">58.4%</td>
+          <td style="color:var(--green)">+7.8%</td>
+          <td>62.4</td>
+          <td><span class="card-badge badge-green">BUY</span></td>
+          <td style="color:var(--text3)">IoT / Mixed</td>
+        </tr>
+        <tr data-signal="sell" data-mktcap="3100" data-perf="−18.2">
+          <td class="ticker-cell">RMBS</td>
+          <td>Rambus Inc.</td>
+          <td>$46.80</td>
+          <td>$5.3B</td>
+          <td>9.2x</td>
+          <td>6.1x</td>
+          <td style="color:var(--green)">71.2%</td>
+          <td style="color:var(--red)">−12.3%</td>
+          <td>38.1</td>
+          <td><span class="card-badge badge-red">SELL</span></td>
+          <td style="color:var(--text3)">IP / Memory</td>
+        </tr>
+        <tr data-signal="hold" data-mktcap="6800" data-perf="5.4">
+          <td class="ticker-cell">ALGM</td>
+          <td>Allegro MicroSystems</td>
+          <td>$12.40</td>
+          <td>$2.3B</td>
+          <td>2.9x</td>
+          <td>2.8x</td>
+          <td style="color:var(--green)">50.2%</td>
+          <td style="color:var(--red)">−3.8%</td>
+          <td>47.6</td>
+          <td><span class="card-badge badge-yellow">HOLD</span></td>
+          <td style="color:var(--text3)">Auto Sensors</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RADAR COMPARISON -->
+  <div style="height:20px"></div>
+  <div class="section-title">Radar Fondamentale — WOLF vs Competitor</div>
+  <div class="grid-2">
+    <div class="chart-container" style="margin-bottom:0">
+      <div class="chart-title"><span>Score Fondamentale Multi-Asse (normalizzato 0–100)</span></div>
+      <canvas id="radarChart" height="280"></canvas>
+    </div>
+    <div>
+      <div class="card" style="margin-bottom:12px">
+        <div class="card-label">Posizionamento WOLF</div>
+        <div class="kv-row"><span class="kv-key">Tecnologia SiC</span><span class="kv-val" style="color:var(--green)">Leader globale puro</span></div>
+        <div class="kv-row"><span class="kv-key">Qualità finanziaria</span><span class="kv-val" style="color:var(--red)">Molto bassa (post-CH11)</span></div>
+        <div class="kv-row"><span class="kv-key">Momentum tecnico</span><span class="kv-val" style="color:var(--green)">Forte breve termine</span></div>
+        <div class="kv-row"><span class="kv-key">Gross Margin</span><span class="kv-val" style="color:var(--red)">Negativo (−16.1%)</span></div>
+        <div class="kv-row"><span class="kv-key">Debt restructured</span><span class="kv-val" style="color:var(--green)">−70% debito</span></div>
+        <div class="kv-row"><span class="kv-key">Cash / investimenti</span><span class="kv-val" style="color:var(--yellow)">$1.3B (protetto)</span></div>
+        <div class="kv-row"><span class="kv-key">EV market exposure</span><span class="kv-val" style="color:var(--red)">Alta (headwind)</span></div>
+        <div class="kv-row"><span class="kv-key">AI datacenter pivot</span><span class="kv-val" style="color:var(--green)">+50% QoQ</span></div>
+      </div>
+      <div class="card card-yellow">
+        <div class="card-label">Consensus Analisti (Wall Street)</div>
+        <div style="display:flex;gap:16px;margin-top:10px">
+          <div style="text-align:center">
+            <div style="font-size:28px;font-weight:700;font-family:'Syne',sans-serif;color:var(--red)">0</div>
+            <div style="font-size:10px;color:var(--text3)">BUY</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:28px;font-weight:700;font-family:'Syne',sans-serif;color:var(--yellow)">1</div>
+            <div style="font-size:10px;color:var(--text3)">HOLD</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:28px;font-weight:700;font-family:'Syne',sans-serif;color:var(--red)">1</div>
+            <div style="font-size:10px;color:var(--text3)">SELL</div>
+          </div>
+        </div>
+        <div class="kv-row" style="margin-top:10px"><span class="kv-key">Prezzo Target Mediano</span><span class="kv-val" style="color:var(--yellow)">$15.00</span></div>
+        <div class="kv-row"><span class="kv-key">Downside vs attuale</span><span class="kv-val" style="color:var(--red)">−35.4%</span></div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ==================== TAB 4: REPORT ==================== -->
+<div id="report" class="tab-content">
+
+  <div class="risk-strip">⚠ Report a scopo informativo e analitico. Non costituisce consulenza finanziaria o d'investimento.</div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="report-section">
+    <div class="report-title">Executive Summary</div>
+    <p class="report-text">
+      <strong>Wolfspeed Inc. (NYSE: WOLF)</strong> è il principale produttore indipendente (pure-play) al mondo di substrati e dispositivi in carburo di silicio (SiC), tecnologia critica per l'elettrificazione dei trasporti, le infrastrutture AI e la modernizzazione della rete energetica. Il titolo scambia a <strong>$23.22</strong> al 14 aprile 2026, dopo un'impennata del +49% in 7 giorni, con un 52W range che va da <strong>$0.39 a $36.60</strong>, riflettendo la storia straordinaria di una ristrutturazione aziendale completata in settembre 2025.
+    </p>
+    <p class="report-text">
+      La società ha completato il <strong>Chapter 11</strong> il 29 settembre 2025 con un piano di riorganizzazione preconfermato che ha ridotto il debito di circa il 70% e abbattuto i costi di interesse cash del 60%, gettando le basi per un nuovo ciclo operativo. Le azioni attuali sono <em>nuove azioni</em> emesse post-ristrutturazione — le vecchie azioni (pre-CH11) hanno subito cancellazione. 
+    </p>
+    <p class="report-text">
+      Sul fronte operativo, l'ultimo earnings (Q2 FY2026, febbraio 2026) ha riportato un EPS di <strong>−$6.11</strong> contro attese di −$0.63, una miss del 893%. Le revenue si sono attestate a $168.5M, sotto i $199M attesi. Tuttavia, il CEO Robert Feurle ha annunciato un <strong>pivot strategico</strong> verso i datacenter AI (revenue +50% QoQ) e la modernizzazione della rete, riducendo la dipendenza dal mercato EV, penalizzato da alti tassi di interesse e riduzione degli incentivi.
+    </p>
+    <p class="report-text">
+      Il prossimo catalizzatore fondamentale è il <strong>Q3 FY2026 earnings del 6 maggio 2026</strong>, con guidance di revenue tra $140–160M e margine lordo ancora negativo.
+    </p>
+  </div>
+
+  <!-- ANALISI TECNICA -->
+  <div class="report-section">
+    <div class="report-title">Analisi Tecnica D1 — Sintesi Completa</div>
+    <p class="report-text">
+      Sul timeframe giornaliero, WOLF si trova in una fase di <strong>pullback tecnico dopo uno spike violento</strong>. Il trend di breve-medio periodo è inequivocabilmente rialzista: tutte le medie mobili principali (SMA10, 20, 50, 200 e EMA9, 21) mostrano segnale <strong>BUY</strong>, con il prezzo sopra ogni media. Il MACD è positivo (+2.34) e il Williams %R indica ancora momentum rialzista. 
+    </p>
+    <p class="report-text">
+      Tuttavia, l'RSI(14) a <strong>49.67</strong> non ha seguito i nuovi massimi di prezzo, creando una divergenza bearish nascosta che suggerisce esaurimento del momentum. Il CCI (41.94) e il MFI (54.2) sono entrambi in zona neutrale, confermando una pausa tecnica. L'ATR a $2.84 segnala volatilità estrema: le escursioni giornaliere del 10–20% sono normali per questo titolo.
+    </p>
+    <p class="report-text">
+      I quattro pattern identificati sono: (1) <strong>V-Shape Recovery</strong> post-CH11 come struttura dominante; (2) possibile <strong>Elliott Wave 3</strong> in sviluppo con trigger a $35; (3) <strong>Spike & Pullback da resistenza $25.90</strong> con consolidamento atteso a $21–$25; (4) <strong>divergenza bearish nascosta RSI</strong> come warning di breve termine. Lo scenario di consolidamento $22–$25 è il più probabile a breve prima del prossimo breakout o breakdown.
+    </p>
+  </div>
+
+  <!-- SCENARI -->
+  <div class="report-section">
+    <div class="report-title">Scenari Operativi — Bull / Base / Bear</div>
+
+    <div class="scenario-block bull">
+      <div class="scenario-title" style="color:var(--green)">🐂 SCENARIO BULL — "SiC Renaissance"</div>
+      <div class="scenario-body">
+        Il pivot verso AI datacenter accelera con contratti significativi e il Q3 FY2026 batte le attese, mostrando miglioramento del gross margin verso il pareggio. Il breakout sopra <strong>$35</strong> attiva la struttura Elliott Wave 3, con forte volume istituzionale e short squeeze. L'annuncio di partnership con clienti tier-1 dell'AI (hyperscaler) amplifica il momentum. La nuova struttura del capitale (−70% debito) permette di raggiungere EBITDA positivo prima del previsto nel FY2027.
+      </div>
+      <div class="scenario-target" style="color:var(--green)">Target 6–12 mesi: $45–$60 | Prob. stimata: 25%</div>
+    </div>
+
+    <div class="scenario-block base">
+      <div class="scenario-title" style="color:var(--accent)">◆ SCENARIO BASE — "Recovery Graduale"</div>
+      <div class="scenario-body">
+        Consolidamento nell'area <strong>$18–$28</strong> nei prossimi 3–6 mesi. Gli earnings di maggio deludono leggermente ma il gross margin migliora sequenzialmente. Il mercato EV rimane una zavorra ma il pivot AI procede con +30–40% QoQ dei ricavi datacenter. Nuovi clienti in Europa (partnership Germania/Francia per grid modernization) supportano la narrativa. Nessun breakout significativo ma struttura tecnica intatta sopra SMA20/EMA21.
+      </div>
+      <div class="scenario-target" style="color:var(--accent)">Target 6–12 mesi: $20–$30 | Prob. stimata: 45%</div>
+    </div>
+
+    <div class="scenario-block bear">
+      <div class="scenario-title" style="color:var(--red)">🐻 SCENARIO BEAR — "Execution Risk"</div>
+      <div class="scenario-body">
+        Il Q3 FY2026 manca nuovamente le stime in modo significativo, con gross margin ancora peggio del previsto. I problemi di yield nella produzione SiC persistono e la conversione al 300mm è più lenta del piano. Il mercato EV continua a deteriorarsi senza che il datacenter compensi. Il cash (attualmente $1.3B) si consuma più rapidamente, sollevando nuovi timori di liquidità. Rottura tecnica sotto <strong>$15</strong> riapre rischio verso $10 o meno.
+      </div>
+      <div class="scenario-target" style="color:var(--red)">Target 6–12 mesi: $8–$14 | Prob. stimata: 30%</div>
+    </div>
+  </div>
+
+  <!-- RISCHI E CATALIZZATORI -->
+  <div class="report-section">
+    <div class="report-title">Risk Matrix & Catalizzatori</div>
+    <div class="grid-2">
+      <div>
+        <div class="section-title" style="font-size:10px">RISCHI PRINCIPALI</div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--red)">⚠ Earnings miss (6 mag)</span><span class="kv-val">Alto impatto</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--red)">⚠ Gross margin negativo</span><span class="kv-val">Strutturale</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--red)">⚠ Problemi yield produzione</span><span class="kv-val">Operativo</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--red)">⚠ Dipendenza EV market</span><span class="kv-val">Macro</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--orange)">◆ Alta short interest</span><span class="kv-val">16.18%</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--orange)">◆ Volatilità estrema ATR</span><span class="kv-val">$2.84 / giorno</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--orange)">◆ Concorrenza asiatica SiC</span><span class="kv-val">Crescente</span></div>
+      </div>
+      <div>
+        <div class="section-title" style="font-size:10px">CATALIZZATORI POSITIVI</div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--green)">✓ 300mm SiC breakthrough</span><span class="kv-val">Gen 2026 anunciato</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--green)">✓ AI datacenter +50% QoQ</span><span class="kv-val">Q2 FY2026</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--green)">✓ 10kV SiC MOSFET primo al mondo</span><span class="kv-val">Mar 2026</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--green)">✓ Debito ridotto −70%</span><span class="kv-val">Post-CH11</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--green)">✓ Cash $1.3B</span><span class="kv-val">Runway 2+ anni</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--green)">✓ Nuovi VP EMEA e China</span><span class="kv-val">Espansione globale</span></div>
+        <div class="kv-row"><span class="kv-key" style="color:var(--green)">✓ Renesas come anchor investor</span><span class="kv-val">CFIUS cleared</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSIONE -->
+  <div class="report-section">
+    <div class="report-title">Conclusione Operativa</div>
+    <p class="report-text">
+      WOLF è un titolo <strong>altamente speculativo</strong> con un profilo rischio/rendimento asimmetrico. Chi ha seguito il rimbalzo post-restructuring dal fondo ha già generato rendimenti eccezionali. Per nuovi ingressi, la zona di interesse si colloca tra <strong>$18–$22</strong> (re-test EMA21 / SMA10) con stop sotto $15, in attesa della conferma del Q3 earnings (6 maggio). 
+    </p>
+    <p class="report-text">
+      Il segnale tecnico complessivo è <strong>NEUTRALE con bias bullish</strong> di breve termine. Il posizionamento fondamentale rimane sfidante ma la narrativa del pivot AI, unita alla posizione unica nel mercato SiC globale, offre un potenziale catalizzatore strutturale per il FY2027–28, a patto che l'azienda riesca a raggiungere margini lordi positivi entro la fine dell'anno fiscale 2026.
+    </p>
+    <p class="report-text">
+      <strong>Livello chiave da monitorare:</strong> $22.20 (supporto intraday), $18.30 (EMA21 — stop level), $35 (trigger bullish). L'earnings del 6 maggio è il prossimo punto di svolta fondamentale.
+    </p>
+  </div>
+
+</div>
+</div><!-- end main -->
+</div><!-- end page-wrapper -->
+
+<script>
+// ===== TAB SWITCHING =====
+function showTab(tabId, el) {
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById(tabId).classList.add('active');
+  el.classList.add('active');
+  setTimeout(() => renderChartsForTab(tabId), 50);
+}
+
+// ===== CHART DEFAULTS =====
+Chart.defaults.color = '#4a6275';
+Chart.defaults.borderColor = '#1e2d3d';
+Chart.defaults.font.family = "'JetBrains Mono', monospace";
+Chart.defaults.font.size = 10;
+
+// ===== CHART REGISTRY =====
+const charts = {};
+
+function destroyChart(id) {
+  if (charts[id]) { charts[id].destroy(); delete charts[id]; }
+}
+
+// ===== PRICE CHART =====
+function renderPriceChart() {
+  destroyChart('priceChart');
+  const ctx = document.getElementById('priceChart').getContext('2d');
+  const labels = [
+    'Oct-25','Nov-25','Dec-25','Jan-26','Feb-26','Mar-26','Apr-26'
+  ];
+  const prices = [1.2, 3.8, 8.5, 14.2, 17.5, 21.2, 23.2];
+  const gradient = ctx.createLinearGradient(0, 0, 0, 200);
+  gradient.addColorStop(0, 'rgba(0,229,160,0.3)');
+  gradient.addColorStop(1, 'rgba(0,229,160,0)');
+
+  charts['priceChart'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [{
+        label: 'WOLF Prezzo ($)',
+        data: prices,
+        borderColor: '#00e5a0',
+        backgroundColor: gradient,
+        borderWidth: 2.5,
+        pointRadius: 5,
+        pointBackgroundColor: '#00e5a0',
+        pointBorderColor: '#080b0f',
+        pointBorderWidth: 2,
+        tension: 0.4,
+        fill: true
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { display: false },
+        tooltip: { 
+          backgroundColor: '#0d1117',
+          borderColor: '#1e2d3d',
+          borderWidth: 1,
+          callbacks: { label: ctx => ` $${ctx.parsed.y.toFixed(2)}` }
+        }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(30,45,61,0.5)' }, ticks: { color: '#4a6275' } },
+        y: { grid: { color: 'rgba(30,45,61,0.5)' }, ticks: { color: '#4a6275', callback: v => '$'+v } }
+      }
+    }
+  });
+}
+
+// ===== REVENUE CHART =====
+function renderRevenueChart() {
+  destroyChart('revenueChart');
+  const ctx = document.getElementById('revenueChart').getContext('2d');
+  charts['revenueChart'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['Q1 FY25','Q2 FY25','Q3 FY25','Q4 FY25','Q1 FY26','Q2 FY26'],
+      datasets: [
+        {
+          label: 'Power Revenue',
+          data: [120, 115, 108, 122, 116, 118],
+          backgroundColor: 'rgba(0,212,255,0.7)',
+          borderRadius: 2
+        },
+        {
+          label: 'Materials Revenue',
+          data: [62, 68, 65, 58, 56, 50],
+          backgroundColor: 'rgba(167,139,250,0.6)',
+          borderRadius: 2
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#8ba3bc', padding: 10, boxWidth: 12 } } },
+      scales: {
+        x: { stacked: true, grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275' } },
+        y: { stacked: true, grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275', callback: v => '$'+v+'M' } }
+      }
+    }
+  });
+}
+
+// ===== PERF CHART =====
+function renderPerfChart() {
+  destroyChart('perfChart');
+  const ctx = document.getElementById('perfChart').getContext('2d');
+  charts['perfChart'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: ['WOLF','ONNN','NXPI','SWKS','SLAB','SOX ETF'],
+      datasets: [{
+        label: 'Performance 3M (%)',
+        data: [39.8, 8.2, 15.3, -4.1, 22.1, 6.4],
+        backgroundColor: [
+          'rgba(0,229,160,0.8)',
+          'rgba(0,212,255,0.6)',
+          'rgba(0,212,255,0.6)',
+          'rgba(255,69,96,0.6)',
+          'rgba(0,212,255,0.6)',
+          'rgba(167,139,250,0.6)'
+        ],
+        borderRadius: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275' } },
+        y: { grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275', callback: v => v+'%' } }
+      }
+    }
+  });
+}
+
+// ===== MIX RICAVI =====
+function renderMixChart() {
+  destroyChart('mixChart');
+  const ctx = document.getElementById('mixChart').getContext('2d');
+  charts['mixChart'] = new Chart(ctx, {
+    type: 'doughnut',
+    data: {
+      labels: ['Power — EV/Auto','Power — AI Datacenter','Power — Industrial','Materials — SiC Wafer','Materials — GaN'],
+      datasets: [{
+        data: [45, 25, 18, 8, 4],
+        backgroundColor: [
+          'rgba(0,212,255,0.8)',
+          'rgba(0,229,160,0.8)',
+          'rgba(167,139,250,0.7)',
+          'rgba(255,214,10,0.7)',
+          'rgba(255,140,66,0.7)'
+        ],
+        borderColor: '#080b0f',
+        borderWidth: 3
+      }]
+    },
+    options: {
+      responsive: true,
+      plugins: {
+        legend: { position: 'right', labels: { color: '#8ba3bc', padding: 8, boxWidth: 12 } },
+        tooltip: { backgroundColor: '#0d1117', borderColor: '#1e2d3d', borderWidth: 1 }
+      },
+      cutout: '62%'
+    }
+  });
+}
+
+// ===== RSI CHART =====
+function renderRsiChart() {
+  destroyChart('rsiChart');
+  const ctx = document.getElementById('rsiChart').getContext('2d');
+  const rsiData = [62, 58, 71, 65, 44, 38, 52, 61, 55, 49, 54, 48, 50];
+  const macdData = [1.2, 0.8, 2.1, 1.5, -0.4, -1.2, 0.3, 1.8, 1.5, 2.0, 2.5, 2.2, 2.34];
+  const labels = Array.from({length: 13}, (_, i) => `D-${12-i}`);
+  charts['rsiChart'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels,
+      datasets: [
+        {
+          label: 'RSI(14)',
+          data: rsiData,
+          borderColor: '#a78bfa',
+          backgroundColor: 'rgba(167,139,250,0.08)',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.4,
+          yAxisID: 'y',
+          fill: false
+        },
+        {
+          label: 'MACD',
+          data: macdData,
+          borderColor: '#00e5a0',
+          backgroundColor: 'rgba(0,229,160,0.08)',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.4,
+          yAxisID: 'y1',
+          fill: false
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      interaction: { mode: 'index', intersect: false },
+      plugins: { legend: { labels: { color: '#8ba3bc', boxWidth: 12 } } },
+      scales: {
+        x: { grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275' } },
+        y: { 
+          position: 'left', 
+          grid: { color: 'rgba(30,45,61,0.4)' }, 
+          ticks: { color: '#a78bfa' },
+          min: 20, max: 80
+        },
+        y1: { 
+          position: 'right', 
+          grid: { drawOnChartArea: false }, 
+          ticks: { color: '#00e5a0' }
+        }
+      },
+      plugins: {
+        annotation: {
+          annotations: {
+            ob: { type: 'line', yMin: 70, yMax: 70, borderColor: 'rgba(255,69,96,0.4)', borderWidth: 1, borderDash: [4,4] },
+            os: { type: 'line', yMin: 30, yMax: 30, borderColor: 'rgba(0,229,160,0.4)', borderWidth: 1, borderDash: [4,4] }
+          }
+        }
+      }
+    }
+  });
+}
+
+// ===== MA CHART =====
+function renderMaChart() {
+  destroyChart('maChart');
+  const ctx = document.getElementById('maChart').getContext('2d');
+  const prices2 = [11.2, 12.8, 14.1, 16.0, 17.5, 18.2, 19.4, 20.1, 22.5, 23.2, 23.2];
+  const sma20 = [null, null, null, null, null, null, null, 15.8, 16.9, 17.6, 17.6];
+  const sma50 = [null, null, null, null, null, null, null, null, 13.9, 14.7, 14.7];
+  const labels2 = ['Nov25','Dec25','Jan26_1','Jan26_2','Feb26','Mar26_1','Mar26_2','Mar26_3','Apr26_1','Apr26_2','Apr14'];
+  charts['maChart'] = new Chart(ctx, {
+    type: 'line',
+    data: {
+      labels: labels2,
+      datasets: [
+        { label: 'Prezzo', data: prices2, borderColor: '#e2eaf4', borderWidth: 2, pointRadius: 4, tension: 0.3 },
+        { label: 'SMA20', data: sma20, borderColor: '#00d4ff', borderWidth: 1.5, borderDash: [4,4], pointRadius: 0, tension: 0.4 },
+        { label: 'SMA50', data: sma50, borderColor: '#ffd60a', borderWidth: 1.5, borderDash: [6,3], pointRadius: 0, tension: 0.4 },
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#8ba3bc', boxWidth: 12 } } },
+      scales: {
+        x: { grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275' } },
+        y: { grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275', callback: v => '$'+v } }
+      }
+    }
+  });
+}
+
+// ===== SR CHART =====
+function renderSrChart() {
+  destroyChart('srChart');
+  const ctx = document.getElementById('srChart').getContext('2d');
+  const levels = [35.00, 28.50, 25.90, 23.22, 22.20, 19.84, 18.30, 15.13];
+  const colors = ['rgba(255,69,96,0.8)','rgba(255,69,96,0.7)','rgba(255,69,96,0.6)',
+    'rgba(0,212,255,1)','rgba(0,229,160,0.6)','rgba(0,229,160,0.7)','rgba(0,229,160,0.8)','rgba(0,229,160,1)'];
+  const names = ['R Forte $35','R Media $28.5','R Imm. $25.9','ATTUALE $23.2','S Imm. $22.2','SMA10 $19.84','EMA21 $18.3','S Forte $15.1'];
+  charts['srChart'] = new Chart(ctx, {
+    type: 'bar',
+    data: {
+      labels: names,
+      datasets: [{
+        data: levels,
+        backgroundColor: colors,
+        borderRadius: 3,
+        barThickness: 20
+      }]
+    },
+    options: {
+      indexAxis: 'y',
+      responsive: true,
+      plugins: { legend: { display: false } },
+      scales: {
+        x: { grid: { color: 'rgba(30,45,61,0.4)' }, ticks: { color: '#4a6275', callback: v => '$'+v }, min: 10, max: 40 },
+        y: { grid: { display: false }, ticks: { color: '#8ba3bc' } }
+      }
+    }
+  });
+}
+
+// ===== RADAR CHART =====
+function renderRadarChart() {
+  destroyChart('radarChart');
+  const ctx = document.getElementById('radarChart').getContext('2d');
+  charts['radarChart'] = new Chart(ctx, {
+    type: 'radar',
+    data: {
+      labels: ['Revenue Growth','Gross Margin','Financial Health','Valuation','Momentum Tecnico','Posizione SiC','R&D / Innovation','Mgmt Execution'],
+      datasets: [
+        {
+          label: 'WOLF',
+          data: [30, 10, 25, 55, 75, 95, 80, 40],
+          backgroundColor: 'rgba(0,229,160,0.15)',
+          borderColor: '#00e5a0',
+          pointBackgroundColor: '#00e5a0',
+          borderWidth: 2,
+          pointRadius: 4
+        },
+        {
+          label: 'ONNN (avg competitor)',
+          data: [50, 70, 65, 60, 55, 60, 65, 72],
+          backgroundColor: 'rgba(0,212,255,0.1)',
+          borderColor: '#00d4ff',
+          pointBackgroundColor: '#00d4ff',
+          borderWidth: 1.5,
+          borderDash: [4,3],
+          pointRadius: 3
+        }
+      ]
+    },
+    options: {
+      responsive: true,
+      plugins: { legend: { labels: { color: '#8ba3bc', boxWidth: 12 } } },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(30,45,61,0.5)' },
+          pointLabels: { color: '#8ba3bc', font: { size: 10 } },
+          ticks: { display: false }
+        }
+      }
+    }
+  });
+}
+
+// ===== SCREENER FILTER =====
+function filterTable(signal, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#tableBody tr').forEach(row => {
+    if (signal === 'all') {
+      row.style.display = '';
+    } else {
+      const s = row.getAttribute('data-signal');
+      row.style.display = s === signal ? '' : 'none';
+    }
+  });
+}
+
+function sortTable(by) {
+  const tbody = document.getElementById('tableBody');
+  const rows = Array.from(tbody.querySelectorAll('tr'));
+  rows.sort((a, b) => {
+    const va = parseFloat(a.getAttribute('data-' + by)) || 0;
+    const vb = parseFloat(b.getAttribute('data-' + by)) || 0;
+    return vb - va;
+  });
+  rows.forEach(r => tbody.appendChild(r));
+}
+
+// ===== RENDER MANAGEMENT =====
+const rendered = new Set();
+
+function renderChartsForTab(tabId) {
+  if (tabId === 'dashboard' && !rendered.has('dashboard')) {
+    rendered.add('dashboard');
+    renderPriceChart();
+    renderRevenueChart();
+    renderPerfChart();
+    renderMixChart();
+  }
+  if (tabId === 'technical' && !rendered.has('technical')) {
+    rendered.add('technical');
+    renderRsiChart();
+    renderMaChart();
+    renderSrChart();
+  }
+  if (tabId === 'screener' && !rendered.has('screener')) {
+    rendered.add('screener');
+    renderRadarChart();
+  }
+}
+
+// Init dashboard on load
+window.addEventListener('load', () => {
+  setTimeout(() => renderChartsForTab('dashboard'), 100);
+});
+</script>
+</body>
+</html>
