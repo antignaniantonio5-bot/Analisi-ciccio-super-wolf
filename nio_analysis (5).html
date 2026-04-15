@@ -1,0 +1,786 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NIO · Terminal</title>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600&family=IBM+Plex+Sans:wght@300;400;500&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg:#0a0c0f; --bg2:#0f1217; --bg3:#141820; --bg4:#1a2030;
+  --border:rgba(255,255,255,0.07); --border2:rgba(255,255,255,0.13);
+  --green:#00d97e; --red:#ff4d4d; --amber:#f5a623; --blue:#3b9eff;
+  --text:#e8e6e1; --muted:#6b7280; --muted2:#9ca3af;
+  --mono:'IBM Plex Mono',monospace; --sans:'IBM Plex Sans',sans-serif;
+}
+*{margin:0;padding:0;box-sizing:border-box;}
+body{background:var(--bg);color:var(--text);font-family:var(--mono);min-height:100vh;overflow-x:hidden;}
+body::before{content:'';position:fixed;inset:0;pointer-events:none;z-index:999;
+  background:repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.025) 2px,rgba(0,0,0,0.025) 4px);}
+
+/* HEADER */
+.hdr{border-bottom:1px solid var(--border);padding:13px 24px;display:flex;align-items:center;justify-content:space-between;background:var(--bg2);}
+.hdr-l{display:flex;align-items:center;gap:12px;}
+.ticker{font-size:20px;font-weight:600;letter-spacing:.08em;}
+.xbg{font-size:9px;padding:2px 7px;border:1px solid var(--border2);color:var(--muted2);letter-spacing:.1em;}
+.xbg.live{border-color:rgba(0,217,126,.3);color:var(--green);}
+.hdr-r{text-align:right;}
+.price{font-size:25px;font-weight:300;}
+.pchg{font-size:11px;color:var(--red);letter-spacing:.04em;}
+.pts{font-size:9px;color:var(--muted);letter-spacing:.07em;margin-top:2px;}
+
+/* TABBAR */
+.tabbar{display:flex;border-bottom:1px solid var(--border);background:var(--bg2);overflow-x:auto;}
+.tbtn{padding:10px 20px;font-family:var(--mono);font-size:9px;letter-spacing:.12em;text-transform:uppercase;
+  color:var(--muted);background:none;border:none;border-bottom:2px solid transparent;
+  cursor:pointer;transition:color .2s,border-color .2s;white-space:nowrap;}
+.tbtn:hover{color:var(--muted2);}
+.tbtn.on{color:var(--green);border-bottom-color:var(--green);}
+
+/* PANELS */
+.panel{display:none;}
+.panel.on{display:block;}
+
+/* SHARED */
+.shdr{font-size:8px;letter-spacing:.15em;color:var(--muted);text-transform:uppercase;
+  margin-bottom:10px;display:flex;align-items:center;gap:8px;}
+.shdr::after{content:'';flex:1;height:1px;background:var(--border);}
+.up{color:var(--green);} .dn{color:var(--red);} .am{color:var(--amber);}
+.mstrip{display:grid;grid-template-columns:repeat(5,1fr);border-bottom:1px solid var(--border);}
+.mc{padding:11px 16px;border-right:1px solid var(--border);}
+.mc:last-child{border-right:none;}
+.mc-l{font-size:8px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;}
+.mc-v{font-size:14px;font-weight:500;}
+
+/* ═══════════════════════════════════════
+   TAB 1 — DASHBOARD
+═══════════════════════════════════════ */
+.dash-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;}
+.kpi{background:var(--bg3);border:1px solid var(--border);padding:14px 16px;position:relative;overflow:hidden;}
+.kpi::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;}
+.kpi.g::before{background:var(--green);} .kpi.r::before{background:var(--red);} .kpi.a::before{background:var(--amber);} .kpi.b::before{background:var(--blue);}
+.kpi-lbl{font-size:8px;color:var(--muted);letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:300;margin-bottom:2px;}
+.kpi.g .kpi-val{color:var(--green);} .kpi.r .kpi-val{color:var(--red);} .kpi.a .kpi-val{color:var(--amber);} .kpi.b .kpi-val{color:var(--blue);}
+.kpi-sub{font-size:9px;color:var(--muted2);}
+
+.dash-charts{display:grid;grid-template-columns:2fr 1fr;gap:12px;}
+.chart-card{background:var(--bg3);border:1px solid var(--border);padding:14px 16px;}
+.chart-card-title{font-size:9px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:12px;}
+.ch280{position:relative;height:200px;width:100%;}
+.ch180{position:relative;height:160px;width:100%;}
+
+.dash-bottom{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;}
+
+.sig-box{background:var(--bg3);border:1px solid var(--border);padding:14px 16px;}
+.sig-ring-wrap{display:flex;align-items:center;gap:14px;margin-top:8px;}
+.sig-ring{position:relative;width:68px;height:68px;flex-shrink:0;}
+.sig-ring svg{transform:rotate(-90deg);}
+.sig-num{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:500;color:var(--green);}
+.sig-info{flex:1;}
+.sig-verdict{font-size:14px;font-weight:500;color:var(--green);}
+.sig-sub{font-size:9px;color:var(--muted2);margin-top:2px;}
+.sig-bars{margin-top:10px;display:flex;flex-direction:column;gap:4px;}
+.sb-row{display:flex;align-items:center;gap:6px;font-size:9px;color:var(--muted);}
+.sb-row span:last-child{min-width:60px;text-align:right;font-weight:500;}
+.sb-track{flex:1;height:3px;background:var(--border2);}
+.sb-fill{height:100%;}
+
+/* ═══════════════════════════════════════
+   TAB 2 — ANALISI TECNICA
+═══════════════════════════════════════ */
+.ta-body{display:grid;grid-template-columns:1fr 300px;}
+.ta-l{border-right:1px solid var(--border);padding:16px 20px;display:flex;flex-direction:column;gap:14px;}
+.ta-r{background:var(--bg2);padding:16px;}
+
+.osc-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.osc{background:var(--bg3);border:1px solid var(--border);padding:9px 11px;}
+.osc-nm{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
+.osc-val{font-size:13px;font-weight:500;margin-bottom:3px;}
+.osc-bar-wrap{height:3px;background:var(--border2);margin-bottom:4px;}
+.osc-bar{height:100%;}
+.osc-sig{font-size:7px;padding:1px 5px;letter-spacing:.07em;display:inline-block;}
+.osc-sig.bull{background:rgba(0,217,126,.12);color:var(--green);}
+.osc-sig.bear{background:rgba(255,77,77,.12);color:var(--red);}
+.osc-sig.warn{background:rgba(245,166,35,.12);color:var(--amber);}
+
+.ma-table{display:flex;flex-direction:column;gap:0;}
+.ma-row{display:flex;align-items:center;gap:8px;padding:5px 0;border-bottom:1px solid var(--border);font-size:10px;}
+.ma-row:last-child{border-bottom:none;}
+.ma-nm{min-width:88px;color:var(--muted2);}
+.ma-vl{min-width:44px;font-weight:500;}
+.ma-bw{flex:1;height:3px;background:var(--border2);}
+.ma-bf{height:100%;}
+.ma-sg{font-size:8px;min-width:90px;text-align:right;}
+.ma-sg.bull{color:var(--green);} .ma-sg.bear{color:var(--red);} .ma-sg.warn{color:var(--amber);}
+
+.pat-list{display:flex;flex-direction:column;gap:6px;}
+.pat-item{display:flex;gap:10px;padding:10px 12px;background:var(--bg3);border:1px solid var(--border);position:relative;overflow:hidden;}
+.pat-item::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;}
+.pat-item.bull::before{background:var(--green);} .pat-item.bear::before{background:var(--red);} .pat-item.neu::before{background:var(--amber);}
+.pat-tag{font-size:8px;letter-spacing:.1em;text-transform:uppercase;min-width:52px;padding-top:1px;}
+.pat-item.bull .pat-tag{color:var(--green);} .pat-item.bear .pat-tag{color:var(--red);} .pat-item.neu .pat-tag{color:var(--amber);}
+.pat-body{flex:1;}
+.pat-title{font-size:11px;font-weight:500;margin-bottom:2px;}
+.pat-desc{font-size:9px;color:var(--muted2);line-height:1.45;font-family:var(--sans);font-weight:300;}
+
+.sr-list{display:flex;flex-direction:column;gap:5px;}
+.sr-item{display:flex;align-items:center;justify-content:space-between;padding:7px 10px;background:var(--bg3);border:1px solid var(--border);}
+.sr-left{display:flex;align-items:center;gap:8px;}
+.sr-dot{width:6px;height:6px;border-radius:50%;}
+.sr-label{font-size:9px;color:var(--muted2);}
+.sr-price{font-size:13px;font-weight:500;}
+.sr-note{font-size:8px;color:var(--muted);}
+
+/* ═══════════════════════════════════════
+   TAB 3 — SCREENER
+═══════════════════════════════════════ */
+.scr-body{padding:20px 24px;display:flex;flex-direction:column;gap:16px;}
+.scr-filters{display:flex;gap:8px;margin-bottom:4px;}
+.flt{padding:5px 14px;font-family:var(--mono);font-size:9px;letter-spacing:.1em;text-transform:uppercase;
+  background:var(--bg3);border:1px solid var(--border);color:var(--muted);cursor:pointer;transition:all .2s;}
+.flt:hover{border-color:var(--border2);color:var(--muted2);}
+.flt.on{background:rgba(0,217,126,.08);border-color:rgba(0,217,126,.3);color:var(--green);}
+.flt.on-bear{background:rgba(255,77,77,.08);border-color:rgba(255,77,77,.3);color:var(--red);}
+.flt.on-hold{background:rgba(245,166,35,.08);border-color:rgba(245,166,35,.3);color:var(--amber);}
+
+.scr-table{width:100%;border-collapse:collapse;font-size:11px;}
+.scr-table th{font-size:8px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);padding:8px 10px;text-align:left;border-bottom:1px solid var(--border);font-weight:400;}
+.scr-table td{padding:9px 10px;border-bottom:1px solid var(--border);color:var(--muted2);}
+.scr-table tr:last-child td{border-bottom:none;}
+.scr-table tr:hover td{background:var(--bg3);}
+.scr-table .ticker-cell{color:var(--text);font-weight:500;}
+.sig-pill{font-size:8px;padding:2px 8px;letter-spacing:.07em;display:inline-block;}
+.sig-pill.buy{background:rgba(0,217,126,.12);color:var(--green);}
+.sig-pill.hold{background:rgba(245,166,35,.12);color:var(--amber);}
+.sig-pill.sell{background:rgba(255,77,77,.12);color:var(--red);}
+
+.scr-bottom{display:grid;grid-template-columns:1fr 1fr;gap:14px;}
+.radar-card{background:var(--bg3);border:1px solid var(--border);padding:14px 16px;}
+.radar-wrap{position:relative;height:220px;width:100%;}
+
+/* ═══════════════════════════════════════
+   TAB 4 — REPORT
+═══════════════════════════════════════ */
+.rep-body{display:grid;grid-template-columns:1fr 280px;}
+.rep-l{padding:24px 28px;border-right:1px solid var(--border);}
+.rep-r{background:var(--bg2);padding:18px;}
+.rep-title{font-size:18px;font-weight:300;color:var(--text);margin-bottom:4px;line-height:1.3;}
+.rep-sub{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:20px;}
+.rep-section-title{font-size:9px;color:var(--green);letter-spacing:.15em;text-transform:uppercase;margin:18px 0 8px;display:flex;align-items:center;gap:8px;}
+.rep-section-title::after{content:'';flex:1;height:1px;background:rgba(0,217,126,.15);}
+.rep-p{font-size:11px;color:var(--muted2);line-height:1.75;font-family:var(--sans);font-weight:300;margin-bottom:10px;}
+.rep-p strong{color:var(--text);font-weight:500;}
+
+.scenario-grid{display:flex;flex-direction:column;gap:8px;margin-top:12px;}
+.scen{padding:12px 14px;border:1px solid var(--border);position:relative;overflow:hidden;}
+.scen::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;}
+.scen.bull::before{background:var(--green);} .scen.base::before{background:var(--amber);} .scen.bear::before{background:var(--red);}
+.scen-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;}
+.scen-name{font-size:9px;letter-spacing:.12em;text-transform:uppercase;font-weight:500;}
+.scen.bull .scen-name{color:var(--green);} .scen.base .scen-name{color:var(--amber);} .scen.bear .scen-name{color:var(--red);}
+.scen-target{font-size:14px;font-weight:500;}
+.scen.bull .scen-target{color:var(--green);} .scen.base .scen-target{color:var(--amber);} .scen.bear .scen-target{color:var(--red);}
+.scen-prob{font-size:8px;color:var(--muted);}
+.scen-desc{font-size:9px;color:var(--muted2);line-height:1.5;font-family:var(--sans);font-weight:300;}
+
+.rep-meta{display:flex;flex-direction:column;gap:8px;}
+.meta-item{padding:8px 10px;background:var(--bg3);border:1px solid var(--border);}
+.meta-k{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
+.meta-v{font-size:12px;font-weight:500;}
+.meta-v.up{color:var(--green);} .meta-v.dn{color:var(--red);} .meta-v.am{color:var(--amber);}
+
+/* ═══════════════════════════════════════
+   TAB 5 — ANALISI MERCATO (ex tab1)
+═══════════════════════════════════════ */
+.t5body{display:grid;grid-template-columns:1fr 310px;}
+.t5l{border-right:1px solid var(--border);}
+.t5r{background:var(--bg2);}
+.chart-area{padding:16px 20px;}
+.clbl{font-size:9px;color:var(--muted);letter-spacing:.1em;margin-bottom:10px;display:flex;align-items:center;gap:6px;}
+.clbl::before{content:'';width:3px;height:3px;background:var(--green);border-radius:50%;animation:blink 1.5s ease-in-out infinite;}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.cwrap{position:relative;height:200px;width:100%;}
+.vwrap{position:relative;height:48px;width:100%;margin-top:5px;}
+.srleg{display:flex;gap:14px;margin-top:8px;font-size:9px;color:var(--muted);}
+.sri{display:flex;align-items:center;gap:5px;}
+.patsec{border-top:1px solid var(--border);padding:14px 20px;}
+.pgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;}
+.pc{background:var(--bg3);border:1px solid var(--border);padding:9px 10px;position:relative;overflow:hidden;transition:border-color .2s;}
+.pc:hover{border-color:var(--border2);}
+.pc::before{content:'';position:absolute;top:0;left:0;width:2px;height:100%;}
+.pc.bull::before{background:var(--green);} .pc.bear::before{background:var(--red);} .pc.neu::before{background:var(--amber);}
+.pc-tp{font-size:7px;letter-spacing:.12em;text-transform:uppercase;margin-bottom:2px;}
+.pc.bull .pc-tp{color:var(--green);} .pc.bear .pc-tp{color:var(--red);} .pc.neu .pc-tp{color:var(--amber);}
+.pc-nm{font-size:10px;font-weight:500;margin-bottom:2px;line-height:1.3;}
+.pc-ds{font-size:9px;color:var(--muted2);line-height:1.4;font-family:var(--sans);font-weight:300;}
+.trendsec{padding:14px 14px;border-bottom:1px solid var(--border);}
+.srow{display:flex;align-items:center;gap:10px;margin:8px 0;}
+.sring{position:relative;width:56px;height:56px;flex-shrink:0;}
+.sring svg{transform:rotate(-90deg);}
+.snum{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:500;color:var(--green);}
+.sinfo{flex:1;}
+.slbl{font-size:7px;letter-spacing:.1em;color:var(--muted);text-transform:uppercase;}
+.sverd{font-size:12px;font-weight:500;color:var(--green);margin-top:1px;}
+.ssub{font-size:9px;color:var(--muted2);}
+.gwrap{margin-top:6px;}
+.grow{display:flex;justify-content:space-between;font-size:9px;color:var(--muted);margin-bottom:3px;}
+.gval{font-weight:500;}
+.gtrack{height:3px;background:var(--border2);margin-bottom:7px;}
+.gfill{height:100%;}
+.catsec{padding:12px 14px;border-bottom:1px solid var(--border);}
+.citem{display:flex;gap:7px;padding:6px 0;border-bottom:1px solid var(--border);}
+.citem:last-child{border-bottom:none;}
+.cdt{font-size:8px;color:var(--muted);letter-spacing:.05em;min-width:38px;padding-top:2px;}
+.cbody{flex:1;}
+.cion{font-size:7px;padding:1px 5px;letter-spacing:.07em;display:inline-block;margin-bottom:1px;}
+.cion.pos{background:rgba(0,217,126,.1);color:var(--green);}
+.cion.warn{background:rgba(245,166,35,.1);color:var(--amber);}
+.ctxt{font-size:9px;color:var(--muted2);line-height:1.4;font-family:var(--sans);font-weight:300;}
+.conssec{padding:12px 14px;}
+.cbar{display:flex;height:4px;overflow:hidden;gap:2px;margin:7px 0 5px;}
+.cb-b{background:var(--green);flex:7;} .cb-h{background:var(--amber);flex:2;} .cb-s{background:var(--red);flex:1;}
+.cleg{display:flex;gap:10px;font-size:8px;color:var(--muted);}
+.cli{display:flex;align-items:center;gap:3px;}
+.cldot{width:5px;height:5px;border-radius:1px;}
+.tline{margin-top:8px;padding:7px 9px;background:rgba(0,217,126,.05);border:1px solid rgba(0,217,126,.15);display:flex;justify-content:space-between;align-items:center;}
+.tl-l{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+.tl-u{font-size:8px;color:var(--green);}
+.tl-p{font-size:16px;font-weight:500;color:var(--green);}
+
+/* ═══════════════════════════════════════
+   TAB 6 — ANALISI CHART (ex tab2)
+═══════════════════════════════════════ */
+.t6body{display:grid;grid-template-columns:1fr 1fr;}
+.t6col{border-right:1px solid var(--border);}
+.t6col:last-child{border-right:none;}
+.vpsec{padding:14px 18px;border-bottom:1px solid var(--border);}
+.vpi{display:flex;gap:8px;padding:7px 9px;border:1px solid var(--border);background:var(--bg3);margin-bottom:4px;position:relative;overflow:hidden;}
+.vpi:last-child{margin-bottom:0;}
+.vpi::before{content:'';position:absolute;left:0;top:0;bottom:0;width:2px;}
+.vpi.bull::before{background:var(--green);} .vpi.bear::before{background:var(--red);} .vpi.neu::before{background:var(--amber);}
+.vtag{font-size:7px;letter-spacing:.1em;text-transform:uppercase;min-width:46px;padding-top:1px;}
+.vpi.bull .vtag{color:var(--green);} .vpi.bear .vtag{color:var(--red);} .vpi.neu .vtag{color:var(--amber);}
+.vbody{flex:1;}
+.vtitle{font-size:10px;font-weight:500;margin-bottom:2px;}
+.vdesc{font-size:9px;color:var(--muted2);line-height:1.4;font-family:var(--sans);font-weight:300;}
+.indsec{padding:14px 18px;border-bottom:1px solid var(--border);}
+.igrid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;}
+.icell{background:var(--bg3);border:1px solid var(--border);padding:6px 8px;}
+.iname{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
+.ival{font-size:11px;font-weight:500;margin-bottom:2px;}
+.ibadge{font-size:7px;padding:1px 5px;letter-spacing:.05em;display:inline-block;}
+.ibadge.bull{background:rgba(0,217,126,.12);color:var(--green);} .ibadge.bear{background:rgba(255,77,77,.12);color:var(--red);} .ibadge.warn{background:rgba(245,166,35,.12);color:var(--amber);}
+.masec2{padding:14px 18px;border-bottom:1px solid var(--border);}
+.marow2{display:flex;align-items:center;gap:7px;padding:4px 0;border-bottom:1px solid var(--border);font-size:10px;}
+.marow2:last-child{border-bottom:none;}
+.manm2{min-width:86px;color:var(--muted2);}
+.mavl2{min-width:40px;font-weight:500;}
+.mabw2{flex:1;height:3px;background:var(--border2);}
+.mabf2{height:100%;}
+.masig2{font-size:8px;min-width:90px;text-align:right;}
+.masig2.bull{color:var(--green);} .masig2.bear{color:var(--red);} .masig2.warn{color:var(--amber);}
+.levsec{padding:14px 18px;border-bottom:1px solid var(--border);}
+.lgrid{display:grid;grid-template-columns:repeat(2,1fr);gap:5px;}
+.lc{padding:7px 9px;border:1px solid var(--border);text-align:center;}
+.lct{font-size:7px;letter-spacing:.1em;text-transform:uppercase;margin-bottom:2px;}
+.lcp{font-size:15px;font-weight:500;margin-bottom:1px;}
+.lcn{font-size:8px;color:var(--muted);}
+.lc.res{border-color:rgba(255,77,77,.25);} .lc.res .lct{color:var(--red);} .lc.res .lcp{color:var(--red);}
+.lc.s1{border-color:rgba(245,166,35,.25);} .lc.s1 .lct{color:var(--amber);} .lc.s1 .lcp{color:var(--amber);}
+.lc.s2 .lct{color:var(--muted);} .lc.s2 .lcp{color:var(--muted2);}
+.verdsec{padding:14px 18px;}
+.vbox{padding:11px 13px;border:1px solid rgba(0,217,126,.2);background:rgba(0,217,126,.04);display:flex;justify-content:space-between;align-items:center;}
+.vbt{font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;}
+.vbv{font-size:13px;font-weight:500;color:var(--green);margin-top:2px;}
+.vbc{font-size:8px;color:var(--muted);margin-top:2px;}
+.vbs{font-size:26px;font-weight:300;color:var(--green);}
+.vbsl{font-size:8px;color:var(--muted);text-align:right;}
+
+/* FOOTER */
+.footer{border-top:1px solid var(--border);padding:8px 24px;font-size:8px;color:var(--muted);letter-spacing:.06em;display:flex;justify-content:space-between;background:var(--bg2);}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-l">
+    <span class="ticker">NIO</span>
+    <span class="xbg">NYSE · ADR</span>
+    <span class="xbg">EV · CHINA</span>
+    <span class="xbg live">● LIVE</span>
+  </div>
+  <div class="hdr-r">
+    <div class="price">$6.50 <span style="font-size:13px;color:var(--green)">▲ +0.43 (+7.08%)</span></div>
+    <div class="pchg" style="color:var(--muted2)">H: 6.63 · L: 6.10 · C: 6.50 · 10 APR 2026</div>
+    <div class="pts">TIMEFRAME 1D · NYSE: NIO · HKEX: 9866 · SGX: NIO</div>
+  </div>
+</div>
+
+<div class="tabbar">
+  <button class="tbtn on"  onclick="sw('t1',this)">01 · Dashboard</button>
+  <button class="tbtn"     onclick="sw('t2',this)">02 · Analisi tecnica</button>
+  <button class="tbtn"     onclick="sw('t3',this)">03 · Screener</button>
+  <button class="tbtn"     onclick="sw('t4',this)">04 · Report</button>
+  <button class="tbtn"     onclick="sw('t5',this)">05 · Analisi mercato</button>
+  <button class="tbtn"     onclick="sw('t6',this)">06 · Analisi chart</button>
+</div>
+
+<!-- ══════════════════ TAB 1 — DASHBOARD ══════════════════ -->
+<div id="t1" class="panel on">
+  <div class="dash-body">
+    <div class="kpi-grid">
+      <div class="kpi g"><div class="kpi-lbl">Prezzo attuale</div><div class="kpi-val">$6.50</div><div class="kpi-sub">+7.08% · 10 apr 2026</div></div>
+      <div class="kpi a"><div class="kpi-lbl">Market Cap</div><div class="kpi-val">$15.4B</div><div class="kpi-sub">+96% YoY consegne Q1</div></div>
+      <div class="kpi b"><div class="kpi-lbl">Revenue 2025</div><div class="kpi-val">¥87.5B</div><div class="kpi-sub">+33.1% YoY</div></div>
+      <div class="kpi g"><div class="kpi-lbl">Primo profitto</div><div class="kpi-val">Q4 '25</div><div class="kpi-sub">Net income $17.3M</div></div>
+    </div>
+
+    <div class="dash-charts">
+      <div class="chart-card">
+        <div class="chart-card-title">Andamento prezzo 2025–2026 (1D)</div>
+        <div class="ch280"><canvas id="dashPrice"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Revenue trimestrale (¥B)</div>
+        <div class="ch180"><canvas id="dashRev"></canvas></div>
+      </div>
+    </div>
+
+    <div class="dash-bottom">
+      <div class="chart-card">
+        <div class="chart-card-title">Performance comparata YTD (%)</div>
+        <div class="ch180"><canvas id="dashPerf"></canvas></div>
+      </div>
+      <div class="chart-card">
+        <div class="chart-card-title">Mix ricavi 2025</div>
+        <div class="ch180"><canvas id="dashMix"></canvas></div>
+      </div>
+      <div class="sig-box">
+        <div class="shdr">Segnale tecnico complessivo</div>
+        <div class="sig-ring-wrap">
+          <div class="sig-ring">
+            <svg width="68" height="68" viewBox="0 0 68 68">
+              <circle cx="34" cy="34" r="27" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/>
+              <circle cx="34" cy="34" r="27" fill="none" stroke="#00d97e" stroke-width="5" stroke-dasharray="170" stroke-dashoffset="31" stroke-linecap="round"/>
+            </svg>
+            <div class="sig-num">82</div>
+          </div>
+          <div class="sig-info">
+            <div class="sig-verdict">Strong Buy</div>
+            <div class="sig-sub">6 bull · 2 bear · 4 neutri</div>
+            <div class="sig-sub">7.08 / 10 · StockInvest</div>
+          </div>
+        </div>
+        <div class="sig-bars">
+          <div class="sb-row"><span>Oscillatori</span><div class="sb-track"><div class="sb-fill" style="width:72%;background:var(--green);"></div></div><span class="up">Buy</span></div>
+          <div class="sb-row"><span>Medie mobili</span><div class="sb-track"><div class="sb-fill" style="width:82%;background:var(--green);"></div></div><span class="up">Strong Buy</span></div>
+          <div class="sb-row"><span>Pattern visivi</span><div class="sb-track"><div class="sb-fill" style="width:65%;background:var(--green);"></div></div><span class="up">Bullish</span></div>
+          <div class="sb-row"><span>Fondamentali</span><div class="sb-track"><div class="sb-fill" style="width:58%;background:var(--amber);"></div></div><span class="am">Neutro+</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 2 — ANALISI TECNICA ══════════════════ -->
+<div id="t2" class="panel">
+  <div class="mstrip">
+    <div class="mc"><div class="mc-l">RSI (14)</div><div class="mc-v up">62.16</div></div>
+    <div class="mc"><div class="mc-l">MACD</div><div class="mc-v up">0.0691</div></div>
+    <div class="mc"><div class="mc-l">Stoch %K</div><div class="mc-v am">77.55</div></div>
+    <div class="mc"><div class="mc-l">CCI (20)</div><div class="mc-v dn">168.11</div></div>
+    <div class="mc"><div class="mc-l">ATR (14)</div><div class="mc-v">$0.2884</div></div>
+  </div>
+  <div class="ta-body">
+    <div class="ta-l">
+      <div>
+        <div class="shdr">Oscillatori</div>
+        <div class="osc-grid">
+          <div class="osc"><div class="osc-nm">RSI (14)</div><div class="osc-val up">62.16</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:62%;background:var(--green);"></div></div><span class="osc-sig bull">Bullish · non saturo</span></div>
+          <div class="osc"><div class="osc-nm">Stoch %K/%D</div><div class="osc-val am">77/82</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:77%;background:var(--amber);"></div></div><span class="osc-sig warn">Ipercomprato</span></div>
+          <div class="osc"><div class="osc-nm">CCI (20)</div><div class="osc-val dn">168.11</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:84%;background:var(--red);"></div></div><span class="osc-sig bear">Zona estrema</span></div>
+          <div class="osc"><div class="osc-nm">MACD</div><div class="osc-val up">0.0691</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:55%;background:var(--green);"></div></div><span class="osc-sig bull">Positivo</span></div>
+          <div class="osc"><div class="osc-nm">MACD Signal</div><div class="osc-val am">0.1191</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:59%;background:var(--amber);"></div></div><span class="osc-sig warn">Sotto signal</span></div>
+          <div class="osc"><div class="osc-nm">Momentum</div><div class="osc-val up">0.4600</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:68%;background:var(--green);"></div></div><span class="osc-sig bull">Forte</span></div>
+          <div class="osc"><div class="osc-nm">OBV</div><div class="osc-val">5.03B</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:50%;background:var(--amber);"></div></div><span class="osc-sig warn">Piatto — div.</span></div>
+          <div class="osc"><div class="osc-nm">Accum/Dist</div><div class="osc-val up">1.68B</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:72%;background:var(--green);"></div></div><span class="osc-sig bull">Accumulazione</span></div>
+          <div class="osc"><div class="osc-nm">Awesome Osc.</div><div class="osc-val up">0.3456</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:65%;background:var(--green);"></div></div><span class="osc-sig bull">Bullish</span></div>
+          <div class="osc"><div class="osc-nm">ATR (14)</div><div class="osc-val">0.2884</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:42%;background:var(--muted);"></div></div><span class="osc-sig warn">±$0.29/gg</span></div>
+          <div class="osc"><div class="osc-nm">BB %b</div><div class="osc-val am">0.94</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:94%;background:var(--amber);"></div></div><span class="osc-sig warn">Banda alta</span></div>
+          <div class="osc"><div class="osc-nm">ADL</div><div class="osc-val up">1,769</div><div class="osc-bar-wrap"><div class="osc-bar" style="width:70%;background:var(--green);"></div></div><span class="osc-sig bull">Bullish</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="shdr">Medie mobili — posizione prezzo</div>
+        <div class="ma-table">
+          <div class="ma-row"><span class="ma-nm">EMA veloce</span><span class="ma-vl up">$5.15</span><div class="ma-bw"><div class="ma-bf" style="width:75%;background:var(--green);"></div></div><span class="ma-sg bull">Prezzo sopra ↑</span></div>
+          <div class="ma-row"><span class="ma-nm">EMA media</span><span class="ma-vl up">$5.28</span><div class="ma-bw"><div class="ma-bf" style="width:65%;background:var(--green);"></div></div><span class="ma-sg bull">Prezzo sopra ↑</span></div>
+          <div class="ma-row"><span class="ma-nm">SMA 5.29</span><span class="ma-vl am">$5.29</span><div class="ma-bw"><div class="ma-bf" style="width:52%;background:var(--amber);"></div></div><span class="ma-sg warn">Test in corso</span></div>
+          <div class="ma-row"><span class="ma-nm">SMA lenta</span><span class="ma-vl am">$5.40</span><div class="ma-bw"><div class="ma-bf" style="width:42%;background:var(--amber);"></div></div><span class="ma-sg warn">Resistenza chiave</span></div>
+          <div class="ma-row"><span class="ma-nm">EMA lenta</span><span class="ma-vl up">$5.07</span><div class="ma-bw"><div class="ma-bf" style="width:82%;background:var(--green);"></div></div><span class="ma-sg bull">Supporto dinamico</span></div>
+          <div class="ma-row"><span class="ma-nm">Vol EMA media</span><span class="ma-vl dn">57.1M</span><div class="ma-bw"><div class="ma-bf" style="width:36%;background:var(--red);"></div></div><span class="ma-sg bear">Volume sotto media</span></div>
+        </div>
+      </div>
+
+      <div>
+        <div class="shdr">4 Pattern riconosciuti</div>
+        <div class="pat-list">
+          <div class="pat-item bull"><span class="pat-tag">Bullish</span><div class="pat-body"><div class="pat-title">Cup & Handle</div><div class="pat-desc">Tazza con fondo $3.02 (ott 2024), bordo sinistro ~$8. Manico in compressione a $5.50. Breakout sopra $5.70 → target $7.50–$8.00. Probabilità di completamento: alta.</div></div></div>
+          <div class="pat-item bull"><span class="pat-tag">Bullish</span><div class="pat-body"><div class="pat-title">Higher Lows — uptrend strutturale</div><div class="pat-desc">Sequenza di minimi crescenti dal bottom $3.02. Ogni correzione assorbita a livello più alto. Conferma pressione rialzista strutturale sul D1. Trend intatto finché $4.78 non viene violato.</div></div></div>
+          <div class="pat-item bull"><span class="pat-tag">Bullish</span><div class="pat-body"><div class="pat-title">Golden Cross EMA</div><div class="pat-desc">EMA veloci (5.15/5.28) incrociate al rialzo le SMA lente. Prezzo sopra tutto il cluster di medie. Configurazione bullish confermata. Segnale valido finché EMA lenta $5.07 regge.</div></div></div>
+          <div class="pat-item neu"><span class="pat-tag">Neutro</span><div class="pat-body"><div class="pat-title">Compressione SMA $5.29–$5.40</div><div class="pat-desc">Zona di resistenza densa (rettangolo viola nel chart). Il prezzo lateralizza in questa fascia con volume calante — classica compressione pre-breakout. Direzione determinata dal volume di rottura.</div></div></div>
+        </div>
+      </div>
+    </div>
+
+    <div class="ta-r">
+      <div class="shdr">Supporti e resistenze</div>
+      <div class="sr-list">
+        <div class="sr-item"><div class="sr-left"><div class="sr-dot" style="background:var(--red)"></div><div class="sr-label">Resistenza 52W</div></div><div style="text-align:right"><div class="sr-price dn">$8.02</div><div class="sr-note">52W High — target cup</div></div></div>
+        <div class="sr-item"><div class="sr-left"><div class="sr-dot" style="background:var(--red)"></div><div class="sr-label">Resistenza SMA</div></div><div style="text-align:right"><div class="sr-price dn">$5.40</div><div class="sr-note">SMA cluster — nodo chiave</div></div></div>
+        <div class="sr-item"><div class="sr-left"><div class="sr-dot" style="background:var(--red)"></div><div class="sr-label">Breakout target</div></div><div style="text-align:right"><div class="sr-price dn">$5.70</div><div class="sr-note">Conferma breakout</div></div></div>
+        <div class="sr-item" style="border:1px solid rgba(0,217,126,.2)"><div class="sr-left"><div class="sr-dot" style="background:var(--green)"></div><div class="sr-label">Prezzo attuale</div></div><div style="text-align:right"><div class="sr-price up">$5.54</div><div class="sr-note">Posizione corrente</div></div></div>
+        <div class="sr-item"><div class="sr-left"><div class="sr-dot" style="background:var(--amber)"></div><div class="sr-label">SAR pivot</div></div><div style="text-align:right"><div class="sr-price am">$5.31</div><div class="sr-note">Soglia critica Parabolic</div></div></div>
+        <div class="sr-item"><div class="sr-left"><div class="sr-dot" style="background:var(--amber)"></div><div class="sr-label">Supporto 1</div></div><div style="text-align:right"><div class="sr-price am">$5.07</div><div class="sr-note">EMA lenta dinamica</div></div></div>
+        <div class="sr-item"><div class="sr-left"><div class="sr-dot" style="background:var(--muted)"></div><div class="sr-label">Supporto 2</div></div><div style="text-align:right"><div class="sr-price">$4.78</div><div class="sr-note">Volume cluster</div></div></div>
+        <div class="sr-item"><div class="sr-left"><div class="sr-dot" style="background:var(--muted)"></div><div class="sr-label">Bottom strutturale</div></div><div style="text-align:right"><div class="sr-price">$3.02</div><div class="sr-note">52W Low — base tazza</div></div></div>
+      </div>
+
+      <div style="margin-top:14px;">
+        <div class="shdr">Livello di rischio</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-top:6px;">
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:8px 10px;">
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;">Stop Loss</div>
+            <div style="font-size:14px;font-weight:500;color:var(--red);">$5.28</div>
+            <div style="font-size:8px;color:var(--muted);">Sotto EMA media</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:8px 10px;">
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;">Target 1</div>
+            <div style="font-size:14px;font-weight:500;color:var(--green);">$6.73</div>
+            <div style="font-size:8px;color:var(--muted);">Consensus analisti</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:8px 10px;">
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;">Target 2</div>
+            <div style="font-size:14px;font-weight:500;color:var(--green);">$7.50</div>
+            <div style="font-size:8px;color:var(--muted);">Cup & Handle</div>
+          </div>
+          <div style="background:var(--bg3);border:1px solid var(--border);padding:8px 10px;">
+            <div style="font-size:7px;color:var(--muted);letter-spacing:.1em;text-transform:uppercase;margin-bottom:3px;">R/R Ratio</div>
+            <div style="font-size:14px;font-weight:500;color:var(--amber);">1 : 4.6</div>
+            <div style="font-size:8px;color:var(--muted);">Stop $5.28 / T $7.50</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 3 — SCREENER ══════════════════ -->
+<div id="t3" class="panel">
+  <div class="scr-body">
+    <div>
+      <div class="shdr">Filtro segnale</div>
+      <div class="scr-filters">
+        <button class="flt on" onclick="filterTable('all',this)">Tutti</button>
+        <button class="flt" onclick="filterTable('buy',this)" id="f-buy">Buy</button>
+        <button class="flt" onclick="filterTable('hold',this)" id="f-hold">Hold</button>
+        <button class="flt" onclick="filterTable('sell',this)" id="f-sell">Sell</button>
+      </div>
+    </div>
+
+    <table class="scr-table" id="scrTable">
+      <thead>
+        <tr>
+          <th>Ticker</th><th>Nome</th><th>Prezzo</th><th>YTD</th><th>P/S</th>
+          <th>Gross Margin</th><th>Consegne YoY</th><th>Profittabilità</th><th>Score</th><th>Segnale</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr data-sig="buy"><td class="ticker-cell">NIO</td><td>NIO Inc.</td><td class="up">$5.54</td><td class="up">+13.5%</td><td>1.2x</td><td class="am">13.7%</td><td class="up">+136%</td><td class="up">Q4 '25 ✓</td><td class="up">82</td><td><span class="sig-pill buy">BUY</span></td></tr>
+        <tr data-sig="buy"><td class="ticker-cell">XPEV</td><td>XPeng Inc.</td><td class="up">$18.42</td><td class="up">+22.1%</td><td>1.8x</td><td class="am">15.2%</td><td class="up">+148%</td><td class="dn">In perdita</td><td class="up">74</td><td><span class="sig-pill buy">BUY</span></td></tr>
+        <tr data-sig="buy"><td class="ticker-cell">LI</td><td>Li Auto Inc.</td><td class="up">$18.38</td><td class="up">+18.3%</td><td>0.9x</td><td class="up">21.5%</td><td class="up">+31%</td><td class="up">Profitto ✓</td><td class="up">79</td><td><span class="sig-pill buy">BUY</span></td></tr>
+        <tr data-sig="hold"><td class="ticker-cell">TSLA</td><td>Tesla Inc.</td><td class="dn">$281.33</td><td class="dn">-14.2%</td><td>7.2x</td><td class="up">18.2%</td><td class="dn">-13%</td><td class="up">Profitto ✓</td><td class="am">58</td><td><span class="sig-pill hold">HOLD</span></td></tr>
+        <tr data-sig="hold"><td class="ticker-cell">RIVN</td><td>Rivian Auto.</td><td class="dn">$13.22</td><td class="dn">-8.7%</td><td>2.1x</td><td class="dn">4.2%</td><td class="up">+52%</td><td class="dn">In perdita</td><td class="am">51</td><td><span class="sig-pill hold">HOLD</span></td></tr>
+        <tr data-sig="sell"><td class="ticker-cell">LCID</td><td>Lucid Group</td><td class="dn">$2.87</td><td class="dn">-31.4%</td><td>8.4x</td><td class="dn">-78%</td><td class="up">+37%</td><td class="dn">In perdita</td><td class="dn">28</td><td><span class="sig-pill sell">SELL</span></td></tr>
+      </tbody>
+    </table>
+
+    <div class="scr-bottom">
+      <div class="radar-card">
+        <div class="shdr">Radar fondamentale — NIO vs peer</div>
+        <div class="radar-wrap"><canvas id="radarChart"></canvas></div>
+      </div>
+      <div class="radar-card">
+        <div class="shdr">Performance comparata 30 giorni (%)</div>
+        <div class="radar-wrap"><canvas id="perfBar"></canvas></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 4 — REPORT ══════════════════ -->
+<div id="t4" class="panel">
+  <div class="rep-body">
+    <div class="rep-l">
+      <div class="rep-title">NIO Inc. — Analisi Tecnica e Fondamentale</div>
+      <div class="rep-sub">TIMEFRAME 1D · AGGIORNATO AL 3 APR 2026 · NYSE: NIO</div>
+
+      <div class="rep-section-title">Sintesi</div>
+      <div class="rep-p">NIO si trova in un momento di svolta strutturale. Dopo aver toccato il minimo a <strong>$3.02</strong> nell'ottobre 2024, il titolo ha costruito una base lunga circa sei mesi che si è progressivamente trasformata in una struttura di <strong>Cup & Handle</strong>, pattern tra i più affidabili in analisi tecnica per segnalare la ripresa di un trend rialzista primario. L'attuale fase di compressione nella zona <strong>$5.29–$5.40</strong> rappresenta il manico della tazza: una fase di pressione ribassista moderata che anticipa statisticamente un breakout direzionale.</div>
+      <div class="rep-p">Sul piano fondamentale, la svolta è altrettanto rilevante: NIO ha riportato il suo <strong>primo profitto trimestrale nella storia</strong> nel Q4 2025, con un utile netto di $17.3M. Le consegne di marzo 2026 hanno segnato un +136% anno su anno (35.486 veicoli), portando il totale Q1 2026 a 83.465 unità, superiore alle aspettative dello stesso management (+96% YoY). HSBC e BOCOM International hanno conseguentemente alzato il rating a Buy.</div>
+
+      <div class="rep-section-title">Analisi tecnica</div>
+      <div class="rep-p">La struttura del trend D1 mostra un <strong>uptrend consolidato con Higher Lows</strong> dal bottom di ottobre 2024. Tutte le principali medie mobili sono allineate al rialzo con il prezzo sopra il cluster EMA/SMA. Il <strong>Golden Cross</strong> tra EMA veloci e SMA lente è stato confermato visivamente nel chart. Il Parabolic SAR è sotto il prezzo (bullish), ma la distanza si è ridotta: il livello <strong>$5.31</strong> rappresenta la soglia critica che non deve essere violata in chiusura per mantenere il segnale bullish.</div>
+      <div class="rep-p">Gli oscillatori presentano un quadro misto che invita alla cautela tattica: RSI a 62.16 (bullish, non saturo), ma Stochastic a 77/82 e CCI a 168 segnalano <strong>ipercomprato esteso</strong>. La divergenza OBV/prezzo — volume calante su un rally crescente — è un early warning che il momentum attuale potrebbe necessitare di una fase di consolidamento prima di un nuovo impulso rialzista. ATR a $0.2884 indica una volatilità giornaliera media del 5.2%.</div>
+
+      <div class="rep-section-title">Scenari di prezzo</div>
+      <div class="scenario-grid">
+        <div class="scen bull">
+          <div class="scen-hdr"><span class="scen-name">Scenario Bull</span><span class="scen-target">$7.50–$8.02</span></div>
+          <div class="scen-prob">Probabilità stimata: 35% · Orizzonte: 3–6 mesi</div>
+          <div class="scen-desc" style="margin-top:5px;">Breakout confermato sopra $5.70 con volume superiore alla media EMA (57M+). Completamento Cup & Handle. Accelerazione consegne Q2 2026. Upgrade ulteriori da parte degli analisti. Target primario $7.50, estensione al 52W High $8.02.</div>
+        </div>
+        <div class="scen base">
+          <div class="scen-hdr"><span class="scen-name">Scenario Base</span><span class="scen-target">$5.70–$6.73</span></div>
+          <div class="scen-prob">Probabilità stimata: 45% · Orizzonte: 1–3 mesi</div>
+          <div class="scen-desc" style="margin-top:5px;">Consolidamento nella zona $5.07–$5.70 con graduale digestione dell'ipercomprato. Ritracciamento verso EMA lenta $5.07, poi rimbalzo verso target consensus $6.73. Scenario più probabile data la divergenza volume/prezzo.</div>
+        </div>
+        <div class="scen bear">
+          <div class="scen-hdr"><span class="scen-name">Scenario Bear</span><span class="scen-target">$4.78–$5.07</span></div>
+          <div class="scen-prob">Probabilità stimata: 20% · Orizzonte: 1–2 mesi</div>
+          <div class="scen-desc" style="margin-top:5px;">Violazione di $5.31 (SAR) con inversione del segnale Parabolic. Debolezza macro USA persistente (VIX elevato). Possibile ritracciamento verso cluster di supporto $4.78. La struttura bullish di lungo termine rimarrebbe intatta sopra $4.78.</div>
+        </div>
+      </div>
+
+      <div class="rep-section-title">Rischi principali</div>
+      <div class="rep-p">I principali rischi da monitorare includono: (1) la <strong>persistente debolezza del mercato USA</strong> con VIX a 26.78 e Nasdaq in correzione; (2) il <strong>rischio di diluizione</strong> già emerso a marzo 2026 che aveva depresso il titolo; (3) la competizione nel mercato EV cinese con XPEV e Li Auto; (4) l'esposizione al rischio regolatorio sino-americano; (5) il bilancio ancora sotto pressione nonostante il primo trimestre in profitto.</div>
+    </div>
+
+    <div class="rep-r">
+      <div class="shdr">Dati chiave</div>
+      <div class="rep-meta">
+        <div class="meta-item"><div class="meta-k">Prezzo</div><div class="meta-v">$6.50</div></div>
+        <div class="meta-item"><div class="meta-k">52W Range</div><div class="meta-v">$3.02 – $8.02</div></div>
+        <div class="meta-item"><div class="meta-k">Market Cap</div><div class="meta-v">$15.4B</div></div>
+        <div class="meta-item"><div class="meta-k">P/S Ratio</div><div class="meta-v am">1.2x</div></div>
+        <div class="meta-item"><div class="meta-k">Gross Margin</div><div class="meta-v am">13.66%</div></div>
+        <div class="meta-item"><div class="meta-k">Revenue 2025</div><div class="meta-v up">¥87.5B (+33%)</div></div>
+        <div class="meta-item"><div class="meta-k">Net Income Q4'25</div><div class="meta-v up">$17.3M (1° profitto)</div></div>
+        <div class="meta-item"><div class="meta-k">Consegne Q1 '26</div><div class="meta-v up">83.465 (+96% YoY)</div></div>
+        <div class="meta-item"><div class="meta-k">Score tecnico</div><div class="meta-v up">82/100 · Strong Buy</div></div>
+        <div class="meta-item"><div class="meta-k">Consensus</div><div class="meta-v up">Buy · Target $6.73</div></div>
+        <div class="meta-item"><div class="meta-k">Prossimi earnings</div><div class="meta-v am">2 giu 2026</div></div>
+        <div class="meta-item"><div class="meta-k">Bias D1</div><div class="meta-v up">Bullish condizionato</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 5 — ANALISI MERCATO ══════════════════ -->
+<div id="t5" class="panel">
+  <div class="mstrip">
+    <div class="mc"><div class="mc-l">Chiusura 1 apr</div><div class="mc-v up">$6.20</div></div>
+    <div class="mc"><div class="mc-l">52W High</div><div class="mc-v">$8.02</div></div>
+    <div class="mc"><div class="mc-l">52W Low</div><div class="mc-v">$3.02</div></div>
+    <div class="mc"><div class="mc-l">Market Cap</div><div class="mc-v">$12.0B</div></div>
+    <div class="mc"><div class="mc-l">+5 giorni</div><div class="mc-v up">+16.0%</div></div>
+  </div>
+  <div class="t5body">
+    <div class="t5l">
+      <div class="chart-area">
+        <div class="clbl">PREZZO · 1D · USD · FEB–APR 2026</div>
+        <div class="cwrap"><canvas id="priceChart5"></canvas></div>
+        <div class="vwrap"><canvas id="volChart5"></canvas></div>
+        <div class="srleg">
+          <div class="sri"><div style="width:16px;border-top:1px dashed var(--green);"></div><span>Res. $8.02</span></div>
+          <div class="sri"><div style="width:16px;border-top:1px dashed var(--amber);"></div><span>Sup. $5.70</span></div>
+          <div class="sri"><div style="width:16px;border-top:1px dashed var(--muted);"></div><span>Sup. $4.78</span></div>
+        </div>
+      </div>
+      <div class="patsec">
+        <div class="shdr">Pattern tecnici</div>
+        <div class="pgrid">
+          <div class="pc bull"><div class="pc-tp">Bullish</div><div class="pc-nm">Breakout Pivot Bottom</div><div class="pc-ds">Segnale buy 27 mar. +16.76% da allora.</div></div>
+          <div class="pc bull"><div class="pc-tp">Bullish</div><div class="pc-nm">Rising Trend Channel</div><div class="pc-ds">Range alto del canale rialzista di breve.</div></div>
+          <div class="pc neu"><div class="pc-tp">Divergenza</div><div class="pc-nm">Volume / Prezzo</div><div class="pc-ds">Volume calante su prezzi in salita.</div></div>
+          <div class="pc bear"><div class="pc-tp">Bearish</div><div class="pc-nm">MACD 3 Mesi</div><div class="pc-ds">Sell signal attivo sul medio periodo.</div></div>
+          <div class="pc neu"><div class="pc-tp">Supporto</div><div class="pc-nm">Livelli chiave</div><div class="pc-ds">$5.70 · $4.78 sup · $8.02 res 52W.</div></div>
+          <div class="pc bull"><div class="pc-tp">Bullish</div><div class="pc-nm">Pivot Bottom Q1</div><div class="pc-ds">Consegne Q1 +96% YoY vs aspettative.</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="t5r">
+      <div class="trendsec">
+        <div class="shdr">Trend · momentum</div>
+        <div class="srow">
+          <div class="sring"><svg width="56" height="56" viewBox="0 0 56 56"><circle cx="28" cy="28" r="22" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="5"/><circle cx="28" cy="28" r="22" fill="none" stroke="#00d97e" stroke-width="5" stroke-dasharray="138" stroke-dashoffset="25" stroke-linecap="round"/></svg><div class="snum">82</div></div>
+          <div class="sinfo"><div class="slbl">Score tecnico</div><div class="sverd">Strong Buy</div><div class="ssub">7.08 / 10 · StockInvest</div></div>
+        </div>
+        <div class="gwrap">
+          <div class="grow"><span>Trend breve (1D)</span><span class="gval up">Rialzista ↑</span></div>
+          <div class="gtrack"><div class="gfill" style="width:82%;background:var(--green);"></div></div>
+          <div class="grow"><span>Momentum settimanale</span><span class="gval up">Molto forte</span></div>
+          <div class="gtrack"><div class="gfill" style="width:88%;background:var(--green);"></div></div>
+          <div class="grow"><span>MACD 3 mesi</span><span class="gval dn">Sell signal ↓</span></div>
+          <div class="gtrack"><div class="gfill" style="width:28%;background:var(--red);"></div></div>
+          <div class="grow"><span>Distanza 52W High</span><span class="gval am">−32%</span></div>
+          <div class="gtrack"><div class="gfill" style="width:48%;background:var(--amber);"></div></div>
+        </div>
+      </div>
+      <div class="catsec">
+        <div class="shdr">Catalyst recenti</div>
+        <div class="citem"><div class="cdt">1 APR</div><div class="cbody"><span class="cion pos">DELIVERY</span><div class="ctxt">Consegne marzo +136% YoY (35.486 veicoli). Q1 83.465 unità, +96% YoY.</div></div></div>
+        <div class="citem"><div class="cdt">11 MAR</div><div class="cbody"><span class="cion pos">UPGRADE</span><div class="ctxt">Primo profitto trimestrale Q4 2025. HSBC e BOCOM upgradano a Buy.</div></div></div>
+        <div class="citem"><div class="cdt">MAR</div><div class="cbody"><span class="cion pos">EXPAND</span><div class="ctxt">Primo Nio House in Americas (Costa Rica). Chip M97 venduto a Leapmotor e Geely.</div></div></div>
+        <div class="citem"><div class="cdt">OGGI</div><div class="cbody"><span class="cion warn">MACRO</span><div class="ctxt">Debolezza macro USA. Nasdaq −2.01%, VIX 26.78. Pullback su $5.70.</div></div></div>
+      </div>
+      <div class="conssec">
+        <div class="shdr">Consensus analisti</div>
+        <div class="cbar"><div class="cb-b"></div><div class="cb-h"></div><div class="cb-s"></div></div>
+        <div class="cleg">
+          <div class="cli"><div class="cldot" style="background:var(--green)"></div>Buy 70%</div>
+          <div class="cli"><div class="cldot" style="background:var(--amber)"></div>Hold 20%</div>
+          <div class="cli"><div class="cldot" style="background:var(--red)"></div>Sell 10%</div>
+        </div>
+        <div class="tline"><div><div class="tl-l">Price target (10 analisti)</div><div class="tl-u">+8.99% dal livello attuale</div></div><div class="tl-p">$6.73</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════ TAB 6 — ANALISI CHART ══════════════════ -->
+<div id="t6" class="panel">
+  <div class="mstrip">
+    <div class="mc"><div class="mc-l">RSI (14)</div><div class="mc-v up">62.16</div></div>
+    <div class="mc"><div class="mc-l">MACD</div><div class="mc-v up">0.0691</div></div>
+    <div class="mc"><div class="mc-l">Stoch %K/%D</div><div class="mc-v am">77 / 82</div></div>
+    <div class="mc"><div class="mc-l">CCI (20)</div><div class="mc-v dn">168.11</div></div>
+    <div class="mc"><div class="mc-l">ATR (14)</div><div class="mc-v">$0.2884</div></div>
+  </div>
+  <div class="t6body">
+    <div class="t6col">
+      <div class="vpsec">
+        <div class="shdr">Pattern visivi dal chart (D1)</div>
+        <div class="vpi bull"><span class="vtag">Bullish</span><div class="vbody"><div class="vtitle">Cup & Handle in formazione</div><div class="vdesc">Tazza con fondo $3.02 (ott 2024), bordo ~$8. Manico in compressione. Breakout $5.70 → target $7.50–$8.</div></div></div>
+        <div class="vpi bull"><span class="vtag">Bullish</span><div class="vbody"><div class="vtitle">Higher Lows — uptrend strutturale</div><div class="vdesc">Dal minimo $3.02 minimi crescenti sul D1. Ogni pullback assorbito a livelli più alti.</div></div></div>
+        <div class="vpi bull"><span class="vtag">Bullish</span><div class="vbody"><div class="vtitle">Golden Cross EMA</div><div class="vdesc">EMA veloci incrociate al rialzo le SMA lente. Prezzo sopra tutte le medie principali.</div></div></div>
+        <div class="vpi neu"><span class="vtag">Neutro</span><div class="vbody"><div class="vtitle">Zona viola $5.29–$5.40</div><div class="vdesc">Rettangolo viola nel chart. Nodo decisivo: chiusura sopra $5.40 con volume. Sotto $5.31 (SAR) inversione.</div></div></div>
+        <div class="vpi bear"><span class="vtag">Bearish</span><div class="vbody"><div class="vtitle">Divergenza OBV / prezzo</div><div class="vdesc">Volume del rally inferiore ai picchi feb–mar 2025. OBV piatto. Pressione d'acquisto in calo.</div></div></div>
+        <div class="vpi bear"><span class="vtag">Bearish</span><div class="vbody"><div class="vtitle">Stoch + CCI ipercomprato</div><div class="vdesc">Stoch 77/82 e CCI 168: zona estesa. Pullback verso $5.07–$5.31 probabile prima del prossimo impulso.</div></div></div>
+      </div>
+      <div class="levsec">
+        <div class="shdr">Livelli chiave aggiornati</div>
+        <div class="lgrid">
+          <div class="lc res"><div class="lct">Resistenza</div><div class="lcp">$8.02</div><div class="lcn">52W High</div></div>
+          <div class="lc res"><div class="lct">Resistenza</div><div class="lcp">$5.40</div><div class="lcn">SMA cluster</div></div>
+          <div class="lc res"><div class="lct">Breakout target</div><div class="lcp">$5.70</div><div class="lcn">Zona conferma</div></div>
+          <div class="lc s1"><div class="lct">SAR pivot</div><div class="lcp">$5.31</div><div class="lcn">Soglia critica</div></div>
+          <div class="lc s1"><div class="lct">Supporto 1</div><div class="lcp">$5.07</div><div class="lcn">EMA lenta</div></div>
+          <div class="lc s2"><div class="lct">Supporto 2</div><div class="lcp">$4.78</div><div class="lcn">Volume cluster</div></div>
+        </div>
+      </div>
+      <div class="verdsec">
+        <div class="vbox"><div><div class="vbt">Bias direzionale — D1</div><div class="vbv">Bullish condizionato</div><div class="vbc">Tenuta $5.31 · breakout confermato $5.40</div></div><div><div class="vbs">6/2</div><div class="vbsl">bull/bear</div></div></div>
+      </div>
+    </div>
+    <div class="t6col">
+      <div class="indsec">
+        <div class="shdr">Indicatori — valori dal chart</div>
+        <div class="igrid">
+          <div class="icell"><div class="iname">RSI (14)</div><div class="ival up">62.16</div><span class="ibadge bull">Bullish</span></div>
+          <div class="icell"><div class="iname">MACD</div><div class="ival up">0.0691</div><span class="ibadge bull">Positivo</span></div>
+          <div class="icell"><div class="iname">MACD Signal</div><div class="ival am">0.1191</div><span class="ibadge warn">Sotto signal</span></div>
+          <div class="icell"><div class="iname">Stoch %K/%D</div><div class="ival am">77/82</div><span class="ibadge warn">Ipercomprato</span></div>
+          <div class="icell"><div class="iname">CCI (20)</div><div class="ival dn">168.11</div><span class="ibadge bear">Esteso</span></div>
+          <div class="icell"><div class="iname">ATR (14)</div><div class="ival">0.2884</div><span class="ibadge warn">±$0.29/gg</span></div>
+          <div class="icell"><div class="iname">OBV</div><div class="ival">5.03B</div><span class="ibadge warn">Piatto</span></div>
+          <div class="icell"><div class="iname">Accum/Dist</div><div class="ival up">1.68B</div><span class="ibadge bull">Accumulaz.</span></div>
+          <div class="icell"><div class="iname">ADL</div><div class="ival up">1,769</div><span class="ibadge bull">Bullish</span></div>
+          <div class="icell"><div class="iname">Momentum</div><div class="ival up">0.4600</div><span class="ibadge bull">Forte</span></div>
+          <div class="icell"><div class="iname">Awesome Osc.</div><div class="ival up">0.3456</div><span class="ibadge bull">Bullish</span></div>
+          <div class="icell"><div class="iname">BB %b</div><div class="ival am">0.94</div><span class="ibadge warn">Banda alta</span></div>
+        </div>
+      </div>
+      <div class="masec2">
+        <div class="shdr">Medie mobili — posizione prezzo</div>
+        <div class="marow2"><span class="manm2">EMA veloce</span><span class="mavl2 up">$5.15</span><div class="mabw2"><div class="mabf2" style="width:75%;background:var(--green);"></div></div><span class="masig2 bull">Prezzo sopra ↑</span></div>
+        <div class="marow2"><span class="manm2">EMA media</span><span class="mavl2 up">$5.28</span><div class="mabw2"><div class="mabf2" style="width:65%;background:var(--green);"></div></div><span class="masig2 bull">Prezzo sopra ↑</span></div>
+        <div class="marow2"><span class="manm2">SMA 5.29</span><span class="mavl2 am">$5.29</span><div class="mabw2"><div class="mabf2" style="width:52%;background:var(--amber);"></div></div><span class="masig2 warn">Test in corso</span></div>
+        <div class="marow2"><span class="manm2">SMA lenta</span><span class="mavl2 am">$5.40</span><div class="mabw2"><div class="mabf2" style="width:42%;background:var(--amber);"></div></div><span class="masig2 warn">Resistenza chiave</span></div>
+        <div class="marow2"><span class="manm2">EMA lenta</span><span class="mavl2 up">$5.07</span><div class="mabw2"><div class="mabf2" style="width:82%;background:var(--green);"></div></div><span class="masig2 bull">Supporto dinamico</span></div>
+        <div class="marow2"><span class="manm2">Vol EMA media</span><span class="mavl2 dn">57.1M</span><div class="mabw2"><div class="mabf2" style="width:36%;background:var(--red);"></div></div><span class="masig2 bear">Volume sotto media</span></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <span>NIO INC. · NYSE: NIO · HKEX: 9866 · SGX: NIO</span>
+  <span>⚠ Solo a scopo informativo — non costituisce consulenza finanziaria</span>
+  <span>03 APR 2026</span>
+</div>
+
+<script>
+function sw(id,btn){
+  document.querySelectorAll('.panel').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.tbtn').forEach(b=>b.classList.remove('on'));
+  document.getElementById(id).classList.add('on');
+  btn.classList.add('on');
+}
+
+function filterTable(sig,btn){
+  document.querySelectorAll('.flt').forEach(b=>{b.classList.remove('on','on-bear','on-hold');});
+  if(sig==='buy') btn.classList.add('on');
+  else if(sig==='sell') btn.classList.add('on-bear');
+  else if(sig==='hold') btn.classList.add('on-hold');
+  else btn.classList.add('on');
+  document.querySelectorAll('#scrTable tbody tr').forEach(r=>{
+    r.style.display=(sig==='all'||r.dataset.sig===sig)?'':'none';
+  });
+}
+
+const labels5 = ['27 feb','3 mar','6 mar','10 mar','13 mar','17 mar','20 mar','24 mar','27 mar','31 mar','1 apr'];
+const prices5 = [4.20,4.35,4.55,5.25,4.80,4.60,5.10,4.85,5.00,5.90,6.20];
+
+function makeLineChart(id,lbs,dat){
+  const ctx=document.getElementById(id);
+  if(!ctx)return;
+  new Chart(ctx,{type:'line',data:{labels:lbs,datasets:[{data:dat,borderColor:'#00d97e',borderWidth:1.5,pointRadius:2.5,pointBackgroundColor:'#00d97e',pointBorderWidth:0,fill:true,backgroundColor:c=>{const g=c.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(0,217,126,0.15)');g.addColorStop(1,'rgba(0,217,126,0)');return g;},tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:900},plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1217',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,titleColor:'#6b7280',bodyColor:'#e8e6e1',titleFont:{family:"'IBM Plex Mono'",size:9},bodyFont:{family:"'IBM Plex Mono'",size:11,weight:'500'},callbacks:{label:c=>' $'+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:9},maxRotation:0},border:{color:'rgba(255,255,255,0.07)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:9},callback:v=>'$'+v.toFixed(2)},border:{color:'rgba(255,255,255,0.07)'},min:3.8,max:7.0}}}});
+}
+
+function makeVolChart(id,lbs,prices){
+  const ctx=document.getElementById(id);
+  if(!ctx)return;
+  const vd=[38,42,65,88,72,44,55,48,51,70,52];
+  const vc=prices.map((v,i)=>i===0||v>=prices[i-1]?'rgba(0,217,126,0.4)':'rgba(255,77,77,0.4)');
+  new Chart(ctx,{type:'bar',data:{labels:lbs,datasets:[{data:vd,backgroundColor:vc,borderWidth:0,borderRadius:1}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{enabled:false}},scales:{x:{grid:{display:false},ticks:{display:false},border:{display:false}},y:{grid:{display:false},ticks:{color:'#374151',font:{family:"'IBM Plex Mono'",size:8},maxTicksLimit:3,callback:v=>v+'M'},border:{display:false}}}}});
+}
+
+/* DASHBOARD CHARTS */
+const dashLabels=['Q1\'24','Q2\'24','Q3\'24','Q4\'24','Q1\'25','Q2\'25','Q3\'25','Q4\'25','Q1\'26e'];
+const dashPriceL=['gen','feb','mar','apr','mag','giu','lug','ago','set','ott','nov','dic','gen\'26','feb','mar','10 apr'];
+const dashPriceD=[5.2,4.8,4.3,3.8,3.6,3.2,3.0,3.4,4.1,4.8,5.6,6.4,5.8,4.2,5.9,6.50];
+
+new Chart(document.getElementById('dashPrice'),{type:'line',data:{labels:dashPriceL,datasets:[{data:dashPriceD,borderColor:'#00d97e',borderWidth:1.5,pointRadius:1.5,pointBackgroundColor:'#00d97e',fill:true,backgroundColor:c=>{const g=c.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(0,217,126,0.14)');g.addColorStop(1,'rgba(0,217,126,0)');return g;},tension:0.4}]},options:{responsive:true,maintainAspectRatio:false,animation:{duration:900},plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1217',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,bodyColor:'#e8e6e1',bodyFont:{family:"'IBM Plex Mono'",size:11},callbacks:{label:c=>' $'+c.parsed.y.toFixed(2)}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:8},maxRotation:30},border:{color:'rgba(255,255,255,0.07)'}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:8},callback:v=>'$'+v.toFixed(1)},border:{color:'rgba(255,255,255,0.07)'},min:2.5,max:7.5}}}});
+
+new Chart(document.getElementById('dashRev'),{type:'bar',data:{labels:dashLabels,datasets:[{data:[17.8,19.2,18.6,10.1,16.3,19.8,22.1,29.3,24.5],backgroundColor:['rgba(0,217,126,0.3)','rgba(0,217,126,0.3)','rgba(0,217,126,0.3)','rgba(0,217,126,0.3)','rgba(0,217,126,0.5)','rgba(0,217,126,0.5)','rgba(0,217,126,0.5)','rgba(0,217,126,0.7)','rgba(59,158,255,0.5)'],borderRadius:2,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1217',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,bodyColor:'#e8e6e1',bodyFont:{family:"'IBM Plex Mono'",size:10},callbacks:{label:c=>' ¥'+c.parsed.y+'B'}}},scales:{x:{grid:{display:false},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:8}},border:{display:false}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:8},callback:v=>'¥'+v+'B'},border:{display:false}}}}});
+
+new Chart(document.getElementById('dashPerf'),{type:'bar',data:{labels:['NIO','XPEV','LI','TSLA','RIVN','LCID'],datasets:[{data:[13.5,22.1,18.3,-14.2,-8.7,-31.4],backgroundColor:d=>d.raw>=0?'rgba(0,217,126,0.6)':'rgba(255,77,77,0.6)',borderRadius:2,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1217',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,bodyColor:'#e8e6e1',bodyFont:{family:"'IBM Plex Mono'",size:10},callbacks:{label:c=>' '+c.parsed.y.toFixed(1)+'%'}}},scales:{x:{grid:{display:false},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:9}},border:{display:false}},y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:8},callback:v=>v+'%'},border:{display:false}}}}});
+
+new Chart(document.getElementById('dashMix'),{type:'doughnut',data:{labels:['Veicoli EV','Servizi','Energia','Altro'],datasets:[{data:[82,10,5,3],backgroundColor:['rgba(0,217,126,0.7)','rgba(59,158,255,0.7)','rgba(245,166,35,0.7)','rgba(107,114,128,0.5)'],borderWidth:0,hoverOffset:4}]},options:{responsive:true,maintainAspectRatio:false,cutout:'65%',plugins:{legend:{display:true,position:'right',labels:{color:'#6b7280',font:{family:"'IBM Plex Mono'",size:9},boxWidth:8,padding:8}}}}});
+
+/* RADAR */
+new Chart(document.getElementById('radarChart'),{type:'radar',data:{labels:['Crescita','Margine','Momentum','Valutaz.','Profitt.','Consegne'],datasets:[{label:'NIO',data:[85,42,82,78,40,95],borderColor:'#00d97e',backgroundColor:'rgba(0,217,126,0.1)',pointBackgroundColor:'#00d97e',borderWidth:1.5,pointRadius:3},{label:'LI Auto',data:[62,75,74,82,70,68],borderColor:'#3b9eff',backgroundColor:'rgba(59,158,255,0.08)',pointBackgroundColor:'#3b9eff',borderWidth:1.5,pointRadius:3},{label:'Tesla',data:[40,65,55,38,80,45],borderColor:'rgba(245,166,35,0.7)',backgroundColor:'rgba(245,166,35,0.05)',pointBackgroundColor:'rgba(245,166,35,0.7)',borderWidth:1,pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{grid:{color:'rgba(255,255,255,0.07)'},ticks:{display:false},pointLabels:{color:'#6b7280',font:{family:"'IBM Plex Mono'",size:9}},angleLines:{color:'rgba(255,255,255,0.07)'}}},plugins:{legend:{labels:{color:'#9ca3af',font:{family:"'IBM Plex Mono'",size:9},boxWidth:8,padding:10}}}}});
+
+new Chart(document.getElementById('perfBar'),{type:'bar',data:{labels:['NIO','XPEV','LI','TSLA','RIVN'],datasets:[{data:[16.0,24.5,19.8,-11.2,-6.4],backgroundColor:d=>d.raw>=0?'rgba(0,217,126,0.55)':'rgba(255,77,77,0.55)',borderRadius:2,borderWidth:0}]},options:{responsive:true,maintainAspectRatio:false,indexAxis:'y',plugins:{legend:{display:false},tooltip:{backgroundColor:'#0f1217',borderColor:'rgba(255,255,255,0.1)',borderWidth:1,bodyColor:'#e8e6e1',bodyFont:{family:"'IBM Plex Mono'",size:10},callbacks:{label:c=>' '+c.parsed.x.toFixed(1)+'%'}}},scales:{x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#4b5563',font:{family:"'IBM Plex Mono'",size:8},callback:v=>v+'%'},border:{display:false}},y:{grid:{display:false},ticks:{color:'#9ca3af',font:{family:"'IBM Plex Mono'",size:10}},border:{display:false}}}}});
+
+/* TAB 5 CHARTS */
+makeLineChart('priceChart5',labels5,prices5);
+makeVolChart('volChart5',labels5,prices5);
+</script>
+</body>
+</html>
