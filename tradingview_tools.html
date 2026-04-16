@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>TradingView MCP Tools</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #0f1117;
+      color: #e0e0e0;
+      padding: 40px 20px;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 48px;
+    }
+
+    header h1 {
+      font-size: 2.2rem;
+      color: #00c896;
+      letter-spacing: 1px;
+    }
+
+    header p {
+      color: #888;
+      margin-top: 8px;
+      font-size: 0.95rem;
+    }
+
+    .badge-row {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin-top: 16px;
+    }
+
+    .badge {
+      background: #1a1e2e;
+      border: 1px solid #2a2e3e;
+      border-radius: 20px;
+      padding: 4px 14px;
+      font-size: 0.78rem;
+      color: #00c896;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 24px;
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    .section {
+      background: #1a1e2e;
+      border: 1px solid #2a2e3e;
+      border-radius: 12px;
+      overflow: hidden;
+    }
+
+    .section-header {
+      background: #0f1423;
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      border-bottom: 1px solid #2a2e3e;
+    }
+
+    .section-header .icon {
+      font-size: 1.2rem;
+    }
+
+    .section-header h2 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      color: #00c896;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+    }
+
+    .tool-list {
+      list-style: none;
+      padding: 12px 0;
+    }
+
+    .tool-list li {
+      padding: 10px 20px;
+      border-bottom: 1px solid #1f2333;
+      transition: background 0.15s;
+    }
+
+    .tool-list li:last-child {
+      border-bottom: none;
+    }
+
+    .tool-list li:hover {
+      background: #0f1423;
+    }
+
+    .tool-name {
+      font-family: 'Consolas', monospace;
+      font-size: 0.82rem;
+      color: #7ec8e3;
+      background: #0d1520;
+      padding: 2px 8px;
+      border-radius: 4px;
+      display: inline-block;
+      margin-bottom: 4px;
+    }
+
+    .tool-desc {
+      font-size: 0.85rem;
+      color: #aaa;
+      line-height: 1.4;
+    }
+
+    footer {
+      text-align: center;
+      margin-top: 48px;
+      color: #444;
+      font-size: 0.8rem;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>📈 TradingView MCP Tools</h1>
+  <p>Tutti gli strumenti disponibili del server TradingView</p>
+  <div class="badge-row">
+    <span class="badge">Binance</span>
+    <span class="badge">KuCoin</span>
+    <span class="badge">Bybit</span>
+    <span class="badge">MEXC</span>
+    <span class="badge">NASDAQ</span>
+    <span class="badge">NYSE</span>
+    <span class="badge">EGX</span>
+    <span class="badge">HKEX</span>
+    <span class="badge">BIST</span>
+    <span class="badge">Bursa Malaysia</span>
+    <span class="badge">SSE</span>
+    <span class="badge">SZSE</span>
+  </div>
+</header>
+
+<div class="grid">
+
+  <!-- Analisi di Mercato -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">🌐</span>
+      <h2>Analisi di Mercato Generale</h2>
+    </div>
+    <ul class="tool-list">
+      <li>
+        <div class="tool-name">market_snapshot</div>
+        <div class="tool-desc">Snapshot rapido dello stato attuale del mercato</div>
+      </li>
+      <li>
+        <div class="tool-name">market_sentiment</div>
+        <div class="tool-desc">Sentiment generale del mercato (bull/bear)</div>
+      </li>
+      <li>
+        <div class="tool-name">financial_news</div>
+        <div class="tool-desc">Ultime notizie finanziarie in tempo reale</div>
+      </li>
+      <li>
+        <div class="tool-name">yahoo_price</div>
+        <div class="tool-desc">Prezzo corrente di un asset via Yahoo Finance</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Screener & Scanner -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">🔍</span>
+      <h2>Screener & Scanner</h2>
+    </div>
+    <ul class="tool-list">
+      <li>
+        <div class="tool-name">top_gainers</div>
+        <div class="tool-desc">Migliori performer del giorno</div>
+      </li>
+      <li>
+        <div class="tool-name">top_losers</div>
+        <div class="tool-desc">Peggiori performer del giorno</div>
+      </li>
+      <li>
+        <div class="tool-name">bollinger_scan</div>
+        <div class="tool-desc">Scansione basata sulle Bande di Bollinger</div>
+      </li>
+      <li>
+        <div class="tool-name">volume_breakout_scanner</div>
+        <div class="tool-desc">Individua breakout confermati da volume anomalo</div>
+      </li>
+      <li>
+        <div class="tool-name">smart_volume_scanner</div>
+        <div class="tool-desc">Scanner volume intelligente con filtri avanzati</div>
+      </li>
+      <li>
+        <div class="tool-name">consecutive_candles_scan</div>
+        <div class="tool-desc">Cerca sequenze di candele consecutive direzionali</div>
+      </li>
+      <li>
+        <div class="tool-name">rating_filter</div>
+        <div class="tool-desc">Filtra asset per rating TradingView</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Analisi Tecnica -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">📊</span>
+      <h2>Analisi Tecnica</h2>
+    </div>
+    <ul class="tool-list">
+      <li>
+        <div class="tool-name">coin_analysis</div>
+        <div class="tool-desc">Analisi tecnica completa di una crypto</div>
+      </li>
+      <li>
+        <div class="tool-name">combined_analysis</div>
+        <div class="tool-desc">Analisi combinata tecnica + fondamentale</div>
+      </li>
+      <li>
+        <div class="tool-name">multi_timeframe_analysis</div>
+        <div class="tool-desc">Analisi su più timeframe contemporaneamente</div>
+      </li>
+      <li>
+        <div class="tool-name">multi_agent_analysis</div>
+        <div class="tool-desc">Analisi multi-agente avanzata</div>
+      </li>
+      <li>
+        <div class="tool-name">advanced_candle_pattern</div>
+        <div class="tool-desc">Riconoscimento pattern candlestick avanzati</div>
+      </li>
+      <li>
+        <div class="tool-name">volume_confirmation_analysis</div>
+        <div class="tool-desc">Analisi di conferma del volume su segnali</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Backtest & Strategie -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">⚙️</span>
+      <h2>Backtest & Strategie</h2>
+    </div>
+    <ul class="tool-list">
+      <li>
+        <div class="tool-name">backtest_strategy</div>
+        <div class="tool-desc">Backtest di una strategia di trading</div>
+      </li>
+      <li>
+        <div class="tool-name">walk_forward_backtest_strategy</div>
+        <div class="tool-desc">Backtest walk-forward per validazione robusta della strategia</div>
+      </li>
+      <li>
+        <div class="tool-name">compare_strategies</div>
+        <div class="tool-desc">Confronto tra più strategie per trovare la migliore</div>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Mercato EGX -->
+  <div class="section">
+    <div class="section-header">
+      <span class="icon">🇪🇬</span>
+      <h2>Mercato Egiziano (EGX)</h2>
+    </div>
+    <ul class="tool-list">
+      <li>
+        <div class="tool-name">egx_market_overview</div>
+        <div class="tool-desc">Panoramica generale del mercato EGX (Borsa del Cairo)</div>
+      </li>
+      <li>
+        <div class="tool-name">egx_sector_scan</div>
+        <div class="tool-desc">Scansione settoriale del mercato EGX</div>
+      </li>
+      <li>
+        <div class="tool-name">egx_sector_scanner</div>
+        <div class="tool-desc">Scanner avanzato per settori EGX</div>
+      </li>
+      <li>
+        <div class="tool-name">egx_stock_screener</div>
+        <div class="tool-desc">Screener azioni quotate su EGX</div>
+      </li>
+      <li>
+        <div class="tool-name">egx_fibonacci_retracement</div>
+        <div class="tool-desc">Livelli di Fibonacci su titoli EGX</div>
+      </li>
+      <li>
+        <div class="tool-name">egx_index_analysis</div>
+        <div class="tool-desc">Analisi degli indici principali EGX</div>
+      </li>
+      <li>
+        <div class="tool-name">egx_trade_plan</div>
+        <div class="tool-desc">Generazione automatica di un piano di trading su EGX</div>
+      </li>
+    </ul>
+  </div>
+
+</div>
+
+<footer>
+  <p>TradingView MCP Server — 27 tool disponibili &nbsp;|&nbsp; Generato con Claude Code</p>
+</footer>
+
+</body>
+</html>
