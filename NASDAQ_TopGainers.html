@@ -1,0 +1,603 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NASDAQ Top Gainers — 16 Aprile 2026</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #0e1a2e 0%, #0d1117 100%);
+    border: 1px solid #30363d;
+    border-radius: 16px;
+    padding: 24px 32px;
+    margin-bottom: 20px;
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 16px;
+  }
+  .header-left { display: flex; align-items: center; gap: 16px; }
+  .logo {
+    width: 56px; height: 56px;
+    background: linear-gradient(135deg, #0ea5e9, #6366f1);
+    border-radius: 12px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 900; color: #fff; text-align: center; line-height: 1.3; letter-spacing: 0.3px;
+  }
+  .h-title  { font-size: 24px; font-weight: 700; color: #f0f6fc; }
+  .h-sub    { font-size: 13px; color: #8b949e; margin-top: 3px; }
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+  .badge { padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 600; }
+  .b-blue   { background: #1c2a3a; color: #58a6ff; }
+  .b-green  { background: #1a4731; color: #3fb950; }
+  .b-yellow { background: #2a2018; color: #d29922; }
+  .h-right  { text-align: right; }
+  .h-count  { font-size: 36px; font-weight: 800; color: #58a6ff; }
+  .h-date   { font-size: 12px; color: #8b949e; margin-top: 4px; }
+
+  /* ── STAT BAR ── */
+  .stat-bar { display: grid; grid-template-columns: repeat(4,1fr); gap: 14px; margin-bottom: 20px; }
+  @media(max-width:700px){ .stat-bar { grid-template-columns: repeat(2,1fr); } }
+  .stat-card {
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .s-label { font-size: 10px; color: #8b949e; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 6px; }
+  .s-value { font-size: 22px; font-weight: 700; }
+  .s-sub   { font-size: 11px; color: #8b949e; margin-top: 3px; }
+
+  /* ── FILTERS ── */
+  .filters {
+    display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 16px;
+  }
+  .filter-btn {
+    padding: 7px 16px; border-radius: 20px; border: 1px solid #30363d;
+    background: #161b22; color: #8b949e; font-size: 12px; font-weight: 600;
+    cursor: pointer; transition: all 0.2s;
+  }
+  .filter-btn:hover { border-color: #58a6ff; color: #58a6ff; }
+  .filter-btn.active { background: #1c2a3a; border-color: #58a6ff; color: #58a6ff; }
+  .filter-btn.active-green { background: #1a4731; border-color: #3fb950; color: #3fb950; }
+  .filter-btn.active-yellow { background: #2a2018; border-color: #d29922; color: #d29922; }
+  .filter-btn.active-red { background: #3b1a1a; border-color: #f85149; color: #f85149; }
+
+  /* ── SEARCH ── */
+  .search-wrap { position: relative; margin-bottom: 16px; }
+  .search-input {
+    width: 100%; background: #161b22; border: 1px solid #30363d;
+    border-radius: 10px; padding: 10px 16px 10px 40px;
+    color: #e6edf3; font-size: 14px; outline: none;
+    transition: border-color 0.2s;
+  }
+  .search-input:focus { border-color: #58a6ff; }
+  .search-icon { position: absolute; left: 14px; top: 50%; transform: translateY(-50%); color: #8b949e; font-size: 14px; }
+
+  /* ── TABLE ── */
+  .table-wrap { overflow-x: auto; }
+  table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  thead th {
+    padding: 10px 12px; text-align: left;
+    color: #8b949e; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #30363d;
+    cursor: pointer; white-space: nowrap; user-select: none;
+    background: #161b22;
+    position: sticky; top: 0;
+  }
+  thead th:hover { color: #58a6ff; }
+  thead th .sort-arrow { margin-left: 4px; opacity: 0.4; }
+  thead th.sorted .sort-arrow { opacity: 1; color: #58a6ff; }
+
+  tbody tr {
+    border-bottom: 1px solid #21262d;
+    transition: background 0.15s;
+    cursor: pointer;
+  }
+  tbody tr:hover { background: #1c2128; }
+  tbody tr:last-child { border-bottom: none; }
+  tbody td { padding: 11px 12px; vertical-align: middle; }
+
+  /* ── RANK ── */
+  .rank { font-size: 12px; color: #8b949e; font-weight: 700; width: 28px; }
+  .rank-top { color: #f0c040; }
+
+  /* ── TICKER CELL ── */
+  .ticker-cell { display: flex; align-items: center; gap: 10px; }
+  .ticker-icon {
+    width: 34px; height: 34px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; font-weight: 800; color: #fff; flex-shrink: 0;
+    letter-spacing: -0.5px;
+  }
+  .ticker-sym { font-weight: 700; font-size: 14px; color: #f0f6fc; }
+  .ticker-revolut { font-size: 10px; margin-top: 2px; }
+
+  /* ── CHANGE CELL ── */
+  .chg-pos { color: #3fb950; font-weight: 700; }
+  .chg-high { color: #f0c040; font-weight: 800; font-size: 14px; }
+
+  /* ── PRICE ── */
+  .price-cell { font-weight: 600; }
+  .penny { color: #8b949e; font-size: 12px; }
+
+  /* ── RSI BAR ── */
+  .rsi-wrap { display: flex; align-items: center; gap: 8px; min-width: 110px; }
+  .rsi-track { flex: 1; height: 5px; background: #21262d; border-radius: 3px; overflow: hidden; position: relative; }
+  .rsi-fill  { height: 100%; border-radius: 3px; }
+  .rsi-num   { font-size: 12px; font-weight: 700; min-width: 32px; text-align: right; }
+
+  /* ── VOLUME ── */
+  .vol-cell { font-size: 12px; color: #c9d1d9; }
+  .vol-high { color: #bc8cff; font-weight: 700; }
+
+  /* ── MOMENTUM TAG ── */
+  .mom-tag {
+    display: inline-flex; align-items: center; gap: 5px;
+    padding: 4px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; white-space: nowrap;
+  }
+  .mom-spike  { background: #251d00; color: #f0c040; border: 1px solid #5a4500; }
+  .mom-great  { background: #1a4731; color: #3fb950; border: 1px solid #238636; }
+  .mom-good   { background: #1c3a2a; color: #7ee787; border: 1px solid #1a5731; }
+  .mom-strong { background: #1c2a3a; color: #58a6ff; border: 1px solid #1f6feb; }
+  .mom-weak   { background: #2a2018; color: #d29922; border: 1px solid #5a4d00; }
+
+  /* ── BB POSITION ── */
+  .bb-tag {
+    display: inline-block; padding: 2px 8px; border-radius: 8px;
+    font-size: 10px; font-weight: 700;
+  }
+  .bb-above { background: #1a4731; color: #3fb950; }
+  .bb-below { background: #3b1a1a; color: #f85149; }
+  .bb-mid   { background: #2a2018; color: #d29922; }
+
+  /* ── DETAIL PANEL ── */
+  .detail-panel {
+    display: none;
+    background: #0d1117; padding: 16px 20px;
+    border-top: 1px solid #21262d;
+  }
+  .detail-panel.open { display: grid; grid-template-columns: repeat(4,1fr); gap: 12px; }
+  @media(max-width:700px){ .detail-panel.open { grid-template-columns: repeat(2,1fr); } }
+  .d-item { }
+  .d-label { font-size: 10px; color: #8b949e; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .d-value { font-size: 14px; font-weight: 700; }
+
+  /* ── TOP 7 SECTION ── */
+  .top7-grid { display: grid; grid-template-columns: repeat(3,1fr); gap: 14px; margin-bottom: 20px; }
+  @media(max-width:900px){ .top7-grid { grid-template-columns: repeat(2,1fr); } }
+  @media(max-width:600px){ .top7-grid { grid-template-columns: 1fr; } }
+
+  .top7-card {
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 12px; padding: 16px 18px;
+    transition: border-color 0.2s;
+  }
+  .top7-card:hover { border-color: #58a6ff; }
+  .top7-card.best { border-color: #238636; background: linear-gradient(135deg, #0d2818, #161b22); }
+  .t7-header { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+  .t7-sym  { font-size: 18px; font-weight: 800; color: #f0f6fc; }
+  .t7-chg  { font-size: 16px; font-weight: 800; color: #3fb950; }
+  .t7-price { font-size: 13px; color: #8b949e; margin-bottom: 10px; }
+  .t7-row  { display: flex; justify-content: space-between; font-size: 12px; padding: 5px 0; border-bottom: 1px solid #21262d; }
+  .t7-row:last-child { border-bottom: none; }
+  .t7-key  { color: #8b949e; }
+  .t7-val  { font-weight: 600; }
+
+  /* ── TABS ── */
+  .tabs { display: flex; gap: 0; margin-bottom: 0; border-bottom: 1px solid #30363d; }
+  .tab {
+    padding: 10px 20px; font-size: 13px; font-weight: 600; color: #8b949e;
+    cursor: pointer; border-bottom: 2px solid transparent; transition: all 0.2s;
+  }
+  .tab:hover { color: #e6edf3; }
+  .tab.active { color: #58a6ff; border-bottom-color: #58a6ff; }
+
+  .tab-content { display: none; padding-top: 20px; }
+  .tab-content.active { display: block; }
+
+  /* ── CARD WRAPPER ── */
+  .card { background: #161b22; border: 1px solid #30363d; border-radius: 12px; padding: 20px 22px; margin-bottom: 20px; }
+  .card-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: #8b949e; margin-bottom: 16px;
+    display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* ── REVOLUT NOTE ── */
+  .revolut-note {
+    background: #1a1030; border: 1px solid #6e40c9;
+    border-radius: 10px; padding: 14px 18px; margin-bottom: 20px;
+    font-size: 13px; color: #c9d1d9; line-height: 1.6;
+  }
+  .revolut-note strong { color: #bc8cff; }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center; margin-top: 24px;
+    font-size: 12px; color: #8b949e; line-height: 1.8;
+    border-top: 1px solid #21262d; padding-top: 16px;
+  }
+
+  /* util */
+  .bull { color: #3fb950; }
+  .bear { color: #f85149; }
+  .neut { color: #d29922; }
+  .blue { color: #58a6ff; }
+  .gold { color: #f0c040; }
+  .purp { color: #bc8cff; }
+  .hidden { display: none !important; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">NASDAQ<br>TOP</div>
+    <div>
+      <div class="h-title">Top Gainers NASDAQ</div>
+      <div class="h-sub">Screener momentum rialzista — Ordinato per performance giornaliera</div>
+      <div class="badge-row">
+        <span class="badge b-blue">Timeframe: 1D</span>
+        <span class="badge b-green">25 titoli analizzati</span>
+        <span class="badge b-yellow">Bollinger + RSI + Volume</span>
+      </div>
+    </div>
+  </div>
+  <div class="h-right">
+    <div class="h-count">25</div>
+    <div class="h-date">16 Aprile 2026 &nbsp;·&nbsp; TradingView MCP</div>
+  </div>
+</div>
+
+<!-- STAT BAR -->
+<div class="stat-bar">
+  <div class="stat-card">
+    <div class="s-label">Miglior Performance</div>
+    <div class="s-value gold">+108.9%</div>
+    <div class="s-sub">PBM — spike su news</div>
+  </div>
+  <div class="stat-card">
+    <div class="s-label">Miglior Momentum</div>
+    <div class="s-value bull">AXTI</div>
+    <div class="s-sub">+30.1% · RSI 67.6 · sano</div>
+  </div>
+  <div class="stat-card">
+    <div class="s-label">Volume Massimo</div>
+    <div class="s-value purp">274M</div>
+    <div class="s-sub">ONFO — volume anomalo</div>
+  </div>
+  <div class="stat-card">
+    <div class="s-label">RSI Medio</div>
+    <div class="s-value neut">63.4</div>
+    <div class="s-sub">Zona rialzista</div>
+  </div>
+</div>
+
+<!-- REVOLUT NOTE -->
+<div class="revolut-note">
+  🟣 <strong>Nota Revolut:</strong> La maggior parte di questi titoli sono <strong>micro-cap e penny stock</strong> probabilmente non disponibili su Revolut. I candidati più probabili sono <strong>NVTS, AXTI, LESL, ACHV</strong> — verifica direttamente nell'app cercando il ticker. Revolut → Trading → Cerca simbolo.
+</div>
+
+<!-- TABS -->
+<div class="card" style="padding:0;overflow:hidden">
+  <div class="tabs" style="padding: 0 20px; background:#161b22">
+    <div class="tab active" onclick="switchTab('all')">Tutti (25)</div>
+    <div class="tab" onclick="switchTab('best')">✅ Miglior Momentum (7)</div>
+    <div class="tab" onclick="switchTab('spike')">⚡ Spike Speculativo</div>
+    <div class="tab" onclick="switchTab('weak')">⚠️ RSI Anomalo</div>
+  </div>
+
+  <div style="padding:20px">
+
+    <!-- SEARCH + FILTERS -->
+    <div class="search-wrap">
+      <span class="search-icon">🔍</span>
+      <input class="search-input" type="text" id="searchInput" placeholder="Cerca ticker (es. AXTI, NVTS...)" oninput="filterSearch()">
+    </div>
+
+    <div class="filters">
+      <button class="filter-btn active" onclick="setFilter('all', this)">Tutti</button>
+      <button class="filter-btn" onclick="setFilter('rsi-healthy', this)">RSI Sano (55–72)</button>
+      <button class="filter-btn" onclick="setFilter('rsi-ob', this)">RSI Ipercomprato (>75)</button>
+      <button class="filter-btn" onclick="setFilter('high-vol', this)">Volume Alto (>10M)</button>
+      <button class="filter-btn" onclick="setFilter('penny', this)">Penny Stock (&lt;$1)</button>
+    </div>
+
+    <!-- TABLE -->
+    <div class="table-wrap">
+      <table id="mainTable">
+        <thead>
+          <tr>
+            <th>#</th>
+            <th onclick="sortTable('ticker')">Ticker <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('price')">Prezzo <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('change')" class="sorted">Performance <span class="sort-arrow">↓</span></th>
+            <th onclick="sortTable('rsi')">RSI <span class="sort-arrow">↕</span></th>
+            <th onclick="sortTable('volume')">Volume <span class="sort-arrow">↕</span></th>
+            <th>BB Position</th>
+            <th>Momentum</th>
+          </tr>
+        </thead>
+        <tbody id="tableBody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- TOP 7 MOMENTUM CARDS -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:#3fb950"></span>Top 7 — Miglior Momento Rialzista Sostenibile (RSI 55–72)</div>
+  <div class="top7-grid" id="top7Grid"></div>
+</div>
+
+<!-- LEGENDA -->
+<div class="card">
+  <div class="card-title"><span class="dot" style="background:#58a6ff"></span>Legenda</div>
+  <div style="display:grid;grid-template-columns:repeat(2,1fr);gap:12px">
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:#0d1117;border-radius:8px">
+      <span style="font-size:18px">✅</span>
+      <div>
+        <div style="font-weight:700;color:#3fb950;font-size:13px">Miglior Momentum</div>
+        <div style="font-size:12px;color:#8b949e;margin-top:3px">RSI 55–72, guadagno forte, struttura solida. Momentum sano senza ipercomprato.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:#0d1117;border-radius:8px">
+      <span style="font-size:18px">⚡</span>
+      <div>
+        <div style="font-weight:700;color:#f0c040;font-size:13px">Spike Speculativo</div>
+        <div style="font-size:12px;color:#8b949e;margin-top:3px">RSI >80, probabile catalizzatore news/evento. Alto rischio di inversione rapida.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:#0d1117;border-radius:8px">
+      <span style="font-size:18px">💪</span>
+      <div>
+        <div style="font-weight:700;color:#58a6ff;font-size:13px">Forte</div>
+        <div style="font-size:12px;color:#8b949e;margin-top:3px">RSI 72–80, momentum buono ma vicino alla zona di ipercomprato.</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:10px;align-items:flex-start;padding:10px;background:#0d1117;border-radius:8px">
+      <span style="font-size:18px">⚠️</span>
+      <div>
+        <div style="font-weight:700;color:#d29922;font-size:13px">RSI Anomalo</div>
+        <div style="font-size:12px;color:#8b949e;margin-top:3px">Guadagno alto ma RSI basso — segnale di debolezza strutturale o dati anomali.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="footer">
+  <strong>NASDAQ Top Gainers</strong> — Screener generato il 16 Aprile 2026<br>
+  Dati: TradingView MCP (Bollinger Band Analysis) &nbsp;|&nbsp; Claude Code (claude-sonnet-4-6)<br>
+  <span style="color:#f85149">⚠ Non è un consiglio finanziario. I top gainer giornalieri sono spesso guidati da news/catalizzatori specifici — verificare sempre prima di operare.</span>
+</div>
+
+<script>
+  // ── DATA ──
+  const stocks = [
+    { rank:1,  sym:"PBM",   price:5.87,   change:108.889, rsi:88.53, vol:44366716,  sma20:2.71,  bbUpper:4.20,  bbLower:1.23, ema50:3.41,  mom:"spike",  revolut:false },
+    { rank:2,  sym:"DARE",  price:2.72,   change:50.276,  rsi:81.92, vol:2909263,   sma20:1.71,  bbUpper:2.32,  bbLower:1.11, ema50:1.73,  mom:"spike",  revolut:false },
+    { rank:3,  sym:"WNW",   price:5.56,   change:50.270,  rsi:24.97, vol:16972926,  sma20:7.14,  bbUpper:14.87, bbLower:-0.59,ema50:71.24, mom:"weak",   revolut:false },
+    { rank:4,  sym:"RMSG",  price:2.55,   change:44.068,  rsi:71.19, vol:48215010,  sma20:0.88,  bbUpper:2.40,  bbLower:-0.64,ema50:0.94,  mom:"best",   revolut:false },
+    { rank:5,  sym:"PN",    price:3.13,   change:37.281,  rsi:34.24, vol:795530,    sma20:8.30,  bbUpper:19.62, bbLower:-3.01,ema50:9.13,  mom:"weak",   revolut:false },
+    { rank:6,  sym:"ONFO",  price:1.50,   change:35.135,  rsi:84.26, vol:274714748, sma20:0.72,  bbUpper:1.09,  bbLower:0.36, ema50:0.68,  mom:"spike",  revolut:false },
+    { rank:7,  sym:"ARTV",  price:12.11,  change:34.855,  rsi:83.61, vol:1270964,   sma20:6.60,  bbUpper:9.83,  bbLower:3.38, ema50:6.08,  mom:"spike",  revolut:false },
+    { rank:8,  sym:"AXTI",  price:81.78,  change:30.119,  rsi:67.62, vol:16743359,  sma20:59.39, bbUpper:77.52, bbLower:41.26,ema50:47.06, mom:"best",   revolut:true  },
+    { rank:9,  sym:"SIDU",  price:5.95,   change:28.233,  rsi:75.38, vol:40374554,  sma20:3.34,  bbUpper:5.64,  bbLower:1.04, ema50:2.99,  mom:"strong", revolut:false },
+    { rank:10, sym:"SILO",  price:0.509,  change:26.554,  rsi:64.00, vol:3570901,   sma20:0.39,  bbUpper:0.50,  bbLower:0.28, ema50:0.38,  mom:"best",   revolut:false },
+    { rank:11, sym:"CMND",  price:0.835,  change:25.188,  rsi:42.91, vol:10207179,  sma20:0.96,  bbUpper:1.46,  bbLower:0.46, ema50:1.78,  mom:"weak",   revolut:false },
+    { rank:12, sym:"SPRC",  price:4.24,   change:23.977,  rsi:53.28, vol:231801,    sma20:3.76,  bbUpper:4.79,  bbLower:2.74, ema50:5.49,  mom:"neutral",revolut:false },
+    { rank:13, sym:"CPOP",  price:0.360,  change:23.356,  rsi:64.52, vol:2774203,   sma20:0.31,  bbUpper:0.34,  bbLower:0.28, ema50:0.34,  mom:"best",   revolut:false },
+    { rank:14, sym:"QVCGP", price:3.41,   change:21.786,  rsi:50.94, vol:998365,    sma20:3.10,  bbUpper:3.80,  bbLower:2.41, ema50:3.68,  mom:"neutral",revolut:false },
+    { rank:15, sym:"OCG",   price:0.76,   change:20.597,  rsi:40.81, vol:1865269,   sma20:0.65,  bbUpper:0.73,  bbLower:0.56, ema50:26.54, mom:"weak",   revolut:false },
+    { rank:16, sym:"LESL",  price:1.82,   change:20.530,  rsi:74.24, vol:552479,    sma20:1.24,  bbUpper:1.67,  bbLower:0.80, ema50:1.34,  mom:"strong", revolut:true  },
+    { rank:17, sym:"BTM",   price:5.05,   change:20.238,  rsi:65.92, vol:754082,    sma20:2.89,  bbUpper:4.46,  bbLower:1.32, ema50:4.64,  mom:"best",   revolut:false },
+    { rank:18, sym:"ENVB",  price:2.35,   change:19.898,  rsi:62.12, vol:10939965,  sma20:1.99,  bbUpper:2.21,  bbLower:1.77, ema50:2.41,  mom:"best",   revolut:false },
+    { rank:19, sym:"SURG",  price:0.647,  change:19.778,  rsi:41.38, vol:2206389,   sma20:0.75,  bbUpper:0.91,  bbLower:0.58, ema50:0.90,  mom:"weak",   revolut:false },
+    { rank:20, sym:"QMMM",  price:119.4,  change:19.436,  rsi:62.53, vol:773300,    sma20:73.88, bbUpper:176.31,bbLower:-28.55,ema50:45.67, mom:"best",   revolut:false },
+    { rank:21, sym:"MNTS",  price:7.63,   change:19.033,  rsi:76.62, vol:7250071,   sma20:4.27,  bbUpper:6.49,  bbLower:2.04, ema50:5.30,  mom:"strong", revolut:true  },
+    { rank:22, sym:"GVH",   price:2.78,   change:18.803,  rsi:66.14, vol:154883,    sma20:1.94,  bbUpper:3.39,  bbLower:0.49, ema50:1.89,  mom:"best",   revolut:false },
+    { rank:23, sym:"ACHV",  price:4.81,   change:18.765,  rsi:71.70, vol:14014514,  sma20:3.37,  bbUpper:4.44,  bbLower:2.31, ema50:3.87,  mom:"strong", revolut:true  },
+    { rank:24, sym:"NVTS",  price:12.37,  change:18.373,  rsi:71.80, vol:50235783,  sma20:9.27,  bbUpper:11.09, bbLower:7.45, ema50:9.28,  mom:"strong", revolut:true  },
+    { rank:25, sym:"SYPR",  price:4.13,   change:18.338,  rsi:71.08, vol:429858,    sma20:3.18,  bbUpper:3.81,  bbLower:2.55, ema50:3.19,  mom:"strong", revolut:false },
+  ];
+
+  const momConfig = {
+    best:    { label:"✅ Miglior Momentum", cls:"mom-great" },
+    spike:   { label:"⚡ Spike",            cls:"mom-spike" },
+    strong:  { label:"💪 Forte",            cls:"mom-strong" },
+    weak:    { label:"⚠️ RSI Anomalo",      cls:"mom-weak" },
+    neutral: { label:"⟳ Neutro",            cls:"mom-weak" },
+  };
+
+  const colors = ["#0ea5e9","#6366f1","#a855f7","#ec4899","#f97316","#eab308",
+                  "#22c55e","#14b8a6","#3b82f6","#8b5cf6","#f43f5e","#84cc16",
+                  "#06b6d4","#f59e0b","#10b981","#6366f1","#e11d48","#0284c7",
+                  "#7c3aed","#b45309","#0891b2","#65a30d","#c2410c","#7e22ce","#0369a1"];
+
+  function fmtVol(v) {
+    if(v >= 1e8) return (v/1e8).toFixed(1)+'M00K';
+    if(v >= 1e6) return (v/1e6).toFixed(1)+'M';
+    if(v >= 1e3) return (v/1e3).toFixed(0)+'K';
+    return v;
+  }
+  function fmtVolFull(v) {
+    if(v>=1e9) return (v/1e9).toFixed(2)+'B';
+    if(v>=1e6) return (v/1e6).toFixed(2)+'M';
+    if(v>=1e3) return (v/1e3).toFixed(0)+'K';
+    return v;
+  }
+
+  function getBBPos(price, upper, lower) {
+    if(price > upper)  return { label:"Sopra Banda", cls:"bb-above" };
+    if(price < lower)  return { label:"Sotto Banda", cls:"bb-below" };
+    return { label:"Dentro Banda", cls:"bb-mid" };
+  }
+
+  function getRSIColor(rsi) {
+    if(rsi >= 75) return "#f85149";
+    if(rsi >= 60) return "#3fb950";
+    if(rsi >= 45) return "#d29922";
+    return "#58a6ff";
+  }
+
+  let currentData = [...stocks];
+  let activeFilter = 'all';
+  let activeTab = 'all';
+
+  function renderTable(data) {
+    const tbody = document.getElementById('tableBody');
+    tbody.innerHTML = '';
+    data.forEach((s, i) => {
+      const bb = getBBPos(s.price, s.bbUpper, s.bbLower);
+      const mc = momConfig[s.mom] || momConfig.neutral;
+      const rsiColor = getRSIColor(s.rsi);
+      const volClass = s.vol > 10000000 ? 'vol-high' : 'vol-cell';
+      const chgClass = s.change > 50 ? 'chg-high' : 'chg-pos';
+      const isPenny = s.price < 1;
+      const revolut = s.revolut ? '<span style="color:#bc8cff;font-size:10px">🟣 Revolut?</span>' : '';
+
+      const row = document.createElement('tr');
+      row.className = `stock-row mom-${s.mom}`;
+      row.dataset.sym = s.sym;
+      row.dataset.mom = s.mom;
+      row.dataset.rsi = s.rsi;
+      row.dataset.vol = s.vol;
+      row.dataset.penny = isPenny ? '1' : '0';
+      row.innerHTML = `
+        <td><span class="rank ${i<3?'rank-top':''}">${i<3?['🥇','🥈','🥉'][i]:s.rank}</span></td>
+        <td>
+          <div class="ticker-cell">
+            <div class="ticker-icon" style="background:${colors[s.rank-1]}">${s.sym.slice(0,4)}</div>
+            <div>
+              <div class="ticker-sym">${s.sym}</div>
+              <div class="ticker-revolut">${revolut}</div>
+            </div>
+          </div>
+        </td>
+        <td class="price-cell ${isPenny?'penny':''}">$${s.price < 1 ? s.price.toFixed(3) : s.price.toFixed(2)}</td>
+        <td><span class="${chgClass}">+${s.change.toFixed(2)}%</span></td>
+        <td>
+          <div class="rsi-wrap">
+            <div class="rsi-track">
+              <div class="rsi-fill" style="width:${s.rsi}%;background:${rsiColor}"></div>
+            </div>
+            <span class="rsi-num" style="color:${rsiColor}">${s.rsi.toFixed(1)}</span>
+          </div>
+        </td>
+        <td><span class="${volClass}">${fmtVolFull(s.vol)}</span></td>
+        <td><span class="bb-tag ${bb.cls}">${bb.label}</span></td>
+        <td><span class="mom-tag ${mc.cls}">${mc.label}</span></td>
+      `;
+      row.addEventListener('click', () => toggleDetail(row, s));
+      tbody.appendChild(row);
+    });
+  }
+
+  function toggleDetail(row, s) {
+    const existing = row.nextElementSibling;
+    if(existing && existing.classList.contains('detail-panel')) {
+      existing.remove(); return;
+    }
+    // remove all open panels
+    document.querySelectorAll('.detail-panel').forEach(p => p.remove());
+
+    const panel = document.createElement('tr');
+    const td = document.createElement('td');
+    td.colSpan = 8;
+    td.innerHTML = `
+      <div class="detail-panel open">
+        <div class="d-item"><div class="d-label">SMA 20</div><div class="d-value">$${s.sma20.toFixed(2)}</div></div>
+        <div class="d-item"><div class="d-label">EMA 50</div><div class="d-value">$${s.ema50 > 100 ? s.ema50.toFixed(0) : s.ema50.toFixed(2)}</div></div>
+        <div class="d-item"><div class="d-label">BB Upper</div><div class="d-value bear">$${s.bbUpper.toFixed(2)}</div></div>
+        <div class="d-item"><div class="d-label">BB Lower</div><div class="d-value bull">$${s.bbLower.toFixed(2)}</div></div>
+        <div class="d-item"><div class="d-label">Volume</div><div class="d-value purp">${fmtVolFull(s.vol)}</div></div>
+        <div class="d-item"><div class="d-label">RSI</div><div class="d-value" style="color:${getRSIColor(s.rsi)}">${s.rsi.toFixed(2)}</div></div>
+        <div class="d-item"><div class="d-label">Dist. da BB Upper</div><div class="d-value">${((s.price/s.bbUpper-1)*100).toFixed(1)}%</div></div>
+        <div class="d-item"><div class="d-label">Revolut</div><div class="d-value">${s.revolut?'<span style="color:#bc8cff">🟣 Possibile</span>':'<span style="color:#8b949e">Improbabile</span>'}</div></div>
+      </div>`;
+    panel.appendChild(td);
+    row.after(panel);
+  }
+
+  function buildTop7() {
+    const top7 = stocks.filter(s => s.mom === 'best');
+    const grid = document.getElementById('top7Grid');
+    top7.forEach((s, i) => {
+      const bb = getBBPos(s.price, s.bbUpper, s.bbLower);
+      const card = document.createElement('div');
+      card.className = `top7-card ${i===0?'best':''}`;
+      card.innerHTML = `
+        <div class="t7-header">
+          <div>
+            <div class="t7-sym" style="color:${colors[s.rank-1]}">${s.sym}</div>
+            <div class="t7-price">Rank #${s.rank} &nbsp;·&nbsp; $${s.price < 1 ? s.price.toFixed(3) : s.price.toFixed(2)}</div>
+          </div>
+          <div class="t7-chg">+${s.change.toFixed(1)}%</div>
+        </div>
+        <div class="t7-row"><span class="t7-key">RSI</span><span class="t7-val" style="color:${getRSIColor(s.rsi)}">${s.rsi.toFixed(1)} ✅</span></div>
+        <div class="t7-row"><span class="t7-key">Volume</span><span class="t7-val ${s.vol>10e6?'purp':''}">${fmtVolFull(s.vol)}</span></div>
+        <div class="t7-row"><span class="t7-key">BB Position</span><span class="t7-val">${bb.label}</span></div>
+        <div class="t7-row"><span class="t7-key">SMA 20</span><span class="t7-val">$${s.sma20.toFixed(2)}</span></div>
+        <div class="t7-row"><span class="t7-key">Revolut</span><span class="t7-val">${s.revolut?'🟣 Possibile':'—'}</span></div>
+      `;
+      grid.appendChild(card);
+    });
+  }
+
+  function applyFilters() {
+    let data = [...stocks];
+    // tab filter
+    if(activeTab !== 'all') {
+      const tabMap = { best:'best', spike:'spike', weak:'weak' };
+      data = data.filter(s => s.mom === tabMap[activeTab] || (activeTab==='weak' && (s.mom==='weak'||s.mom==='neutral')));
+    }
+    // button filter
+    if(activeFilter === 'rsi-healthy') data = data.filter(s => s.rsi >= 55 && s.rsi <= 72);
+    if(activeFilter === 'rsi-ob')      data = data.filter(s => s.rsi > 75);
+    if(activeFilter === 'high-vol')    data = data.filter(s => s.vol > 10000000);
+    if(activeFilter === 'penny')       data = data.filter(s => s.price < 1);
+    // search
+    const q = document.getElementById('searchInput').value.toUpperCase();
+    if(q) data = data.filter(s => s.sym.includes(q));
+    renderTable(data);
+  }
+
+  function setFilter(f, btn) {
+    activeFilter = f;
+    document.querySelectorAll('.filter-btn').forEach(b => b.className='filter-btn');
+    btn.className = 'filter-btn active';
+    applyFilters();
+  }
+
+  function filterSearch() { applyFilters(); }
+
+  function switchTab(tab) {
+    activeTab = tab;
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    event.target.classList.add('active');
+    applyFilters();
+  }
+
+  function sortTable(col) {
+    const colMap = { ticker:'sym', price:'price', change:'change', rsi:'rsi', volume:'vol' };
+    const key = colMap[col];
+    currentData.sort((a,b) => key==='sym' ? a.sym.localeCompare(b.sym) : b[key]-a[key]);
+    renderTable(currentData);
+  }
+
+  // ── INIT ──
+  renderTable(stocks);
+  buildTop7();
+</script>
+</body>
+</html>
