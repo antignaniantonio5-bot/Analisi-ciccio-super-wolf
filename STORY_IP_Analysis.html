@@ -1,0 +1,741 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Story Protocol IP/USDT — Analisi Tecnica</title>
+<style>
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: #0d1117;
+    color: #e6edf3;
+    font-family: 'Segoe UI', system-ui, sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* ── HEADER ── */
+  .header {
+    background: linear-gradient(135deg, #1a1a2e 0%, #0d1117 100%);
+    border: 1px solid #30363d;
+    border-radius: 16px;
+    padding: 28px 32px;
+    margin-bottom: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+
+  .header-left { display: flex; align-items: center; gap: 20px; }
+
+  .logo {
+    width: 60px; height: 60px;
+    background: linear-gradient(135deg, #a855f7, #6366f1);
+    border-radius: 14px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; font-weight: 900; color: #fff; letter-spacing: -1px;
+  }
+
+  .ticker { font-size: 28px; font-weight: 700; color: #f0f6fc; }
+  .company { font-size: 14px; color: #8b949e; margin-top: 2px; }
+
+  .price-block { text-align: right; }
+  .price { font-size: 36px; font-weight: 700; color: #f0f6fc; }
+  .price-change {
+    display: inline-block;
+    background: #1a4731; color: #3fb950;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 14px; font-weight: 600; margin-top: 4px;
+  }
+
+  .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  .badge {
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 12px; font-weight: 600; letter-spacing: 0.4px;
+  }
+  .badge-neut  { background: #2a2018; color: #d29922; }
+  .badge-risk  { background: #3b1a1a; color: #f85149; }
+  .badge-bull  { background: #1a4731; color: #3fb950; }
+  .badge-info  { background: #1c2a3a; color: #58a6ff; }
+  .badge-purp  { background: #251d3a; color: #bc8cff; }
+  .date-tag { font-size: 12px; color: #8b949e; margin-top: 6px; }
+
+  /* ── ALERT BOX ── */
+  .alert-box {
+    background: linear-gradient(135deg, #2a1a1a, #1a1118);
+    border: 1px solid #f85149;
+    border-radius: 12px;
+    padding: 16px 24px;
+    margin-bottom: 20px;
+    display: flex; align-items: center; gap: 16px; flex-wrap: wrap;
+  }
+  .alert-icon { font-size: 28px; }
+  .alert-title { font-size: 14px; color: #f85149; font-weight: 700; margin-bottom: 4px; }
+  .alert-text  { font-size: 13px; color: #c9d1d9; line-height: 1.5; }
+
+  /* ── GRID ── */
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 20px; margin-bottom: 20px; }
+  @media (max-width: 900px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+
+  /* ── CARDS ── */
+  .card {
+    background: #161b22;
+    border: 1px solid #30363d;
+    border-radius: 12px;
+    padding: 20px 22px;
+  }
+
+  .card-title {
+    font-size: 11px; font-weight: 700; letter-spacing: 1px;
+    text-transform: uppercase; color: #8b949e;
+    margin-bottom: 16px; display: flex; align-items: center; gap: 8px;
+  }
+  .dot { width: 8px; height: 8px; border-radius: 50%; display: inline-block; }
+
+  /* ── STAT CARDS ── */
+  .stat-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; margin-bottom: 20px; }
+  @media (max-width: 800px) { .stat-grid { grid-template-columns: repeat(2,1fr); } }
+
+  .stat-card {
+    background: #161b22; border: 1px solid #30363d;
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .stat-label { font-size: 11px; color: #8b949e; margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .stat-value { font-size: 22px; font-weight: 700; }
+  .stat-sub   { font-size: 11px; color: #8b949e; margin-top: 3px; }
+
+  /* ── IND ROWS ── */
+  .ind-row {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 9px 0; border-bottom: 1px solid #21262d; font-size: 14px;
+  }
+  .ind-row:last-child { border-bottom: none; }
+  .ind-label { color: #8b949e; }
+  .ind-value { font-weight: 600; }
+
+  .bull   { color: #3fb950; }
+  .bear   { color: #f85149; }
+  .neut   { color: #d29922; }
+  .blue   { color: #58a6ff; }
+  .purple { color: #bc8cff; }
+
+  /* ── RSI BAR ── */
+  .rsi-wrap { padding: 4px 0 12px; }
+  .rsi-bar { height: 8px; background: #21262d; border-radius: 4px; overflow: hidden; position: relative; }
+  .rsi-fill { height: 100%; border-radius: 4px; background: linear-gradient(90deg, #3fb950 0%, #d29922 50%, #f85149 80%); }
+  .rsi-marker {
+    position: absolute; top: -3px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #fff; border: 2px solid #0d1117;
+    transform: translateX(-50%);
+    box-shadow: 0 0 6px rgba(255,255,255,0.4);
+  }
+  .rsi-labels { display: flex; justify-content: space-between; font-size: 10px; color: #8b949e; margin-top: 4px; }
+
+  /* ── PILL ── */
+  .pill { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 11px; font-weight: 700; }
+  .pill-bull   { background: #1a4731; color: #3fb950; }
+  .pill-bear   { background: #3b1a1a; color: #f85149; }
+  .pill-neut   { background: #2a2018; color: #d29922; }
+  .pill-ob     { background: #3b1a1a; color: #ff7b72; }
+  .pill-os     { background: #1a3a4a; color: #58a6ff; }
+  .pill-strong { background: #1c2a3a; color: #58a6ff; }
+  .pill-vstrong{ background: #1a1f3a; color: #bc8cff; }
+  .pill-weak   { background: #1e1e1e; color: #8b949e; }
+  .pill-mod    { background: #1e1e2e; color: #a5d6ff; }
+
+  /* ── TF TABLE ── */
+  .tf-table { width: 100%; border-collapse: collapse; font-size: 13px; }
+  .tf-table th {
+    text-align: left; padding: 8px 10px;
+    color: #8b949e; font-size: 11px; font-weight: 700;
+    text-transform: uppercase; letter-spacing: 0.5px;
+    border-bottom: 1px solid #30363d;
+  }
+  .tf-table td { padding: 10px; border-bottom: 1px solid #21262d; }
+  .tf-table tr:last-child td { border-bottom: none; }
+  .tf-label { font-weight: 600; }
+  .tf-note  { font-size: 11px; color: #8b949e; margin-top: 2px; }
+
+  /* ── PATTERN ── */
+  .pattern-item {
+    display: flex; gap: 14px; align-items: flex-start;
+    padding: 12px 0; border-bottom: 1px solid #21262d;
+  }
+  .pattern-item:last-child { border-bottom: none; }
+  .pattern-icon {
+    width: 36px; height: 36px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 16px; flex-shrink: 0;
+  }
+  .icon-bull { background: #1a4731; }
+  .icon-warn { background: #2a2018; }
+  .icon-bear { background: #3b1a1a; }
+  .pattern-name { font-size: 14px; font-weight: 600; }
+  .pattern-tf   { font-size: 11px; color: #8b949e; margin: 2px 0; }
+  .pattern-desc { font-size: 12px; color: #8b949e; }
+
+  /* ── LEVELS ── */
+  .level-item {
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 10px 0; border-bottom: 1px solid #21262d;
+  }
+  .level-item:last-child { border-bottom: none; }
+  .level-left  { display: flex; align-items: center; gap: 10px; }
+  .level-dot   { width: 10px; height: 10px; border-radius: 50%; }
+  .dot-res     { background: #f85149; }
+  .dot-sup     { background: #3fb950; }
+  .dot-cur     { background: #58a6ff; }
+  .dot-crit    { background: #d29922; }
+  .level-name  { font-size: 13px; font-weight: 600; }
+  .level-sub   { font-size: 11px; color: #8b949e; }
+  .level-price { font-size: 15px; font-weight: 700; }
+  .level-dist  { font-size: 11px; color: #8b949e; text-align: right; }
+
+  /* ── ADX GAUGE ── */
+  .adx-row { display: flex; gap: 10px; margin-top: 8px; }
+  .adx-block {
+    flex: 1; background: #0d1117; border-radius: 8px; padding: 10px;
+    text-align: center;
+  }
+  .adx-val  { font-size: 20px; font-weight: 700; }
+  .adx-lab  { font-size: 10px; color: #8b949e; margin-top: 2px; text-transform: uppercase; }
+
+  /* ── SCENARIO ── */
+  .scenario-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 12px; }
+  @media (max-width: 700px) { .scenario-grid { grid-template-columns: 1fr; } }
+  .scenario {
+    border-radius: 10px; padding: 14px 16px;
+  }
+  .sc-bull { background: #0d2818; border: 1px solid #238636; }
+  .sc-bear { background: #1a0d0d; border: 1px solid #7d1a1a; }
+  .sc-base { background: #1a1800; border: 1px solid #5a4d00; }
+  .sc-title { font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 8px; }
+  .sc-bull .sc-title { color: #3fb950; }
+  .sc-bear .sc-title { color: #f85149; }
+  .sc-base .sc-title { color: #d29922; }
+  .sc-text { font-size: 13px; color: #c9d1d9; line-height: 1.6; }
+  .sc-target { font-size: 16px; font-weight: 700; margin-top: 8px; }
+
+  /* ── FOOTER ── */
+  .footer {
+    text-align: center; margin-top: 28px;
+    font-size: 12px; color: #8b949e; line-height: 1.8;
+  }
+  .footer strong { color: #c9d1d9; }
+
+  /* ── LONG TERM WARNING ── */
+  .lt-bar {
+    background: #1a1200; border: 1px solid #9e6a03;
+    border-radius: 10px; padding: 12px 18px;
+    font-size: 13px; color: #e3b341; line-height: 1.6;
+    margin-bottom: 20px;
+  }
+  .lt-bar strong { color: #f0e68c; }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="logo">IP</div>
+    <div>
+      <div class="ticker">IP/USDT <span style="color:#8b949e;font-size:16px;font-weight:400">KuCoin</span></div>
+      <div class="company">Story Protocol — IP Licensing Layer su Blockchain</div>
+      <div class="badge-row">
+        <span class="badge badge-neut">Neutro M/T</span>
+        <span class="badge badge-bull">Rimbalzo Forte</span>
+        <span class="badge badge-risk">Downtrend L/T</span>
+        <span class="badge badge-info">ADX 60 — Trend Esplosivo</span>
+        <span class="badge badge-purp">Crypto</span>
+      </div>
+    </div>
+  </div>
+  <div class="price-block">
+    <div class="price">$0.5687</div>
+    <div><span class="price-change">▲ +13.33% oggi</span></div>
+    <div class="date-tag">Aggiornato: 16 Aprile 2026</div>
+  </div>
+</div>
+
+<!-- LONG TERM WARNING -->
+<div class="lt-bar">
+  ⚠ <strong>Contesto di Lungo Termine:</strong> IP è in forte downtrend dalla quotazione — SMA200 Daily a <strong>$2.54</strong>, EMA200 Daily a <strong>$2.22</strong>. Il prezzo attuale ($0.57) è <strong>−78% dalle medie di lungo periodo</strong>. La candela odierna è un rimbalzo significativo, ma la struttura macro resta ribassista. Death Cross attivo su Daily.
+</div>
+
+<!-- STAT CARDS -->
+<div class="stat-grid">
+  <div class="stat-card">
+    <div class="stat-label">Prezzo</div>
+    <div class="stat-value blue">$0.5687</div>
+    <div class="stat-sub">+13.33% oggi</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">RSI Daily</div>
+    <div class="stat-value neut">48.45</div>
+    <div class="stat-sub">↑ da 33.65 — recupero</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">ADX 1H</div>
+    <div class="stat-value purple">60.29</div>
+    <div class="stat-sub">Trend esplosivo</div>
+  </div>
+  <div class="stat-card">
+    <div class="stat-label">RSI 4H</div>
+    <div class="stat-value bear">74.61</div>
+    <div class="stat-sub">Ipercomprato ↓</div>
+  </div>
+</div>
+
+<!-- GRID: Daily + 4H -->
+<div class="grid-2">
+
+  <!-- DAILY -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#bc8cff"></span>Daily (1D) — Bias Neutro / Recupero</div>
+
+    <div class="ind-row">
+      <span class="ind-label">RSI (14)</span>
+      <span class="ind-value neut">48.45 &nbsp;<span style="font-size:11px;color:#3fb950">↑ da 33.65</span></span>
+    </div>
+    <div class="rsi-wrap">
+      <div class="rsi-bar">
+        <div class="rsi-fill" style="width:100%"></div>
+        <div class="rsi-marker" style="left:48.45%"></div>
+      </div>
+      <div class="rsi-labels"><span>0</span><span>30 OS</span><span>50</span><span>70 OB</span><span>100</span></div>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">MACD</span>
+      <span class="ind-value bull">Crossover Rialzista ✓</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Histogram MACD</span>
+      <span class="ind-value bull">+0.019 (positivo)</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Bollinger Position</span>
+      <span class="ind-value bear">Sopra Banda Superiore</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">ADX</span>
+      <span class="ind-value">39.56 — Strong &nbsp;<span class="bear">(-DI > +DI)</span></span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Stochastic K/D</span>
+      <span class="ind-value neut">63.05 / 51.44</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">EMA 20</span>
+      <span class="ind-value">$0.544</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">EMA 50</span>
+      <span class="ind-value bear">$0.7354 &nbsp;<span style="font-size:11px">resistenza</span></span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">EMA 200</span>
+      <span class="ind-value bear">$2.2211 &nbsp;<span style="font-size:11px">molto lontana</span></span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Death Cross</span>
+      <span class="ind-value bear">Attivo — EMA50 &lt; EMA200</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Candela</span>
+      <span class="ind-value bull">Bullish Forte (body 83%)</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">OBV</span>
+      <span class="ind-value bull">Accumulation</span>
+    </div>
+  </div>
+
+  <!-- 4H -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#f85149"></span>4H — Bullish ma Ipercomprato</div>
+
+    <div class="ind-row">
+      <span class="ind-label">RSI (14)</span>
+      <span class="ind-value bear">74.61 &nbsp;<span style="font-size:11px;color:#f85149">↓ da 78.13</span></span>
+    </div>
+    <div class="rsi-wrap">
+      <div class="rsi-bar">
+        <div class="rsi-fill" style="width:100%"></div>
+        <div class="rsi-marker" style="left:74.61%"></div>
+      </div>
+      <div class="rsi-labels"><span>0</span><span>30 OS</span><span>50</span><span>70 OB</span><span>100</span></div>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Stochastic K/D</span>
+      <span class="ind-value bear">89.61 / 86.49 — Ipercomprato</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">MACD</span>
+      <span class="ind-value bull">Bullish (+0.0084)</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">ADX</span>
+      <span class="ind-value blue">34.7 — Strong</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">+DI / -DI</span>
+      <span class="ind-value bull">41.58 / 7.68 — Dominio rialzista</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">EMA Stack</span>
+      <span class="ind-value bull">Prezzo > EMA20 > EMA50 ✓</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Bollinger</span>
+      <span class="ind-value bear">Sopra Banda Superiore</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">OBV</span>
+      <span class="ind-value bear">Distribution ⚠</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Candela attuale</span>
+      <span class="ind-value bear">Bearish (−0.76%)</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Resistenza R3</span>
+      <span class="ind-value">$0.6366 (+12%)</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Supporto S1</span>
+      <span class="ind-value bull">$0.4563 (−20%)</span>
+    </div>
+  </div>
+</div>
+
+<!-- 1H CARD -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-title"><span class="dot" style="background:#58a6ff"></span>1H — Trend Esplosivo (ADX 60) ma RSI in Discesa</div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0">
+    <div style="padding-right:20px;border-right:1px solid #21262d">
+      <div class="ind-row"><span class="ind-label">RSI (14)</span><span class="ind-value bear">76.02 ↓ da 81.57</span></div>
+      <div class="ind-row"><span class="ind-label">MACD</span><span class="ind-value bull">Bullish (+0.0047)</span></div>
+      <div class="ind-row"><span class="ind-label">Stochastic</span><span class="ind-value bear">85.69 — OB</span></div>
+    </div>
+    <div style="padding:0 20px;border-right:1px solid #21262d">
+      <div class="ind-row"><span class="ind-label">ADX</span><span class="ind-value purple">60.29 🔥 Esplosivo</span></div>
+      <div class="ind-row"><span class="ind-label">+DI</span><span class="ind-value bull">51.13</span></div>
+      <div class="ind-row"><span class="ind-label">-DI</span><span class="ind-value">3.23 &nbsp;— quasi zero</span></div>
+    </div>
+    <div style="padding-left:20px">
+      <div class="ind-row"><span class="ind-label">EMA Stack 1H</span><span class="ind-value bull">Perfetto ✓</span></div>
+      <div class="ind-row"><span class="ind-label">Golden Cross 1H</span><span class="ind-value bull">SMA50 > SMA200</span></div>
+      <div class="ind-row"><span class="ind-label">Struttura</span><span class="ind-value bull">Bullish Very Strong</span></div>
+    </div>
+  </div>
+
+  <div class="adx-row" style="margin-top:14px">
+    <div class="adx-block">
+      <div class="adx-val purple">60.29</div>
+      <div class="adx-lab">ADX 1H</div>
+    </div>
+    <div class="adx-block">
+      <div class="adx-val bull">51.13</div>
+      <div class="adx-lab">+DI (bulls)</div>
+    </div>
+    <div class="adx-block">
+      <div class="adx-val" style="color:#8b949e">3.23</div>
+      <div class="adx-lab">-DI (bears)</div>
+    </div>
+    <div class="adx-block">
+      <div class="adx-val bear">76.02</div>
+      <div class="adx-lab">RSI — OB ↓</div>
+    </div>
+    <div class="adx-block">
+      <div class="adx-val bear">85.69</div>
+      <div class="adx-lab">Stoch — OB</div>
+    </div>
+  </div>
+</div>
+
+<!-- PATTERN + LIVELLI -->
+<div class="grid-2">
+
+  <!-- PATTERN -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#d29922"></span>Pattern Identificati</div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-bull">🕯️</div>
+      <div>
+        <div class="pattern-name bull">Strong Bullish Candle</div>
+        <div class="pattern-tf">Daily &nbsp;·&nbsp; +13.33%, body ratio 83%</div>
+        <div class="pattern-desc">Candela bullish molto forte con corpo dominante — forte pressione compratori nella sessione.</div>
+      </div>
+    </div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-bull">⚡</div>
+      <div>
+        <div class="pattern-name bull">MACD Bullish Crossover</div>
+        <div class="pattern-tf">Daily &nbsp;·&nbsp; Primo segnale inversione M/T</div>
+        <div class="pattern-desc">Histogram appena diventato positivo (+0.019). Primo segnale di inversione del momentum sul daily.</div>
+      </div>
+    </div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-bull">📈</div>
+      <div>
+        <div class="pattern-name bull">RSI Recovery da Oversold</div>
+        <div class="pattern-tf">Daily &nbsp;·&nbsp; 33 → 48 in poche candele</div>
+        <div class="pattern-desc">Rimbalzo da zona di capitolazione (RSI 33). Recupero veloce indica forte interesse dei compratori.</div>
+      </div>
+    </div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-bull">📊</div>
+      <div>
+        <div class="pattern-name bull">Bollinger Band Breakout</div>
+        <div class="pattern-tf">Daily / 4H &nbsp;·&nbsp; Sopra banda superiore</div>
+        <div class="pattern-desc">Il prezzo ha rotto la banda superiore delle Bollinger — segnale di breakout con forte momentum.</div>
+      </div>
+    </div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-bull">📶</div>
+      <div>
+        <div class="pattern-name bull">EMA Bullish Stack + Golden Cross 1H</div>
+        <div class="pattern-tf">1H &nbsp;·&nbsp; Prezzo > EMA20>50>100>200</div>
+        <div class="pattern-desc">Allineamento perfetto di tutte le EMA sul timeframe orario. Golden Cross confermato.</div>
+      </div>
+    </div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-warn">⚠️</div>
+      <div>
+        <div class="pattern-name neut">RSI Bearish Divergence Nascente</div>
+        <div class="pattern-tf">4H / 1H &nbsp;·&nbsp; RSI in calo mentre prezzo resta alto</div>
+        <div class="pattern-desc">RSI in discesa (78→74 su 4H, 81→76 su 1H) — segnale di esaurimento del momentum a breve.</div>
+      </div>
+    </div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-bear">☠️</div>
+      <div>
+        <div class="pattern-name bear">Death Cross Attivo</div>
+        <div class="pattern-tf">Daily &nbsp;·&nbsp; EMA50 < EMA200</div>
+        <div class="pattern-desc">Struttura ribassista di lungo termine ancora dominante. Il rimbalzo avviene in un contesto macro negativo.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- LIVELLI -->
+  <div class="card">
+    <div class="card-title"><span class="dot" style="background:#58a6ff"></span>Livelli Chiave — Supporti & Resistenze</div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-res"></div>
+        <div>
+          <div class="level-name">Resistenza 3 (Pivot alto)</div>
+          <div class="level-sub">Area target di lungo</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price bear">$1.5703</div>
+        <div class="level-dist">+176%</div>
+      </div>
+    </div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-res"></div>
+        <div>
+          <div class="level-name">Resistenza 2</div>
+          <div class="level-sub">Zona di vendita importante</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price bear">$1.1103</div>
+        <div class="level-dist">+95%</div>
+      </div>
+    </div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-res"></div>
+        <div>
+          <div class="level-name">Resistenza 1 — Prima Significativa</div>
+          <div class="level-sub">Prossima resistenza da battere</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price bear">$0.8067</div>
+        <div class="level-dist">+42%</div>
+      </div>
+    </div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-res" style="background:#d29922"></div>
+        <div>
+          <div class="level-name">Resistenza 4H</div>
+          <div class="level-sub">R3 pivot 4H</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price neut">$0.6366</div>
+        <div class="level-dist">+12%</div>
+      </div>
+    </div>
+
+    <div class="level-item" style="background:#0d1f38;border-radius:8px;padding:10px 8px;margin:4px 0">
+      <div class="level-left">
+        <div class="level-dot dot-cur"></div>
+        <div>
+          <div class="level-name">▶ Prezzo Attuale</div>
+          <div class="level-sub">+13.33% oggi</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price blue">$0.5687</div>
+      </div>
+    </div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-sup"></div>
+        <div>
+          <div class="level-name">Supporto Immediato</div>
+          <div class="level-sub">EMA20 Daily — zona pullback ideale</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price bull">$0.50 — $0.52</div>
+        <div class="level-dist">−9%</div>
+      </div>
+    </div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-sup"></div>
+        <div>
+          <div class="level-name">Supporto 1</div>
+          <div class="level-sub">Primo supporto serio</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price bull">$0.4563</div>
+        <div class="level-dist">−20%</div>
+      </div>
+    </div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-crit"></div>
+        <div>
+          <div class="level-name">Supporto Critico</div>
+          <div class="level-sub">Area di minimo strutturale</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price neut">$0.3467</div>
+        <div class="level-dist">−39%</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENARI -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-title"><span class="dot" style="background:#3fb950"></span>Scenari Possibili</div>
+  <div class="scenario-grid">
+
+    <div class="scenario sc-bull">
+      <div class="sc-title">Scenario Rialzista</div>
+      <div class="sc-text">
+        Pullback sano verso <strong>$0.50–$0.52</strong>, rimbalzo e breakout sopra <strong>$0.64</strong>. Conferma inversione di M/T con superamento di $0.80.
+      </div>
+      <div class="sc-target bull">Target: $0.80 → $1.11</div>
+    </div>
+
+    <div class="scenario sc-base">
+      <div class="sc-title">Scenario Base</div>
+      <div class="sc-text">
+        Consolidamento tra <strong>$0.50 e $0.64</strong> nelle prossime sessioni. RSI si raffredda, poi nuovo tentativo di rottura.
+      </div>
+      <div class="sc-target neut">Range: $0.50 — $0.64</div>
+    </div>
+
+    <div class="scenario sc-bear">
+      <div class="sc-title">Scenario Ribassista</div>
+      <div class="sc-text">
+        Perdita del supporto <strong>$0.50</strong> e ritorno verso <strong>$0.45</strong>. Death Cross mantiene pressione ribassista. Downtrend riprende.
+      </div>
+      <div class="sc-target bear">Rischio: $0.45 → $0.35</div>
+    </div>
+
+  </div>
+</div>
+
+<!-- TF SUMMARY TABLE -->
+<div class="card" style="margin-bottom:20px">
+  <div class="card-title"><span class="dot" style="background:#58a6ff"></span>Riepilogo Multi-Timeframe</div>
+  <table class="tf-table">
+    <thead>
+      <tr>
+        <th>TF</th>
+        <th>Bias</th>
+        <th>RSI</th>
+        <th>MACD</th>
+        <th>ADX</th>
+        <th>Stochastic</th>
+        <th>Struttura</th>
+        <th>Attenzione</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td><div class="tf-label">1D</div><div class="tf-note">Setup medio</div></td>
+        <td><span class="pill pill-neut">Neutro</span></td>
+        <td><span class="neut">48.45 ↑</span></td>
+        <td><span class="bull">Bullish ✓</span></td>
+        <td>39.56</td>
+        <td><span class="neut">63</span></td>
+        <td><span class="pill pill-weak">Ranging</span></td>
+        <td style="font-size:12px;color:#8b949e">Death Cross attivo</td>
+      </tr>
+      <tr>
+        <td><div class="tf-label">4H</div><div class="tf-note">Ingresso</div></td>
+        <td><span class="pill pill-bull">Bullish</span></td>
+        <td><span class="bear">74.61 ↓ OB</span></td>
+        <td><span class="bull">Bullish</span></td>
+        <td>34.7</td>
+        <td><span class="bear">89 OB</span></td>
+        <td><span class="pill pill-strong">Strong</span></td>
+        <td style="font-size:12px;color:#f85149">Ipercomprato</td>
+      </tr>
+      <tr>
+        <td><div class="tf-label">1H</div><div class="tf-note">Esecuzione</div></td>
+        <td><span class="pill pill-bull">Bullish</span></td>
+        <td><span class="bear">76.02 ↓ OB</span></td>
+        <td><span class="bull">Bullish</span></td>
+        <td><span class="purple">60.29 🔥</span></td>
+        <td><span class="bear">85 OB</span></td>
+        <td><span class="pill pill-vstrong">Very Strong</span></td>
+        <td style="font-size:12px;color:#f85149">Pump esaurito</td>
+      </tr>
+    </tbody>
+  </table>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <strong>Story Protocol — IP/USDT (KuCoin)</strong> — Analisi generata il 16 Aprile 2026<br>
+  Dati: TradingView / KuCoin &nbsp;|&nbsp; Analisi: Claude Code (claude-sonnet-4-6)<br>
+  <span style="color:#f85149">⚠ Non è un consiglio finanziario. Effettuare sempre le proprie valutazioni prima di investire. Le crypto sono asset ad alto rischio.</span>
+</div>
+
+</body>
+</html>
