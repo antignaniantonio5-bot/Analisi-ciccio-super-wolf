@@ -50,6 +50,12 @@
     padding: 4px 12px; border-radius: 20px;
     font-size: 14px; font-weight: 600; margin-top: 4px;
   }
+  .price-change-bear {
+    display: inline-block;
+    background: #3b1a1a; color: #f85149;
+    padding: 4px 12px; border-radius: 20px;
+    font-size: 13px; font-weight: 600; margin-top: 4px;
+  }
 
   .badge-row { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
   .badge {
@@ -248,48 +254,57 @@
       <div class="ticker">IP/USDT <span style="color:#8b949e;font-size:16px;font-weight:400">KuCoin</span></div>
       <div class="company">Story Protocol — IP Licensing Layer su Blockchain</div>
       <div class="badge-row">
-        <span class="badge badge-neut">Neutro Daily</span>
-        <span class="badge badge-bull">Bullish 4H/1H</span>
+        <span class="badge badge-risk">Bearish Daily</span>
+        <span class="badge badge-risk">Bearish 4H/1H</span>
         <span class="badge badge-risk">Downtrend L/T</span>
-        <span class="badge badge-info">ADX 49 — Trend Forte</span>
-        <span class="badge badge-risk">Shooting Star Daily ⚠</span>
+        <span class="badge badge-neut">ADX 33 — Trend Moderato</span>
+        <span class="badge badge-info">Stoch 4H Oversold K:7 ⚠</span>
         <span class="badge badge-purp">Crypto</span>
       </div>
     </div>
   </div>
   <div class="price-block">
-    <div class="price">$0.6122</div>
-    <div><span class="price-change">▲ +3.94% oggi</span></div>
-    <div class="date-tag">Aggiornato: 17 Aprile 2026</div>
+    <div class="price">$0.5041</div>
+    <div><span class="price-change">▲ +0.64% oggi</span> &nbsp;<span class="price-change-bear">▼ −17.7% dal 17 Apr</span></div>
+    <div class="date-tag">Aggiornato: 20 Aprile 2026</div>
+  </div>
+</div>
+
+<!-- ALERT BOX -->
+<div class="alert-box">
+  <div class="alert-icon">📉</div>
+  <div>
+    <div class="alert-title">INVERSIONE COMPLETATA — Struttura Bearish su Tutti i Timeframe</div>
+    <div class="alert-text">Il rally da $0.34 a $0.72 è terminato. Il prezzo è tornato a <strong>$0.50</strong>, sotto tutte le EMA (Daily, 4H, 1H). RSI Daily crollato da 55 a 40, RSI 4H da 66 a 38. <strong>Unico segnale positivo:</strong> Stochastic 4H in oversold estremo (K:7.25 / D:6.42) — possibile rimbalzo tecnico verso $0.52–$0.54.</div>
   </div>
 </div>
 
 <!-- LONG TERM WARNING -->
 <div class="lt-bar">
-  ⚠ <strong>Contesto di Lungo Termine:</strong> IP è in forte downtrend dalla quotazione — SMA200 Daily a <strong>$2.50</strong>, EMA200 Daily a <strong>$2.21</strong>. Il prezzo attuale ($0.61) è <strong>−76% dalle medie di lungo periodo</strong>. La candela odierna mostra un <strong>Shooting Star</strong> (wick superiore 82.5% — rifiuto a $0.72). Death Cross attivo su Daily. La struttura macro resta ribassista.
+  ⚠ <strong>Contesto di Lungo Termine:</strong> IP è in forte downtrend dalla quotazione — SMA200 Daily a <strong>$2.38</strong>, EMA200 Daily a <strong>$2.16</strong>. Il prezzo attuale ($0.50) è <strong>−76.6% dalle medie di lungo periodo</strong>. Death Cross attivo su Daily e 1H. Struttura macro completamente ribassista su tutti i timeframe.
 </div>
 
 <!-- STAT CARDS -->
 <div class="stat-grid">
   <div class="stat-card">
     <div class="stat-label">Prezzo</div>
-    <div class="stat-value blue">$0.6122</div>
-    <div class="stat-sub">+3.94% oggi (+7.7% da ieri)</div>
+    <div class="stat-value blue">$0.5041</div>
+    <div class="stat-sub">+0.64% oggi / −17.7% dal 17 Apr</div>
   </div>
   <div class="stat-card">
     <div class="stat-label">RSI Daily</div>
-    <div class="stat-value neut">55.59</div>
-    <div class="stat-sub">↑ da 51.58 — momentum</div>
+    <div class="stat-value bear">40.19</div>
+    <div class="stat-sub">↑ da 39.50 — zona neutro/bearish</div>
   </div>
   <div class="stat-card">
-    <div class="stat-label">ADX 1H</div>
-    <div class="stat-value blue">49.91</div>
-    <div class="stat-sub">Trend forte (era 60.29)</div>
+    <div class="stat-label">ADX Daily</div>
+    <div class="stat-value neut">33.94</div>
+    <div class="stat-sub">Forte (era 39.58) — in calo</div>
   </div>
   <div class="stat-card">
     <div class="stat-label">RSI 4H</div>
-    <div class="stat-value bull">66.13</div>
-    <div class="stat-sub">Bullish — raffreddato ↓</div>
+    <div class="stat-value bear">38.89</div>
+    <div class="stat-sub">Bearish ↓ da 39.88 — in calo</div>
   </div>
 </div>
 
@@ -298,16 +313,16 @@
 
   <!-- DAILY -->
   <div class="card">
-    <div class="card-title"><span class="dot" style="background:#bc8cff"></span>Daily (1D) — Neutro / Shooting Star</div>
+    <div class="card-title"><span class="dot" style="background:#f85149"></span>Daily (1D) — Bearish / Death Cross Attivo</div>
 
     <div class="ind-row">
       <span class="ind-label">RSI (14)</span>
-      <span class="ind-value neut">55.59 &nbsp;<span style="font-size:11px;color:#3fb950">↑ da 51.58</span></span>
+      <span class="ind-value bear">40.19 &nbsp;<span style="font-size:11px;color:#3fb950">↑ da 39.50</span></span>
     </div>
     <div class="rsi-wrap">
       <div class="rsi-bar">
         <div class="rsi-fill" style="width:100%"></div>
-        <div class="rsi-marker" style="left:55.59%"></div>
+        <div class="rsi-marker" style="left:40.19%"></div>
       </div>
       <div class="rsi-labels"><span>0</span><span>30 OS</span><span>50</span><span>70 OB</span><span>100</span></div>
     </div>
@@ -317,31 +332,35 @@
     </div>
     <div class="ind-row">
       <span class="ind-label">Histogram MACD</span>
-      <span class="ind-value bull">+0.0246 (positivo, in crescita)</span>
+      <span class="ind-value bull">+0.0143 (positivo, in crescita)</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">Bollinger Position</span>
-      <span class="ind-value bear">Sopra Banda Superiore ($0.576)</span>
+      <span class="ind-value bear">Lower Half — sotto Banda Media ($0.5161)</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">Bollinger Bands</span>
+      <span class="ind-value">Upper $0.5778 &nbsp;|&nbsp; Middle $0.5161 &nbsp;|&nbsp; Lower $0.4544</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">ADX</span>
-      <span class="ind-value">39.58 — Strong &nbsp;<span class="bull">(+DI 35.44 > -DI 16.20 ✓)</span></span>
+      <span class="ind-value">33.94 — Strong &nbsp;<span class="bull">(+DI 26.48 > -DI 22.88 ✓)</span></span>
     </div>
     <div class="ind-row">
       <span class="ind-label">Stochastic K/D</span>
-      <span class="ind-value neut">66.53 / 60.20</span>
+      <span class="ind-value blue">18.41 / 36.68 — Oversold</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">EMA 20</span>
-      <span class="ind-value bull">$0.552 &nbsp;<span style="font-size:11px">supporto dinamico</span></span>
+      <span class="ind-value bear">$0.5423 &nbsp;<span style="font-size:11px">resistenza dinamica (+7.6%)</span></span>
     </div>
     <div class="ind-row">
       <span class="ind-label">EMA 50</span>
-      <span class="ind-value bear">$0.7313 &nbsp;<span style="font-size:11px">resistenza</span></span>
+      <span class="ind-value bear">$0.7068 &nbsp;<span style="font-size:11px">resistenza (+40.2%)</span></span>
     </div>
     <div class="ind-row">
       <span class="ind-label">EMA 200</span>
-      <span class="ind-value bear">$2.2053 &nbsp;<span style="font-size:11px">molto lontana</span></span>
+      <span class="ind-value bear">$2.1553 &nbsp;<span style="font-size:11px">molto lontana (−76.6%)</span></span>
     </div>
     <div class="ind-row">
       <span class="ind-label">Death Cross</span>
@@ -349,52 +368,56 @@
     </div>
     <div class="ind-row">
       <span class="ind-label">Candela</span>
-      <span class="ind-value bear">Shooting Star (wick +82.5%, body 17%) — rifiuto a $0.72</span>
+      <span class="ind-value neut">Bullish debole (body 25%, wick sup 64.9%) — doji-like</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">OBV</span>
-      <span class="ind-value bull">Accumulation</span>
+      <span class="ind-value bull">Accumulation (candela bullish)</span>
     </div>
   </div>
 
   <!-- 4H -->
   <div class="card">
-    <div class="card-title"><span class="dot" style="background:#3fb950"></span>4H — Bullish, Stochastic Normalizzato</div>
+    <div class="card-title"><span class="dot" style="background:#f85149"></span>4H — Bearish, Stochastic Oversold Estremo</div>
 
     <div class="ind-row">
       <span class="ind-label">RSI (14)</span>
-      <span class="ind-value bull">66.13 &nbsp;<span style="font-size:11px;color:#f85149">↓ da 68.51</span></span>
+      <span class="ind-value bear">38.89 &nbsp;<span style="font-size:11px;color:#f85149">↓ da 39.88</span></span>
     </div>
     <div class="rsi-wrap">
       <div class="rsi-bar">
         <div class="rsi-fill" style="width:100%"></div>
-        <div class="rsi-marker" style="left:66.13%"></div>
+        <div class="rsi-marker" style="left:38.89%"></div>
       </div>
       <div class="rsi-labels"><span>0</span><span>30 OS</span><span>50</span><span>70 OB</span><span>100</span></div>
     </div>
     <div class="ind-row">
       <span class="ind-label">Stochastic K/D</span>
-      <span class="ind-value neut">51.54 / 53.73 — Neutro (era 89/86) ✓</span>
+      <span class="ind-value blue">7.25 / 6.42 — Oversold Estremo ⚡</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">MACD</span>
-      <span class="ind-value bull">Bullish (+0.0097)</span>
+      <span class="ind-value bear">Bearish (−0.0070) ⚠</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">ADX</span>
-      <span class="ind-value blue">48.77 — Very Strong</span>
+      <span class="ind-value neut">32.45 — Strong</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">+DI / -DI</span>
-      <span class="ind-value bull">46.01 / 6.46 — Dominio rialzista totale</span>
+      <span class="ind-value bull">23.85 / 19.27 — +DI marginalmente sopra</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">EMA Stack</span>
-      <span class="ind-value bull">Prezzo > EMA20 > EMA50 ✓</span>
+      <span class="ind-value bear">Prezzo &lt; EMA20 &lt; EMA50 — Bearish</span>
+    </div>
+    <div class="ind-row">
+      <span class="ind-label">EMA 20 / 50</span>
+      <span class="ind-value bear">$0.5298 / $0.5305 — resistenze</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">Bollinger</span>
-      <span class="ind-value neut">Upper Half (rientrato nella banda)</span>
+      <span class="ind-value bear">Lower Half — BB Lower $0.4645</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">OBV</span>
@@ -402,59 +425,59 @@
     </div>
     <div class="ind-row">
       <span class="ind-label">Candela attuale</span>
-      <span class="ind-value bear">Bearish (−0.87%)</span>
+      <span class="ind-value bear">Bearish (−0.26%)</span>
     </div>
     <div class="ind-row">
-      <span class="ind-label">Resistenza R3</span>
-      <span class="ind-value bear">$0.6366 (+4%) — CRITICA, prossima</span>
+      <span class="ind-label">Resistenza R1</span>
+      <span class="ind-value bear">$0.6582 (+30.6%) — zona di vendita</span>
     </div>
     <div class="ind-row">
       <span class="ind-label">Supporto S1</span>
-      <span class="ind-value bull">$0.4563 (−25%)</span>
+      <span class="ind-value bull">$0.4056 (−19.5%)</span>
     </div>
   </div>
 </div>
 
 <!-- 1H CARD -->
 <div class="card" style="margin-bottom:20px">
-  <div class="card-title"><span class="dot" style="background:#58a6ff"></span>1H — Trend Forte (ADX 49) — RSI Normalizzato, MACD Cross-Down</div>
+  <div class="card-title"><span class="dot" style="background:#f85149"></span>1H — Bearish (ADX 23 Moderato) — -DI Dominante, MACD Micro-Cross Up</div>
   <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:0">
     <div style="padding-right:20px;border-right:1px solid #21262d">
-      <div class="ind-row"><span class="ind-label">RSI (14)</span><span class="ind-value neut">54.96 ↓ da 55.49</span></div>
-      <div class="ind-row"><span class="ind-label">MACD</span><span class="ind-value bear">Bearish (−0.0042) ⚠</span></div>
-      <div class="ind-row"><span class="ind-label">Stochastic</span><span class="ind-value neut">35.73 — Neutro</span></div>
+      <div class="ind-row"><span class="ind-label">RSI (14)</span><span class="ind-value bear">40.29 ↓ da 42.43</span></div>
+      <div class="ind-row"><span class="ind-label">MACD</span><span class="ind-value neut">Bullish micro (+0.0018) ⚡</span></div>
+      <div class="ind-row"><span class="ind-label">Stochastic</span><span class="ind-value neut">53.56 — Neutro</span></div>
     </div>
     <div style="padding:0 20px;border-right:1px solid #21262d">
-      <div class="ind-row"><span class="ind-label">ADX</span><span class="ind-value blue">49.91 — Forte</span></div>
-      <div class="ind-row"><span class="ind-label">+DI</span><span class="ind-value bull">28.08</span></div>
-      <div class="ind-row"><span class="ind-label">-DI</span><span class="ind-value bear">14.27 — Bears rientrati</span></div>
+      <div class="ind-row"><span class="ind-label">ADX</span><span class="ind-value neut">23.83 — Moderato</span></div>
+      <div class="ind-row"><span class="ind-label">+DI</span><span class="ind-value bull">19.46</span></div>
+      <div class="ind-row"><span class="ind-label">-DI</span><span class="ind-value bear">29.07 — Bears dominano</span></div>
     </div>
     <div style="padding-left:20px">
-      <div class="ind-row"><span class="ind-label">EMA Stack 1H</span><span class="ind-value bull">Bullish ✓</span></div>
-      <div class="ind-row"><span class="ind-label">Golden Cross 1H</span><span class="ind-value bull">SMA50 > SMA200</span></div>
-      <div class="ind-row"><span class="ind-label">Bollinger</span><span class="ind-value neut">Lower Half (pullback)</span></div>
+      <div class="ind-row"><span class="ind-label">EMA Stack 1H</span><span class="ind-value bear">Bearish ✗ (Price &lt; tutte le EMA)</span></div>
+      <div class="ind-row"><span class="ind-label">Death Cross 1H</span><span class="ind-value bear">SMA50 &lt; SMA200 ⚠</span></div>
+      <div class="ind-row"><span class="ind-label">Bollinger</span><span class="ind-value bear">Lower Half — BB Lower $0.4992</span></div>
     </div>
   </div>
 
   <div class="adx-row" style="margin-top:14px">
     <div class="adx-block">
-      <div class="adx-val blue">49.91</div>
+      <div class="adx-val neut">23.83</div>
       <div class="adx-lab">ADX 1H</div>
     </div>
     <div class="adx-block">
-      <div class="adx-val bull">28.08</div>
+      <div class="adx-val bull">19.46</div>
       <div class="adx-lab">+DI (bulls)</div>
     </div>
     <div class="adx-block">
-      <div class="adx-val bear">14.27</div>
+      <div class="adx-val bear">29.07</div>
       <div class="adx-lab">-DI (bears)</div>
     </div>
     <div class="adx-block">
-      <div class="adx-val neut">54.96</div>
-      <div class="adx-lab">RSI — Neutro</div>
+      <div class="adx-val bear">40.29</div>
+      <div class="adx-lab">RSI — Bearish</div>
     </div>
     <div class="adx-block">
-      <div class="adx-val neut">35.73</div>
+      <div class="adx-val neut">53.56</div>
       <div class="adx-lab">Stoch — Neutro</div>
     </div>
   </div>
@@ -468,65 +491,65 @@
     <div class="card-title"><span class="dot" style="background:#d29922"></span>Pattern Identificati</div>
 
     <div class="pattern-item">
-      <div class="pattern-icon icon-warn">🕯️</div>
+      <div class="pattern-icon icon-warn">⚡</div>
       <div>
-        <div class="pattern-name bear">Shooting Star Daily</div>
-        <div class="pattern-tf">Daily &nbsp;·&nbsp; Wick superiore 82.5% — rifiuto a $0.72</div>
-        <div class="pattern-desc">Il prezzo ha toccato $0.72 intraday ma chiuso a $0.61. Corpo piccolo (17%) con enorme wick sopra — potenziale segnale di inversione a breve.</div>
+        <div class="pattern-name blue">Stochastic 4H Oversold Estremo</div>
+        <div class="pattern-tf">4H &nbsp;·&nbsp; K:7.25 / D:6.42 — zona di rimbalzo tecnico</div>
+        <div class="pattern-desc">Stochastic 4H ai minimi estremi (sotto 10). Storicamente genera rimbalzi tecnici verso $0.52–$0.54. Non inverte il trend ma può produrre un bounce.</div>
       </div>
     </div>
 
     <div class="pattern-item">
-      <div class="pattern-icon icon-bull">⚡</div>
+      <div class="pattern-icon icon-bear">📉</div>
       <div>
-        <div class="pattern-name bull">MACD Bullish Daily — Histogram in Crescita</div>
-        <div class="pattern-tf">Daily &nbsp;·&nbsp; Histogram +0.0246 (era +0.019)</div>
-        <div class="pattern-desc">Il crossover bullish si rafforza. L'histogram continua ad espandersi positivamente sul Daily.</div>
+        <div class="pattern-name bear">Inversione Ribassista Multi-TF Completa</div>
+        <div class="pattern-tf">Daily / 4H / 1H &nbsp;·&nbsp; RSI Daily 55→40, 4H 66→38 in 3 giorni</div>
+        <div class="pattern-desc">Il rally da $0.34 a $0.72 è terminato. Il prezzo è tornato sotto tutte le EMA su Daily, 4H e 1H. Bias bearish confermato su tutti i timeframe.</div>
       </div>
     </div>
 
     <div class="pattern-item">
-      <div class="pattern-icon icon-bull">📈</div>
+      <div class="pattern-icon icon-bull">💹</div>
       <div>
-        <div class="pattern-name bull">RSI Recovery Continua</div>
-        <div class="pattern-tf">Daily &nbsp;·&nbsp; 33 → 48 → 55 in 2 candele</div>
-        <div class="pattern-desc">RSI Daily risalito a 55.59 — zona neutro/rialzista. Momentum in espansione dopo la capitolazione a 33.</div>
+        <div class="pattern-name bull">MACD Daily Ancora Bullish — Divergenza Positiva</div>
+        <div class="pattern-tf">Daily &nbsp;·&nbsp; Histogram +0.0143 — positivo nonostante il calo</div>
+        <div class="pattern-desc">Il MACD Daily mantiene il crossover rialzista (+0.0143) mentre il prezzo scende — possibile divergenza positiva nascosta. Da monitorare.</div>
       </div>
     </div>
 
     <div class="pattern-item">
-      <div class="pattern-icon icon-bull">📊</div>
+      <div class="pattern-icon icon-bear">📊</div>
       <div>
-        <div class="pattern-name bull">ADX Daily — DI Bullish Flip</div>
-        <div class="pattern-tf">Daily &nbsp;·&nbsp; +DI 35.44 > -DI 16.20</div>
-        <div class="pattern-desc">Inversione del DI sul Daily: prima -DI dominava (downtrend), ora +DI ha sorpassato. Conferma che i compratori prendono controllo.</div>
+        <div class="pattern-name bear">ADX in Forte Calo — Trend si Indebolisce</div>
+        <div class="pattern-tf">1H &nbsp;·&nbsp; ADX 49.91 → 23.83 (−52%)</div>
+        <div class="pattern-desc">L'ADX sul timeframe orario è crollato da 49 a 23 — il trend forte si sta decomprimendo. Attenzione: trend più debole può significare range o inversione.</div>
       </div>
     </div>
 
     <div class="pattern-item">
-      <div class="pattern-icon icon-bull">📶</div>
+      <div class="pattern-icon icon-bear">📉</div>
       <div>
-        <div class="pattern-name bull">EMA Bullish Stack + Golden Cross 1H</div>
-        <div class="pattern-tf">1H &nbsp;·&nbsp; Prezzo > EMA20>50>100>200</div>
-        <div class="pattern-desc">Allineamento perfetto di tutte le EMA sul timeframe orario. Golden Cross SMA50 > SMA200 confermato.</div>
-      </div>
-    </div>
-
-    <div class="pattern-item">
-      <div class="pattern-icon icon-warn">🔄</div>
-      <div>
-        <div class="pattern-name neut">Stochastic Normalizzato Post-Pump</div>
-        <div class="pattern-tf">4H / 1H &nbsp;·&nbsp; 89 → 51 su 4H &nbsp;·&nbsp; 85 → 35 su 1H</div>
-        <div class="pattern-desc">Stochastic drasticamente raffreddato. La decompressione degli oscillatori crea spazio per un nuovo impulso rialzista.</div>
+        <div class="pattern-name bear">EMA Bearish Stack Completo su 4H e 1H</div>
+        <div class="pattern-tf">4H / 1H &nbsp;·&nbsp; Price &lt; EMA20 &lt; EMA50 &lt; EMA200</div>
+        <div class="pattern-desc">Allineamento ribassista perfetto su tutti i timeframe intermedi. La struttura favorisce venditori a ogni rimbalzo verso le EMA.</div>
       </div>
     </div>
 
     <div class="pattern-item">
       <div class="pattern-icon icon-bear">☠️</div>
       <div>
-        <div class="pattern-name bear">Death Cross Attivo</div>
-        <div class="pattern-tf">Daily &nbsp;·&nbsp; EMA50 < EMA200</div>
-        <div class="pattern-desc">Struttura ribassista di lungo termine ancora dominante. Il rally avviene in un contesto macro negativo.</div>
+        <div class="pattern-name bear">Death Cross Doppio — Daily e 1H</div>
+        <div class="pattern-tf">Daily + 1H &nbsp;·&nbsp; EMA50 &lt; EMA200 su entrambi i TF</div>
+        <div class="pattern-desc">Death Cross confermato sia su Daily che su 1H. Struttura ribassista strutturale di medio-lungo termine ancora dominante. Il rally a $0.72 non l'ha invertita.</div>
+      </div>
+    </div>
+
+    <div class="pattern-item">
+      <div class="pattern-icon icon-bear">⚠️</div>
+      <div>
+        <div class="pattern-name bear">-DI Dominante su 1H (29.07 vs +DI 19.46)</div>
+        <div class="pattern-tf">1H &nbsp;·&nbsp; -DI > +DI — Bears in controllo</div>
+        <div class="pattern-desc">Sul timeframe orario i venditori dominano chiaramente. Il DI bearish è tornato in controllo dopo il flip bullish del 17 aprile — la pressione ribassista è ripresa.</div>
       </div>
     </div>
   </div>
@@ -539,27 +562,13 @@
       <div class="level-left">
         <div class="level-dot dot-res"></div>
         <div>
-          <div class="level-name">Resistenza 3 (Pivot alto)</div>
-          <div class="level-sub">Area target di lungo</div>
-        </div>
-      </div>
-      <div style="text-align:right">
-        <div class="level-price bear">$1.5693</div>
-        <div class="level-dist">+156%</div>
-      </div>
-    </div>
-
-    <div class="level-item">
-      <div class="level-left">
-        <div class="level-dot dot-res"></div>
-        <div>
-          <div class="level-name">Resistenza 2</div>
-          <div class="level-sub">Zona di vendita importante</div>
+          <div class="level-name">Resistenza 2 (Daily R2)</div>
+          <div class="level-sub">Zona di vendita forte</div>
         </div>
       </div>
       <div style="text-align:right">
         <div class="level-price bear">$1.1099</div>
-        <div class="level-dist">+81%</div>
+        <div class="level-dist">+120%</div>
       </div>
     </div>
 
@@ -567,13 +576,27 @@
       <div class="level-left">
         <div class="level-dot dot-res"></div>
         <div>
-          <div class="level-name">Resistenza 1 — Prima Significativa</div>
-          <div class="level-sub">Daily R1 pivot</div>
+          <div class="level-name">Resistenza 1 (Daily R1)</div>
+          <div class="level-sub">Primo target di rimbalzo importante</div>
         </div>
       </div>
       <div style="text-align:right">
         <div class="level-price bear">$0.8068</div>
-        <div class="level-dist">+32%</div>
+        <div class="level-dist">+60%</div>
+      </div>
+    </div>
+
+    <div class="level-item">
+      <div class="level-left">
+        <div class="level-dot dot-res"></div>
+        <div>
+          <div class="level-name">4H Resistenza R1</div>
+          <div class="level-sub">Zona pivot 4H</div>
+        </div>
+      </div>
+      <div style="text-align:right">
+        <div class="level-price bear">$0.6582</div>
+        <div class="level-dist">+30.6%</div>
       </div>
     </div>
 
@@ -581,13 +604,13 @@
       <div class="level-left">
         <div class="level-dot dot-crit"></div>
         <div>
-          <div class="level-name">⚡ Resistenza Critica Prossima — 4H R3</div>
-          <div class="level-sub">Solo +4% di distanza — test imminente</div>
+          <div class="level-name">⚡ Resistenza Critica Prossima — EMA20 Daily</div>
+          <div class="level-sub">Solo +7.6% — da recuperare per invertire il bias</div>
         </div>
       </div>
       <div style="text-align:right">
-        <div class="level-price neut">$0.6366</div>
-        <div class="level-dist">+4%</div>
+        <div class="level-price neut">$0.5423</div>
+        <div class="level-dist">+7.6%</div>
       </div>
     </div>
 
@@ -596,11 +619,11 @@
         <div class="level-dot dot-cur"></div>
         <div>
           <div class="level-name">▶ Prezzo Attuale</div>
-          <div class="level-sub">+3.94% oggi</div>
+          <div class="level-sub">+0.64% oggi / −17.7% dal 17 Apr</div>
         </div>
       </div>
       <div style="text-align:right">
-        <div class="level-price blue">$0.6122</div>
+        <div class="level-price blue">$0.5041</div>
       </div>
     </div>
 
@@ -608,13 +631,13 @@
       <div class="level-left">
         <div class="level-dot dot-sup"></div>
         <div>
-          <div class="level-name">Supporto Immediato</div>
-          <div class="level-sub">EMA20 Daily — zona pullback ideale</div>
+          <div class="level-name">Supporto Immediato — BB Lower 4H</div>
+          <div class="level-sub">Banda inferiore Bollinger 4H</div>
         </div>
       </div>
       <div style="text-align:right">
-        <div class="level-price bull">$0.55 — $0.57</div>
-        <div class="level-dist">−9%</div>
+        <div class="level-price bull">$0.4645</div>
+        <div class="level-dist">−7.9%</div>
       </div>
     </div>
 
@@ -622,13 +645,13 @@
       <div class="level-left">
         <div class="level-dot dot-sup"></div>
         <div>
-          <div class="level-name">Supporto 1</div>
+          <div class="level-name">Supporto 1 (4H S1)</div>
           <div class="level-sub">Primo supporto serio</div>
         </div>
       </div>
       <div style="text-align:right">
-        <div class="level-price bull">$0.4563</div>
-        <div class="level-dist">−25%</div>
+        <div class="level-price bull">$0.4056</div>
+        <div class="level-dist">−19.5%</div>
       </div>
     </div>
 
@@ -636,13 +659,13 @@
       <div class="level-left">
         <div class="level-dot dot-crit"></div>
         <div>
-          <div class="level-name">Supporto Critico</div>
+          <div class="level-name">Supporto Critico (Daily S1)</div>
           <div class="level-sub">Area di minimo strutturale</div>
         </div>
       </div>
       <div style="text-align:right">
-        <div class="level-price neut">$0.3467</div>
-        <div class="level-dist">−43%</div>
+        <div class="level-price neut">$0.3473</div>
+        <div class="level-dist">−31.1%</div>
       </div>
     </div>
   </div>
@@ -656,25 +679,25 @@
     <div class="scenario sc-bull">
       <div class="sc-title">Scenario Rialzista</div>
       <div class="sc-text">
-        Breakout confermato sopra <strong>$0.6366</strong> (4H R3, solo +4%). Consolidamento breve e poi attacco a <strong>$0.80</strong>. DI Daily già bullish favorisce la continuazione.
+        Rimbalzo tecnico da Stochastic 4H oversold, recupero sopra <strong>EMA20 Daily ($0.54)</strong>. Poi attacco a Bollinger Middle (<strong>$0.52</strong>) e superamento verso <strong>$0.58–$0.66</strong>. MACD Daily bullish favorisce.
       </div>
-      <div class="sc-target bull">Target: $0.64 → $0.80 → $1.11</div>
+      <div class="sc-target bull">Target: $0.54 → $0.58 → $0.66</div>
     </div>
 
     <div class="scenario sc-base">
       <div class="sc-title">Scenario Base</div>
       <div class="sc-text">
-        Rifiuto a <strong>$0.63–$0.64</strong> (Shooting Star + R3), pullback verso <strong>$0.55–$0.58</strong> (EMA20 Daily), poi nuovo tentativo di breakout.
+        Rimbalzo dalla zona <strong>$0.46–$0.50</strong> (BB lower 4H + Stoch oversold), consolidamento verso <strong>$0.50–$0.54</strong> ma incapace di superare EMA20 Daily — range laterale.
       </div>
-      <div class="sc-target neut">Range: $0.55 — $0.64</div>
+      <div class="sc-target neut">Range: $0.46 — $0.54</div>
     </div>
 
     <div class="scenario sc-bear">
       <div class="sc-title">Scenario Ribassista</div>
       <div class="sc-text">
-        Perdita del supporto <strong>$0.55</strong> e rottura sotto EMA20 Daily. Death Cross + MACD 1H bearish portano ritorno verso <strong>$0.45</strong>.
+        Perdita del supporto <strong>$0.46</strong> (BB lower 4H), continua verso <strong>$0.40</strong> (4H S1). Struttura bearish multi-TF + Death Cross doppio confermano la continuazione del downtrend.
       </div>
-      <div class="sc-target bear">Rischio: $0.50 → $0.45 → $0.35</div>
+      <div class="sc-target bear">Rischio: $0.46 → $0.41 → $0.35</div>
     </div>
 
   </div>
@@ -699,33 +722,43 @@
     <tbody>
       <tr>
         <td><div class="tf-label">1D</div><div class="tf-note">Setup medio</div></td>
-        <td><span class="pill pill-neut">Neutro</span></td>
-        <td><span class="neut">55.59 ↑</span></td>
+        <td><span class="pill pill-bear">Bearish</span></td>
+        <td><span class="bear">40.19 ↑</span></td>
         <td><span class="bull">Bullish ✓</span></td>
-        <td>39.58</td>
-        <td><span class="neut">66</span></td>
-        <td><span class="pill pill-weak">Ranging</span></td>
-        <td style="font-size:12px;color:#f85149">Death Cross + Shooting Star</td>
+        <td>33.94</td>
+        <td><span class="blue">18 Oversold</span></td>
+        <td><span class="pill pill-bear">Bearish Strong</span></td>
+        <td style="font-size:12px;color:#f85149">Death Cross + Price &lt; EMA20</td>
       </tr>
       <tr>
         <td><div class="tf-label">4H</div><div class="tf-note">Ingresso</div></td>
-        <td><span class="pill pill-bull">Bullish</span></td>
-        <td><span class="bull">66.13 ↓</span></td>
-        <td><span class="bull">Bullish</span></td>
-        <td>48.77</td>
-        <td><span class="neut">51 Neutro</span></td>
-        <td><span class="pill pill-vstrong">Very Strong</span></td>
-        <td style="font-size:12px;color:#d29922">Test R3 $0.6366 (+4%)</td>
+        <td><span class="pill pill-bear">Bearish</span></td>
+        <td><span class="bear">38.89 ↓</span></td>
+        <td><span class="bear">Bearish ⚠</span></td>
+        <td>32.45</td>
+        <td><span class="blue">7 OS Estremo ⚡</span></td>
+        <td><span class="pill pill-bear">Bearish Strong</span></td>
+        <td style="font-size:12px;color:#58a6ff">Stoch 4H oversold K:7 — possibile bounce</td>
       </tr>
       <tr>
         <td><div class="tf-label">1H</div><div class="tf-note">Esecuzione</div></td>
-        <td><span class="pill pill-bull">Bullish</span></td>
-        <td><span class="neut">54.96 ↓</span></td>
-        <td><span class="bear">Bearish ⚠</span></td>
-        <td><span class="blue">49.91</span></td>
-        <td><span class="neut">35 Neutro</span></td>
-        <td><span class="pill pill-vstrong">Very Strong</span></td>
-        <td style="font-size:12px;color:#f85149">MACD cross-down 1H</td>
+        <td><span class="pill pill-bear">Bearish</span></td>
+        <td><span class="bear">40.29 ↓</span></td>
+        <td><span class="neut">Bullish micro</span></td>
+        <td><span class="neut">23.83</span></td>
+        <td><span class="neut">53 Neutro</span></td>
+        <td><span class="pill pill-mod">Bearish Moderate</span></td>
+        <td style="font-size:12px;color:#f85149">-DI 29 > +DI 19 — bears dominano</td>
+      </tr>
+      <tr>
+        <td><div class="tf-label">1W</div><div class="tf-note">Contesto macro</div></td>
+        <td><span class="pill pill-bear">Bearish</span></td>
+        <td><span class="bear">34.10 ↑</span></td>
+        <td><span class="bull">Bullish ✓</span></td>
+        <td>—</td>
+        <td><span class="bear">—</span></td>
+        <td><span class="pill pill-weak">Bearish Weak</span></td>
+        <td style="font-size:12px;color:#f85149">EMA20W a $1.48 — lontanissima</td>
       </tr>
     </tbody>
   </table>
@@ -733,7 +766,7 @@
 
 <!-- FOOTER -->
 <div class="footer">
-  <strong>Story Protocol — IP/USDT (KuCoin)</strong> — Analisi generata il 17 Aprile 2026<br>
+  <strong>Story Protocol — IP/USDT (KuCoin)</strong> — Analisi aggiornata il 20 Aprile 2026<br>
   Dati: TradingView / KuCoin &nbsp;|&nbsp; Analisi: Claude Code (claude-sonnet-4-6)<br>
   <span style="color:#f85149">⚠ Non è un consiglio finanziario. Effettuare sempre le proprie valutazioni prima di investire. Le crypto sono asset ad alto rischio.</span>
 </div>
