@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>ARM Holdings — Dashboard 20 Apr 2026</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@700;800&display=swap');
+:root{--bg:#080C10;--bg2:#0D1117;--bg3:#111822;--card:#131B26;--b:rgba(255,255,255,0.06);--b2:rgba(255,255,255,0.12);--tx:#E8EDF2;--mu:#7A8899;--dm:#3A4A5C;--ac:#00D4FF;--gr:#00E676;--rd:#FF4444;--am:#FFB300;--pu:#9D5CFF;--mo:'DM Mono',monospace;--sa:'Syne',sans-serif}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:var(--tx);font-family:var(--mo);font-size:13px;line-height:1.6}
+header{background:var(--bg2);border-bottom:1px solid var(--b);padding:14px 24px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100}
+.logo{display:flex;align-items:center;gap:10px}
+.chip{width:30px;height:30px;background:var(--ac);border-radius:6px;display:flex;align-items:center;justify-content:center;font-family:var(--sa);font-weight:800;font-size:13px;color:#000}
+.lt{font-family:var(--sa);font-size:17px;font-weight:700}
+.ls{font-size:11px;color:var(--mu)}
+.pb{font-family:var(--sa);font-size:22px;font-weight:700;color:var(--ac)}
+.pc{font-size:11px;color:var(--gr)}
+.dot{width:6px;height:6px;border-radius:50%;background:var(--gr);animation:pulse 2s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+.tabs{display:flex;background:var(--bg2);border-bottom:1px solid var(--b);padding:0 24px;overflow-x:auto;gap:0;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{padding:11px 16px;cursor:pointer;font-family:var(--sa);font-size:11px;font-weight:700;color:var(--mu);border-bottom:2px solid transparent;white-space:nowrap;transition:.2s;letter-spacing:.05em;text-transform:uppercase}
+.tab:hover{color:var(--tx)}
+.tab.active{color:var(--ac);border-bottom-color:var(--ac)}
+.page{display:none;padding:20px 24px}
+.page.active{display:block}
+.card{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:14px}
+.ct{font-family:var(--sa);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;color:var(--mu);margin-bottom:10px;display:flex;align-items:center;gap:5px}
+.ct .d{width:4px;height:4px;border-radius:50%}
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;margin-bottom:12px}
+.g4{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.g8{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px}
+.kpi .v{font-family:var(--sa);font-size:20px;font-weight:700;line-height:1;margin-bottom:3px}
+.kpi .l{font-size:11px;color:var(--mu);margin-bottom:5px}
+.bge{display:inline-block;font-size:10px;padding:2px 7px;border-radius:4px;font-weight:500}
+.bg{background:rgba(0,230,118,.12);color:var(--gr)}
+.br{background:rgba(255,68,68,.12);color:var(--rd)}
+.ba{background:rgba(255,179,0,.12);color:var(--am)}
+.bb{background:rgba(0,212,255,.12);color:var(--ac)}
+.bp{background:rgba(157,92,255,.12);color:var(--pu)}
+.cw{position:relative;height:200px}
+.cw-lg{position:relative;height:260px}
+.cw-sm{position:relative;height:150px}
+.mb{margin-bottom:12px}
+.row{display:flex;align-items:center;justify-content:space-between;padding:6px 0;border-bottom:1px solid var(--b);font-size:12px}
+.row:last-child{border-bottom:none}
+.rl{color:var(--mu)}
+.rv{font-weight:600}
+/* Oscillator grid */
+.osc{background:var(--bg3);border:1px solid var(--b);border-radius:8px;padding:10px 12px}
+.on{font-family:var(--sa);font-size:10px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--mu)}
+.ov{font-family:var(--sa);font-size:18px;font-weight:700}
+.os{font-size:10px;padding:2px 7px;border-radius:3px;align-self:flex-start;font-weight:600;letter-spacing:.05em;display:inline-block;margin-top:3px}
+/* Expandable */
+.xcard{background:var(--card);border:1px solid var(--b);border-radius:10px;overflow:hidden;margin-bottom:8px}
+.xhdr{display:flex;align-items:center;justify-content:space-between;padding:11px 13px;cursor:pointer}
+.xl{display:flex;align-items:center;gap:8px}
+.xi{width:26px;height:26px;border-radius:6px;display:flex;align-items:center;justify-content:center;font-size:12px}
+.xn{font-family:var(--sa);font-size:12px;font-weight:700}
+.xs{font-size:10px;font-weight:600;padding:2px 7px;border-radius:3px;letter-spacing:.05em}
+.xch{font-size:10px;color:var(--mu);transition:transform .2s}
+.xcard.open .xch{transform:rotate(180deg)}
+.xbody{display:none;padding:0 13px 13px;border-top:1px solid var(--b)}
+.xcard.open .xbody{display:block}
+/* News */
+.ni{background:var(--card);border:1px solid var(--b);border-radius:10px;padding:12px 14px;display:flex;gap:12px;margin-bottom:8px;border-left:3px solid}
+.nb{flex:1}
+.nh{font-family:var(--sa);font-size:12px;font-weight:700;margin-bottom:3px;line-height:1.4}
+.nm{font-size:11px;color:var(--mu);margin-bottom:4px}
+.nd{font-size:11px;color:#9AABB8;line-height:1.5}
+/* Snapshot hero */
+.hero{background:linear-gradient(135deg,#0D1B2A,#131B26);border:1px solid var(--b);border-radius:12px;padding:20px 24px;margin-bottom:14px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px}
+.ht{font-family:var(--sa);font-size:38px;font-weight:800;color:var(--ac);line-height:1}
+.hp{font-family:var(--sa);font-size:30px;font-weight:700}
+/* Setup trade */
+.setup{border-radius:12px;padding:18px;border:1px solid}
+.setup.long{border-color:rgba(0,230,118,.3);background:rgba(0,230,118,.03)}
+.setup.short{border-color:rgba(255,68,68,.3);background:rgba(255,68,68,.03)}
+.sd{font-family:var(--sa);font-size:10px;font-weight:700;letter-spacing:.12em;text-transform:uppercase;margin-bottom:6px;display:flex;align-items:center;gap:8px}
+.st{font-family:var(--sa);font-size:16px;font-weight:800;margin-bottom:12px}
+/* Bars */
+.sbar{height:6px;border-radius:3px;background:var(--dm);position:relative;overflow:hidden;flex:1}
+.sfill{height:100%;border-radius:3px;position:absolute;left:0;top:0}
+/* Rules */
+.rule{display:flex;align-items:flex-start;gap:8px;background:var(--bg3);border:1px solid var(--b);border-radius:7px;padding:9px 11px;margin-bottom:6px;font-size:12px}
+.rn{font-family:var(--sa);font-size:14px;font-weight:800;color:var(--dm);min-width:22px}
+/* checklist */
+.ci{display:flex;align-items:flex-start;gap:8px;background:var(--bg3);border:1px solid var(--b);border-radius:6px;padding:8px 10px;margin-bottom:5px;font-size:12px;color:#9AABB8}
+.ci strong{color:var(--tx)}
+/* Filter btns */
+.fb{padding:5px 12px;border-radius:6px;border:1px solid var(--b2);background:transparent;color:var(--mu);font-family:var(--mo);font-size:11px;cursor:pointer;transition:.2s;margin:0 4px 8px 0}
+.fb:hover,.fb.active{border-color:var(--ac);color:var(--ac);background:rgba(0,212,255,.08)}
+/* table */
+.stbl{width:100%;border-collapse:collapse;font-size:12px}
+.stbl th{text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:var(--mu);padding:6px 10px;border-bottom:1px solid var(--b);cursor:pointer}
+.stbl td{padding:8px 10px;border-bottom:1px solid var(--b);vertical-align:middle}
+.stbl tr:hover td{background:rgba(255,255,255,.02)}
+/* risk calc */
+.ri{width:100%;padding:8px 11px;background:var(--bg3);border:1px solid var(--b2);border-radius:7px;color:var(--tx);font-family:var(--mo);font-size:13px;outline:none;transition:.2s}
+.ri:focus{border-color:var(--ac)}
+.rcb{width:100%;padding:10px;background:linear-gradient(135deg,rgba(0,212,255,.15),rgba(157,92,255,.15));border:1px solid var(--ac);border-radius:8px;color:var(--ac);font-family:var(--sa);font-size:13px;font-weight:700;cursor:pointer;margin-top:8px;letter-spacing:.05em}
+.rcb:hover{background:linear-gradient(135deg,rgba(0,212,255,.25),rgba(157,92,255,.25))}
+.rc{background:var(--bg3);border:1px solid var(--b);border-radius:8px;padding:10px 12px;text-align:center}
+.rcv{font-family:var(--sa);font-size:18px;font-weight:700;margin-bottom:2px}
+.rcl{font-size:10px;color:var(--mu);letter-spacing:.06em;text-transform:uppercase}
+.rrbar{height:6px;border-radius:3px;background:var(--dm);margin:8px 0 4px;position:relative;overflow:hidden}
+.rrfill{height:100%;border-radius:3px;position:absolute;left:0;top:0;transition:width .5s}
+/* S/R levels */
+.lrow{display:flex;align-items:center;gap:8px;background:var(--bg3);border:1px solid var(--b);border-radius:6px;padding:7px 10px;margin-bottom:5px}
+.lt2{font-size:10px;font-weight:700;min-width:24px}
+.lp{font-family:var(--sa);font-size:13px;font-weight:700;min-width:68px}
+.ld{font-size:11px;color:var(--mu);flex:1}
+.lbw{width:46px;height:3px;border-radius:2px;background:var(--dm);position:relative;overflow:hidden}
+.lbf{height:100%;border-radius:2px;position:absolute;left:0;top:0}
+/* Analyst bars */
+.abr{display:flex;align-items:center;gap:8px;margin-bottom:7px;font-size:11px}
+/* TF signal */
+.tfsig{font-family:var(--sa);font-size:12px;font-weight:700;padding:7px;border-radius:6px;border:1px solid;text-align:center}
+/* Scrollable wrapper */
+.scr{overflow-x:auto}
+</style>
+</head>
+<body>
+<header>
+  <div class="logo">
+    <div class="chip">AR</div>
+    <div><div class="lt">ARM Holdings</div><div class="ls">NASDAQ: ARM · Aggiornato 20 Apr 2026</div></div>
+  </div>
+  <div style="display:flex;align-items:center;gap:14px">
+    <div><div class="pb">$166.73</div><div class="pc">▲ +2.71% ven 17 Apr &nbsp;|&nbsp; +47.4% YTD</div></div>
+    <div class="dot"></div>
+  </div>
+</header>
+
+<div class="tabs" id="tabs">
+  <div class="tab active" onclick="go('dashboard',this)">📊 Dashboard</div>
+  <div class="tab" onclick="go('tecnica',this)">📈 Tecnica</div>
+  <div class="tab" onclick="go('screener',this)">🔍 Screener</div>
+  <div class="tab" onclick="go('sentiment',this)">🌡️ Sentiment</div>
+  <div class="tab" onclick="go('avanzati',this)">🧠 Indicatori</div>
+  <div class="tab" onclick="go('risk',this)">⚖️ Risk</div>
+  <div class="tab" onclick="go('news',this)">📰 News</div>
+  <div class="tab" onclick="go('fondamentali',this)">🔬 Fondamentali</div>
+  <div class="tab" onclick="go('snapshot',this)">⚡ Snapshot</div>
+  <div class="tab" onclick="go('trade',this)">🎯 Trade</div>
+  <div class="tab" onclick="go('report',this)">📄 Report</div>
+</div>
+
+<!-- ── DASHBOARD ── -->
+<div class="page active" id="page-dashboard">
+  <div class="g8">
+    <div class="card kpi"><div class="l">Prezzo</div><div class="v" style="color:var(--ac)">$166.73</div><span class="bge bg">▲ +2.71% ven</span></div>
+    <div class="card kpi"><div class="l">Market Cap</div><div class="v">$172.4B</div><span class="bge ba">Large Cap</span></div>
+    <div class="card kpi"><div class="l">P/E (TTM)</div><div class="v">~130x</div><span class="bge br">Settore: 36x</span></div>
+    <div class="card kpi"><div class="l">Revenue TTM</div><div class="v">$4.67B</div><span class="bge bg">+26% YoY</span></div>
+    <div class="card kpi"><div class="l">52W Range</div><div class="v" style="font-size:14px">$95–$183</div><span class="bge bb">+75% da min</span></div>
+    <div class="card kpi"><div class="l">EPS TTM</div><div class="v">$0.75</div><span class="bge ba">FY27 +21%</span></div>
+    <div class="card kpi"><div class="l">Gross Margin</div><div class="v">97.5%</div><span class="bge bg">Best-class</span></div>
+    <div class="card kpi"><div class="l">Earnings</div><div class="v" style="font-size:14px">6 Mag 2026</div><span class="bge bb">16 giorni</span></div>
+  </div>
+  <div class="g2">
+    <div class="card mb"><div class="ct"><div class="d" style="background:var(--ac)"></div>Prezzo 2025–2026</div><div class="cw-lg"><canvas id="priceChart"></canvas></div></div>
+    <div class="card mb"><div class="ct"><div class="d" style="background:var(--pu)"></div>Revenue Trimestrale (M$)</div><div class="cw-lg"><canvas id="revenueChart"></canvas></div></div>
+  </div>
+  <div class="g2 mb">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Performance YTD 2026</div><div class="cw"><canvas id="perfChart"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>Mix Ricavi FY2026</div><div class="cw"><canvas id="mixChart"></canvas></div></div>
+  </div>
+  <div class="card">
+    <div class="ct"><div class="d" style="background:var(--gr)"></div>Segnale Tecnico Multi-Timeframe</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:10px">
+      <div><div style="font-size:10px;color:var(--mu);margin-bottom:5px;text-align:center">5min</div><div class="tfsig" style="color:var(--gr);background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.2)">STRONG BUY</div></div>
+      <div><div style="font-size:10px;color:var(--mu);margin-bottom:5px;text-align:center">Orario</div><div class="tfsig" style="color:var(--gr);background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.2)">STRONG BUY</div></div>
+      <div><div style="font-size:10px;color:var(--mu);margin-bottom:5px;text-align:center">Daily</div><div class="tfsig" style="color:var(--gr);background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.2)">STRONG BUY</div></div>
+      <div><div style="font-size:10px;color:var(--mu);margin-bottom:5px;text-align:center">Weekly</div><div class="tfsig" style="color:var(--gr);background:rgba(0,230,118,.08);border-color:rgba(0,230,118,.2)">BUY</div></div>
+      <div><div style="font-size:10px;color:var(--mu);margin-bottom:5px;text-align:center">Monthly</div><div class="tfsig" style="color:var(--am);background:rgba(255,179,0,.08);border-color:rgba(255,179,0,.2)">BUY</div></div>
+    </div>
+    <div style="margin-top:10px;padding:9px 12px;background:rgba(0,212,255,.05);border-radius:6px;border:1px solid rgba(0,212,255,.1);font-size:12px;color:var(--mu)">⚡ Pivot bottom 30 Mar confermato. +21.7% da allora. RSI 65.83, MACD +7.28, opzioni 81% call. Volume cala sui rialzi — monitorare divergenza.</div>
+  </div>
+</div>
+
+<!-- ── TECNICA ── -->
+<div class="page" id="page-tecnica">
+  <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:12px">
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">RSI (14)</div><div class="ov" style="color:var(--gr)">65.83</div><span class="os" style="background:rgba(0,230,118,.12);color:var(--gr)">NEUTRO-BULL</span></div>
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">Stochastic (14)</div><div class="ov" style="color:var(--am)">~72 / 68</div><span class="os" style="background:rgba(255,179,0,.12);color:var(--am)">ZONA OB</span></div>
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">MACD (12,26,9)</div><div class="ov" style="color:var(--gr)">7.28</div><span class="os" style="background:rgba(0,230,118,.12);color:var(--gr)">BUY</span></div>
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">Williams %R</div><div class="ov" style="color:var(--am)">-12.50</div><span class="os" style="background:rgba(255,179,0,.12);color:var(--am)">ZONA OB</span></div>
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">CCI (14)</div><div class="ov" style="color:var(--gr)">~120</div><span class="os" style="background:rgba(0,230,118,.12);color:var(--gr)">BULL</span></div>
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">ADX (14)</div><div class="ov" style="color:var(--gr)">~42</div><span class="os" style="background:rgba(0,230,118,.12);color:var(--gr)">TREND FORTE</span></div>
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">ATR (14)</div><div class="ov" style="color:var(--tx)">8.75</div><span class="os" style="background:rgba(255,255,255,.05);color:var(--mu)">ALTA VOL</span></div>
+    <div class="osc" style="display:flex;flex-direction:column"><div class="on">BB %b</div><div class="ov" style="color:var(--am)">~0.85</div><span class="os" style="background:rgba(255,179,0,.12);color:var(--am)">BANDA SUP.</span></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>RSI storico</div><div class="cw"><canvas id="rsiChart"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--pu)"></div>MACD</div><div class="cw"><canvas id="macdChart"></canvas></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Prezzo + Medie Mobili</div><div class="cw-lg"><canvas id="maChart"></canvas></div></div>
+    <div class="card">
+      <div class="ct"><div class="d" style="background:var(--mu)"></div>MA Signals</div>
+      <div id="maTable"></div>
+      <div class="ct" style="margin-top:14px"><div class="d" style="background:var(--ac)"></div>S/R Chiave</div>
+      <div id="srList"></div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>4 Pattern Riconosciuti</div><div id="patterns"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--pu)"></div>Radar Tecnico vs Settore</div><div class="cw"><canvas id="radarChart"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ── SCREENER ── -->
+<div class="page" id="page-screener">
+  <div style="margin-bottom:12px" id="scrFilters"></div>
+  <div class="card mb scr"><div class="ct"><div class="d" style="background:var(--ac)"></div>Comparativo Semiconduttori AI</div><table class="stbl"><thead><tr><th>Ticker</th><th onclick="sortScr('price')">Prezzo ↕</th><th onclick="sortScr('ytd')">YTD ↕</th><th onclick="sortScr('pe')">P/E ↕</th><th>Rev Growth</th><th>Gross Margin</th><th>Cap</th><th>Analisti</th><th>Tecnica</th><th>Rating</th></tr></thead><tbody id="scrBody"></tbody></table></div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--pu)"></div>Radar Fondamentale ARM vs Peer</div><div class="cw"><canvas id="radarFond"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Metriche Normalizzate</div><div id="metricBars"></div></div>
+  </div>
+</div>
+
+<!-- ── SENTIMENT ── -->
+<div class="page" id="page-sentiment">
+  <div class="g4 mb">
+    <div class="card kpi" style="border-top:2px solid var(--am)"><div class="l">RVOL</div><div class="v" style="color:var(--am)">1.8×</div><span class="bge ba">Normalizzato</span></div>
+    <div class="card kpi" style="border-top:2px solid var(--rd)"><div class="l">Short Interest</div><div class="v" style="color:var(--rd)">18.4%</div><span class="bge ba">Ratio 2.43</span></div>
+    <div class="card kpi" style="border-top:2px solid var(--gr)"><div class="l">Fear & Greed</div><div class="v" style="color:var(--gr)">52</div><span class="bge bg">Neutro ↑</span></div>
+    <div class="card kpi" style="border-top:2px solid var(--pu)"><div class="l">Social Buzz</div><div class="v" style="color:var(--pu)">7.8/10</div><span class="bge bp">Bullish ↑</span></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>Volume 10 Giorni + Media 20gg</div><div class="cw-lg"><canvas id="volChart"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--pu)"></div>OBV — Divergenza Bullish</div><div class="cw-lg"><canvas id="obvChart"></canvas></div>
+      <div style="margin-top:8px;padding:7px 10px;background:rgba(157,92,255,.06);border-radius:6px;border:1px solid rgba(157,92,255,.15);font-size:11px;color:var(--mu)">🔵 <strong style="color:var(--pu)">Divergenza Bullish:</strong> Prezzo fa minimi decrescenti mentre OBV mantiene minimi crescenti — accumulazione istituzionale.</div>
+    </div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Sentiment Multi-Source</div><div id="sentBars"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Timeline Catalyst + Impatto</div><div id="timeline" style="max-height:400px;overflow-y:auto"></div></div>
+  </div>
+</div>
+
+<!-- ── INDICATORI AVANZATI ── -->
+<div class="page" id="page-avanzati">
+  <div style="font-family:var(--sa);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);padding:4px 0 10px;border-bottom:1px solid var(--b);margin-bottom:10px">📦 Volume &amp; Volatilità</div>
+  <div id="xVol"></div>
+  <div style="font-family:var(--sa);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);padding:14px 0 10px;border-bottom:1px solid var(--b);margin-bottom:10px">🕯️ Momentum &amp; Pattern</div>
+  <div id="xMom"></div>
+  <div style="font-family:var(--sa);font-size:10px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--mu);padding:14px 0 10px;border-bottom:1px solid var(--b);margin-bottom:10px">📰 Fondamentali &amp; Sentiment</div>
+  <div id="xFond"></div>
+</div>
+
+<!-- ── RISK ── -->
+<div class="page" id="page-risk">
+  <div class="g2">
+    <div class="card">
+      <div class="ct"><div class="d" style="background:var(--ac)"></div>Calcolatore Position Sizing</div>
+      <div style="margin-bottom:8px"><div style="font-size:11px;color:var(--mu);margin-bottom:4px">💰 Capitale ($)</div><input class="ri" type="number" id="ri-cap" value="50000" oninput="calcR()"></div>
+      <div style="margin-bottom:8px"><div style="font-size:11px;color:var(--mu);margin-bottom:4px">⚠️ Rischio max (%)</div><input class="ri" type="number" id="ri-rsk" value="2" step="0.1" oninput="calcR()"></div>
+      <div style="margin-bottom:8px"><div style="font-size:11px;color:var(--mu);margin-bottom:4px">📍 Entrata ($)</div><input class="ri" type="number" id="ri-ent" value="166.73" step="0.01" oninput="calcR()"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+        <div><div style="font-size:11px;color:var(--mu);margin-bottom:4px">🛑 Stop ($)</div><input class="ri" type="number" id="ri-stp" value="157.99" step="0.01" oninput="calcR()"></div>
+        <div><div style="font-size:11px;color:var(--mu);margin-bottom:4px">🎯 Target ($)</div><input class="ri" type="number" id="ri-tgt" value="183.00" step="0.01" oninput="calcR()"></div>
+      </div>
+      <button class="rcb" onclick="calcR()">▶ CALCOLA</button>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px">
+        <div class="rc"><div class="rcv" id="r-sh" style="color:var(--ac)">—</div><div class="rcl">Azioni</div></div>
+        <div class="rc"><div class="rcv" id="r-pv">—</div><div class="rcl">Valore pos.</div></div>
+        <div class="rc"><div class="rcv" id="r-ml" style="color:var(--rd)">—</div><div class="rcl">Max loss</div></div>
+        <div class="rc"><div class="rcv" id="r-gn" style="color:var(--gr)">—</div><div class="rcl">Profitto att.</div></div>
+      </div>
+      <div style="background:var(--bg3);border:1px solid var(--b);border-radius:8px;padding:11px;margin-top:10px">
+        <div style="display:flex;justify-content:space-between;margin-bottom:7px;font-size:12px"><span style="color:var(--mu)">R/R Ratio</span><span id="r-rr" style="font-family:var(--sa);font-size:14px;font-weight:700;color:var(--am)">—</span></div>
+        <div class="rrbar"><div class="rrfill" id="r-rrb" style="width:0%;background:var(--am)"></div></div>
+        <div id="r-vrd" style="font-size:11px;color:var(--mu);margin-top:5px"></div>
+      </div>
+      <div style="margin-top:8px;padding:8px 10px;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.1);border-radius:7px;font-size:11px;color:#9AABB8">Pre-compilato 20 Apr — Entrata: <strong style="color:var(--tx)">$166.73</strong> · Stop: <strong style="color:var(--rd)">$157.99</strong> (MA100) · Target: <strong style="color:var(--gr)">$183</strong></div>
+    </div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card"><div class="ct"><div class="d" style="background:var(--rd)"></div>Profilo Rischio ARM</div><div class="cw"><canvas id="riskRadar"></canvas></div></div>
+      <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>9 Regole Operative</div><div id="rules"></div></div>
+    </div>
+  </div>
+  <div class="card" style="margin-top:12px"><div class="ct"><div class="d" style="background:var(--gr)"></div>P&L Scenari (da $166.73)</div><div class="cw"><canvas id="pnlChart"></canvas></div>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px">
+      <div style="text-align:center;padding:9px;background:rgba(0,230,118,.05);border-radius:7px;border:1px solid rgba(0,230,118,.15)"><div style="font-family:var(--sa);font-size:11px;font-weight:700;color:var(--gr);margin-bottom:3px">🐂 BULL $210</div><div style="font-size:12px;color:var(--mu)"><strong style="color:var(--gr)">+$4,327</strong> / 100 az · +26%</div></div>
+      <div style="text-align:center;padding:9px;background:rgba(0,212,255,.05);border-radius:7px;border:1px solid rgba(0,212,255,.15)"><div style="font-family:var(--sa);font-size:11px;font-weight:700;color:var(--ac);margin-bottom:3px">⚖️ BASE $183</div><div style="font-size:12px;color:var(--mu)"><strong style="color:var(--ac)">+$1,627</strong> / 100 az · +9.8%</div></div>
+      <div style="text-align:center;padding:9px;background:rgba(255,68,68,.05);border-radius:7px;border:1px solid rgba(255,68,68,.15)"><div style="font-family:var(--sa);font-size:11px;font-weight:700;color:var(--rd);margin-bottom:3px">🐻 BEAR $130</div><div style="font-size:12px;color:var(--mu)"><strong style="color:var(--rd)">-$3,673</strong> / 100 az · -22%</div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── NEWS ── -->
+<div class="page" id="page-news">
+  <div style="margin-bottom:12px" id="newsFilters"></div>
+  <div class="g2">
+    <div id="newsFeed"></div>
+    <div style="display:flex;flex-direction:column;gap:12px">
+      <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Impatto per Evento</div><div class="cw"><canvas id="impactChart"></canvas></div></div>
+      <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>Reattività per Categoria</div><div id="reactBars"></div></div>
+      <div class="card"><div class="ct"><div class="d" style="background:var(--pu)"></div>Prossimi Catalyst</div><div id="upcoming"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ── FONDAMENTALI ── -->
+<div class="page" id="page-fondamentali">
+  <div class="g3">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--rd)"></div>Valutazione</div><div id="fondVal"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Redditività</div><div id="fondRed"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Bilancio</div><div id="fondBil"></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Revenue per Segmento</div><div class="cw"><canvas id="segChart"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--pu)"></div>EPS Storico + Stime</div><div class="cw"><canvas id="epsChart"></canvas></div></div>
+  </div>
+  <div class="g3">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Catalyst Bull</div><div id="catBull"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>Pattern Tecnici</div><div id="catPat"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Livelli Chiave</div><div id="fondLevels"></div></div>
+  </div>
+</div>
+
+<!-- ── SNAPSHOT ── -->
+<div class="page" id="page-snapshot">
+  <div class="hero">
+    <div><div class="ht">ARM</div><div class="ls" style="margin-top:3px">Arm Holdings plc · NASDAQ · 20 Aprile 2026</div>
+      <div style="display:flex;gap:8px;margin-top:10px;flex-wrap:wrap">
+        <span class="bge bg">📈 Trend Bull confermato</span>
+        <span class="bge bg">⚡ RSI 65.83</span>
+        <span class="bge bb">📊 Earnings 6 Mag (16gg)</span>
+        <span class="bge bp">🎯 Options 81% call</span>
+      </div>
+    </div>
+    <div style="text-align:right"><div class="hp">$166.73</div><div style="color:var(--gr);font-family:var(--sa);font-size:15px">▲ +2.71% ven 17 Apr</div><div style="font-size:11px;color:var(--mu);margin-top:3px">Pre-mkt 20 Apr: $165.94</div></div>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(8,1fr);gap:10px;margin-bottom:12px" id="ohlcGrid"></div>
+  <div class="g3">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--rd)"></div>Segnali Tecnici</div><div id="snapSig"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Consensus Analisti</div><div id="snapAnl"></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Scadenze & Rischi</div><div id="snapRisk"></div></div>
+  </div>
+  <div class="g2">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Performance Multi-Timeframe</div><div class="cw"><canvas id="snapPerfChart"></canvas></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>Volatilità Storica vs Implicita</div><div class="cw"><canvas id="snapVolChart"></canvas></div></div>
+  </div>
+</div>
+
+<!-- ── TRADE ── -->
+<div class="page" id="page-trade">
+  <div style="padding:11px 16px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.2);border-radius:10px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px">
+    <div><span style="font-family:var(--sa);font-size:11px;font-weight:700;color:var(--gr)">⚡ CONTESTO 20 APRILE 2026</span><span style="font-size:11px;color:var(--mu);margin-left:10px">ARM $166.73 · RSI 65.83 · Trend bull · Earnings 6 Mag (16gg)</span></div>
+    <div><span class="bge bg">Trend Bull</span>&nbsp;<span class="bge ba">Beta 4.13×</span></div>
+  </div>
+  <div class="g2 mb">
+    <div class="setup long">
+      <div class="sd" style="color:var(--gr)"><span style="background:rgba(0,230,118,.15);padding:3px 9px;border-radius:4px">▲ LONG</span><span style="color:var(--mu);font-weight:400">Trend following</span></div>
+      <div class="st">Continuazione Trend — Breakout $168</div>
+      <div id="longRows"></div>
+      <div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-bottom:3px"><span>Convinzione</span><span style="color:var(--gr)">72/100</span></div><div class="sbar" style="height:5px;margin-bottom:8px"><div class="sfill" style="width:72%;background:var(--gr)"></div></div></div>
+      <div style="padding:10px;background:rgba(0,230,118,.05);border-radius:7px;border:1px solid rgba(0,230,118,.12);font-size:11px;color:#9AABB8"><strong style="color:var(--gr)">Pro:</strong> Pivot 30 Mar confermato, tutti SMA allineati, MACD +7.28, opzioni 81% call. <br><strong style="color:var(--rd)">Contro:</strong> RSI si avvicina OB, volume cala, earnings 6 Mag = rischio evento.</div>
+    </div>
+    <div class="setup short">
+      <div class="sd" style="color:var(--rd)"><span style="background:rgba(255,68,68,.15);padding:3px 9px;border-radius:4px">▼ SHORT</span><span style="color:var(--mu);font-weight:400">Pre-earnings fade</span></div>
+      <div class="st">OB Fade pre-Earnings (alta rischio)</div>
+      <div id="shortRows"></div>
+      <div style="margin-top:10px"><div style="display:flex;justify-content:space-between;font-size:10px;color:var(--mu);margin-bottom:3px"><span>Convinzione</span><span style="color:var(--am)">42/100</span></div><div class="sbar" style="height:5px;margin-bottom:8px"><div class="sfill" style="width:42%;background:var(--am)"></div></div></div>
+      <div style="padding:10px;background:rgba(255,68,68,.04);border-radius:7px;border:1px solid rgba(255,68,68,.12);font-size:11px;color:#9AABB8"><strong style="color:var(--gr)">Pro:</strong> Volume cala sui rialzi, RSI si avvicina OB, pre-earnings fade pattern. <br><strong style="color:var(--rd)">Contro:</strong> Trend rialzista dominante, SI 18.4% squeeze risk, earnings miss di bersaglio.</div>
+    </div>
+  </div>
+  <div class="g2 mb">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--ac)"></div>Mappa Prezzi — Livelli</div><div class="cw-lg"><canvas id="tradeLevelChart"></canvas></div></div>
+    <div style="display:flex;flex-direction:column;gap:10px">
+      <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>Checklist Long</div><div id="ckLong"></div></div>
+      <div class="card"><div class="ct"><div class="d" style="background:var(--rd)"></div>Checklist Short</div><div id="ckShort"></div></div>
+    </div>
+  </div>
+  <div class="g3">
+    <div class="card"><div class="ct"><div class="d" style="background:var(--gr)"></div>🐂 Bull — Earnings Beat</div><div style="font-size:12px;color:#9AABB8;line-height:1.6;margin-bottom:8px">ARM batte Q4 FY2026. Royalty data center accelera. Breakout $183 con squeeze 18.4% float. Target Susquehanna $210.</div><div style="font-size:11px;color:var(--mu)">P&L 100 az da $167: T1 $183 = <strong style="color:var(--gr)">+$1,600</strong> · T2 $210 = <strong style="color:var(--gr)">+$4,300</strong> · Stop $158 = <strong style="color:var(--rd)">-$900</strong></div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--am)"></div>⚖️ Base — Consolidamento</div><div style="font-size:12px;color:#9AABB8;line-height:1.6;margin-bottom:8px">Range $160–183 pre-earnings. Volume calante, RSI in leggero indebolimento. Mercato aspetta conferma fondamentale.</div><div style="font-size:11px;color:var(--mu)">Strategia: mantenere long con stop MA100 $158. Prendere 50% a $178, lasciare correre verso earnings.</div></div>
+    <div class="card"><div class="ct"><div class="d" style="background:var(--rd)"></div>🐻 Bear — Earnings Miss</div><div style="font-size:12px;color:#9AABB8;line-height:1.6;margin-bottom:8px">ARM manca le stime. P/E 130x + miss = correzione violenta. Rompe $158 MA100, verso $137–130. Geopolitica Cina amplifica.</div><div style="font-size:11px;color:var(--mu)">Con stop corretto la perdita è limitata a $900 su 100 azioni — gestibile.</div></div>
+  </div>
+  <div style="padding:12px 16px;background:rgba(255,68,68,.04);border:1px solid rgba(255,68,68,.15);border-radius:9px;font-size:11px;color:#9AABB8;line-height:1.7">⚠️ <strong style="color:var(--am)">Disclaimer:</strong> Analisi educativa, non consulenza finanziaria. Usa sempre stop loss. Consulta un consulente qualificato.</div>
+</div>
+
+<!-- ── REPORT ── -->
+<div class="page" id="page-report">
+  <div style="max-width:800px">
+    <div style="font-family:var(--sa);font-size:26px;font-weight:800;color:var(--ac);margin-bottom:4px">ARM Holdings — Report Completo</div>
+    <div style="font-size:12px;color:var(--mu);margin-bottom:18px">20 Aprile 2026 · NASDAQ: ARM · Non è consulenza finanziaria</div>
+    <div id="reportContent"></div>
+  </div>
+</div>
+
+<script>
+// ── NAV
+function go(id,el){
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t=>t.classList.remove('active'));
+  document.getElementById('page-'+id).classList.add('active');
+  el.classList.add('active');
+  if(!window._init) window._init={};
+  if(!window._init[id]){window._init[id]=1;initTab(id);}
+}
+
+// ── CHART DEFAULTS
+const F="'DM Mono',monospace";
+const CD={
+  responsive:true,maintainAspectRatio:false,
+  plugins:{legend:{display:false},tooltip:{backgroundColor:'#1A2333',borderColor:'rgba(255,255,255,.08)',borderWidth:1,titleColor:'#7A8899',bodyColor:'#E8EDF2',bodyFont:{family:F,size:12},titleFont:{family:F,size:11}}},
+  scales:{x:{grid:{color:'rgba(255,255,255,.03)'},ticks:{color:'#3A4A5C',font:{family:F,size:10}}},y:{grid:{color:'rgba(255,255,255,.04)'},ticks:{color:'#3A4A5C',font:{family:F,size:10}}}}
+};
+const LG=(ctx,c1,c2)=>{const g=ctx.createLinearGradient(0,0,0,280);g.addColorStop(0,c1);g.addColorStop(1,c2);return g;};
+
+// ── DATA
+const months=['Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic','Gen','Feb','Mar','Apr','20Apr'];
+const prices=[80,95,108,118,105,120,148,165,145,125,122,160,149,167];
+const rsiD=[42,55,58,60,38,62,68,72,52,35,30,75,27,66];
+const macdD=[-2,1,3,5,-3,4,8,10,2,-4,-6,12,-0.8,7.28];
+const macdS=[-3,0,2,4,-1,2,6,9,4,-1,-4,8,-0.4,6.27];
+
+// ── INIT DASHBOARD (always first)
+(function initDash(){
+  const pc=document.getElementById('priceChart');
+  new Chart(pc,{type:'line',data:{labels:months,datasets:[{data:prices,borderColor:'#00D4FF',borderWidth:2,backgroundColor:ctx=>LG(ctx.chart.ctx,'rgba(0,212,255,.15)','rgba(0,212,255,0)'),fill:true,tension:.4,pointRadius:3,pointBackgroundColor:'#00D4FF',pointBorderColor:'#080C10',pointBorderWidth:2}]},options:{...CD,scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'$'+v}}}}});
+  new Chart('revenueChart',{type:'bar',data:{labels:['Q1F25','Q2F25','Q3F25','Q4F25','Q1F26','Q2F26','Q3F26'],datasets:[{label:'Royalty',data:[512,563,603,660,692,724,737],backgroundColor:'rgba(157,92,255,.7)',borderRadius:4},{label:'License',data:[358,372,388,410,440,468,505],backgroundColor:'rgba(0,212,255,.4)',borderRadius:4}]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:10,padding:10}}},scales:{x:{...CD.scales.x,stacked:true},y:{...CD.scales.y,stacked:true,ticks:{...CD.scales.y.ticks,callback:v=>'$'+v+'M'}}}}});
+  new Chart('perfChart',{type:'bar',data:{labels:['ARM','NVDA','MRVL','AMD','INTC','Nasdaq','SOX'],datasets:[{data:[47.4,28.4,38.2,22.5,12.1,8.3,-3.5],backgroundColor:['#00D4FF','#9D5CFF','#9D5CFF','#7A8899','#7A8899','#3A4A5C','#FF4444'],borderRadius:4}]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,callback:v=>v+'%'}},y:CD.scales.y}}});
+  new Chart('mixChart',{type:'doughnut',data:{labels:['Smartphone','Data Center','Auto/IoT','License'],datasets:[{data:[38,22,15,25],backgroundColor:['#9D5CFF','#00D4FF','#00E676','#FFB300'],borderColor:'#131B26',borderWidth:3,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'62%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:10,padding:8}},tooltip:CD.plugins.tooltip}}});
+})();
+
+// ── TAB INITS
+function initTab(id){
+  if(id==='tecnica') initTecnica();
+  if(id==='screener') initScreener();
+  if(id==='sentiment') initSentiment();
+  if(id==='avanzati') initAvanzati();
+  if(id==='risk'){initRisk();calcR();}
+  if(id==='news') initNews();
+  if(id==='fondamentali') initFond();
+  if(id==='snapshot') initSnapshot();
+  if(id==='trade') initTrade();
+  if(id==='report') initReport();
+}
+
+// ── TECNICA
+function initTecnica(){
+  new Chart('rsiChart',{type:'line',data:{labels:months,datasets:[{data:rsiD,borderColor:'#FFB300',borderWidth:1.5,fill:false,tension:.4,pointRadius:0},{data:Array(14).fill(70),borderColor:'rgba(255,68,68,.4)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0},{data:Array(14).fill(30),borderColor:'rgba(0,230,118,.4)',borderWidth:1,borderDash:[4,4],fill:false,pointRadius:0}]},options:{...CD,scales:{x:CD.scales.x,y:{...CD.scales.y,min:0,max:100}}}});
+  const mc=macdD.map((v,i)=>v-macdS[i]);
+  new Chart('macdChart',{type:'bar',data:{labels:months,datasets:[{type:'line',data:macdD,borderColor:'#00D4FF',borderWidth:1.5,fill:false,pointRadius:0,tension:.4},{type:'line',data:macdS,borderColor:'#FFB300',borderWidth:1.5,fill:false,pointRadius:0,tension:.4},{type:'bar',data:mc,backgroundColor:mc.map(v=>v>=0?'rgba(0,230,118,.5)':'rgba(255,68,68,.5)'),borderRadius:2}]},options:{...CD}});
+  new Chart('maChart',{type:'line',data:{labels:months,datasets:[{label:'Prezzo',data:prices,borderColor:'#00D4FF',borderWidth:2,fill:false,tension:.4,pointRadius:2},{label:'MA20',data:[null,null,null,null,104,106,110,122,128,126,124,138,124,150],borderColor:'rgba(0,230,118,.7)',borderWidth:1.2,fill:false,tension:.4,pointRadius:0},{label:'MA50',data:[null,null,null,null,null,null,null,null,118,125,130,140,140,147],borderColor:'rgba(255,179,0,.7)',borderWidth:1.2,fill:false,tension:.4,pointRadius:0},{label:'MA200',data:[null,null,null,null,null,null,null,null,null,null,115,118,124,133],borderColor:'rgba(255,68,68,.6)',borderWidth:1,borderDash:[4,3],fill:false,tension:.4,pointRadius:0}]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:16,padding:8}}},scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'$'+v}}}}});
+  new Chart('radarChart',{type:'radar',data:{labels:['Crescita Rev.','Gross Margin','Momentum','Valutazione*','Innovazione','Copertura AI'],datasets:[{label:'ARM',data:[85,98,80,20,90,88],borderColor:'#00D4FF',backgroundColor:'rgba(0,212,255,.1)',borderWidth:2,pointBackgroundColor:'#00D4FF',pointRadius:4},{label:'NVDA',data:[99,78,75,55,96,99],borderColor:'#9D5CFF',backgroundColor:'rgba(157,92,255,.1)',borderWidth:2,pointBackgroundColor:'#9D5CFF',pointRadius:4},{label:'Settore',data:[50,60,50,60,55,60],borderColor:'#3A4A5C',backgroundColor:'rgba(58,74,92,.08)',borderWidth:1,borderDash:[4,3],pointBackgroundColor:'#3A4A5C',pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,.05)'},angleLines:{color:'rgba(255,255,255,.05)'},ticks:{display:false},pointLabels:{color:'#7A8899',font:{family:F,size:11}}}},plugins:{legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:12,padding:8}},tooltip:CD.plugins.tooltip}}});
+  // MA table
+  const maData=[['MA 5','$149.02','Sopra*','SELL*','r'],['MA 8','$153.20','Sopra','BUY','g'],['MA 20','$150.00','Sopra','BUY','g'],['MA 50','$146.93','Sopra','BUY','g'],['MA 100','$157.99','Vicino','NEUTRO','a'],['MA 200','$132.85','Sopra (+25%)','BUY','g'],['EMA 20','$150.00','Sopra','BUY','g'],['EMA 50','$134.13','Sopra (+24%)','BUY','g']];
+  const cols={'g':'<span class="bge bg">','r':'<span class="bge br">','a':'<span class="bge ba">'};
+  document.getElementById('maTable').innerHTML='<table style="width:100%;border-collapse:collapse;font-size:12px"><thead><tr>'+['MA','Valore','vs Prezzo','Segnale'].map(h=>`<th style="text-align:left;font-size:10px;letter-spacing:.08em;text-transform:uppercase;color:#7A8899;padding:5px 8px;border-bottom:1px solid rgba(255,255,255,.06)">${h}</th>`).join('')+'</tr></thead><tbody>'+maData.map(r=>`<tr><td style="padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04)">${r[0]}</td><td style="padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04)">${r[1]}</td><td style="padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04);color:${r[4]==='g'?'#00E676':r[4]==='r'?'#FF4444':'#FFB300'}">${r[2]}</td><td style="padding:7px 8px;border-bottom:1px solid rgba(255,255,255,.04)">${cols[r[4]]}${r[3]}</span></td></tr>`).join('')+'</tbody></table>';
+  // SR list
+  const sr=[['R3','$183.16','Max 52W','rd',95],['R2','$175–180','Target BofA/WF','rd',75],['R1','$168.35','High recente 17 Apr','rd',50],['▶','$166.73','Prezzo attuale','ac',100],['S1','$162.73','Low 17 Apr','gr',45],['S2','$157.99','MA100','gr',60],['S3','$149','Pivot 30 Mar','gr',72],['S4','$137.97','Stop area','gr',82],['S5','$95.32','Min 52W','gr',95]];
+  const cc={'rd':'var(--rd)','ac':'var(--ac)','gr':'var(--gr)'};
+  document.getElementById('srList').innerHTML=sr.map(r=>`<div class="lrow${r[3]==='ac'?' '+' style="background:rgba(0,212,255,.05);border-color:rgba(0,212,255,.2)"':''}"><div class="lt2" style="color:${cc[r[3]]}">${r[0]}</div><div class="lp" style="color:${cc[r[3]]}">${r[1]}</div><div class="ld">${r[2]}</div><div class="lbw"><div class="lbf" style="width:${r[4]}%;background:${cc[r[3]]}"></div></div></div>`).join('');
+  // Patterns
+  const pats=[{n:'Death Cross MA50×MA200',m:'Daily · 15 Mar 2026',d:'Incrocio ribassista su daily — ora in fase di recupero. Golden Cross in formazione.',c:'rd',rel:74},{n:'Golden Cross in formazione',m:'Daily · Imminente',d:'MA50 ($147) si avvicina a MA200 ($133). Un Golden Cross confermato sarebbe fortemente bullish.',c:'gr',rel:68},{n:'Pivot Bottom confermato',m:'Daily · 30 Mar 2026',d:'Doppio minimo a $111–115 con rimbalzo violento. +21.7% da allora. Struttura bullish.',c:'gr',rel:76},{n:'Volume cala sui rialzi',m:'Daily · Apr 2026',d:'Divergenza tecnica: prezzi crescenti ma volume decrescente. Segnale di attenzione per il breve.',c:'am',rel:62}];
+  const cc2={'rd':'var(--rd)','gr':'var(--gr)','am':'var(--am)'};
+  document.getElementById('patterns').innerHTML=pats.map(p=>`<div style="background:var(--bg3);border:1px solid var(--b);border-radius:8px;padding:12px;border-left:3px solid ${cc2[p.c]};margin-bottom:8px"><div style="font-family:var(--sa);font-size:12px;font-weight:700;margin-bottom:3px">${p.n}</div><div style="font-size:11px;color:var(--mu);margin-bottom:6px">${p.m}</div><div style="font-size:11px;color:#9AABB8;line-height:1.5;margin-bottom:6px">${p.d}</div><div style="display:flex;align-items:center;gap:6px"><span style="font-size:10px;color:${cc2[p.c]}">${p.rel}%</span><div class="sbar"><div class="sfill" style="width:${p.rel}%;background:${cc2[p.c]}"></div></div><span style="font-size:10px;color:var(--mu)">Affidabilità</span></div></div>`).join('');
+}
+
+// ── SCREENER
+const scrD=[
+  {t:'ARM',n:'Arm Holdings',p:'$166.73',ytd:47.4,pe:130,rg:26,gm:97.5,cap:'$172B',an:'Buy',tech:'Strong Buy',r:'buy',c:'#00D4FF'},
+  {t:'NVDA',n:'NVIDIA',p:'$875',ytd:28.4,pe:48,rg:122,gm:76.8,cap:'$2.15T',an:'Strong Buy',tech:'Buy',r:'buy',c:'#9D5CFF'},
+  {t:'MRVL',n:'Marvell',p:'$139.69',ytd:38.2,pe:'-',rg:36,gm:54.8,cap:'$120B',an:'Buy',tech:'Buy',r:'buy',c:'#9D5CFF'},
+  {t:'AVGO',n:'Broadcom',p:'$1,142',ytd:18.2,pe:42,rg:51,gm:62.4,cap:'$534B',an:'Buy',tech:'Hold',r:'buy',c:'#9D5CFF'},
+  {t:'AMD',n:'AMD',p:'$278',ytd:22.5,pe:78,rg:24,gm:52.9,cap:'$166B',an:'Buy',tech:'Buy',r:'buy',c:'#7A8899'},
+  {t:'QCOM',n:'Qualcomm',p:'$136',ytd:5.1,pe:19,rg:18,gm:56.1,cap:'$165B',an:'Hold',tech:'Hold',r:'hold',c:'#FFB300'},
+  {t:'INTC',n:'Intel',p:'$68.50',ytd:12.1,pe:'-',rg:-8,gm:42.3,cap:'$292B',an:'Hold',tech:'Hold',r:'hold',c:'#FF4444'},
+  {t:'ASML',n:'ASML',p:'$712',ytd:-12.1,pe:34,rg:16,gm:51.4,cap:'$280B',an:'Buy',tech:'Sell',r:'hold',c:'#7A8899'}
+];
+let scrFilter='all', scrSort='';
+function initScreener(){
+  const f=document.getElementById('scrFilters');
+  f.innerHTML=['all','buy','hold','sell'].map(x=>`<button class="fb${x==='all'?' active':''}" onclick="setScrFilter('${x}',this)">${x==='all'?'Tutti':x.toUpperCase()}</button>`).join('');
+  renderScr();
+  new Chart('radarFond',{type:'radar',data:{labels:['Crescita','Margin','Momentum','Valutazione*','AI Cover','Innovazione'],datasets:[{label:'ARM',data:[85,98,80,20,88,90],borderColor:'#00D4FF',backgroundColor:'rgba(0,212,255,.1)',borderWidth:2,pointBackgroundColor:'#00D4FF',pointRadius:4},{label:'NVDA',data:[99,78,75,55,99,96],borderColor:'#9D5CFF',backgroundColor:'rgba(157,92,255,.1)',borderWidth:2,pointBackgroundColor:'#9D5CFF',pointRadius:4},{label:'Settore',data:[50,60,50,60,60,55],borderColor:'#3A4A5C',backgroundColor:'rgba(58,74,92,.08)',borderWidth:1,borderDash:[4,3],pointBackgroundColor:'#3A4A5C',pointRadius:2}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,.05)'},angleLines:{color:'rgba(255,255,255,.05)'},ticks:{display:false},pointLabels:{color:'#7A8899',font:{family:F,size:11}}}},plugins:{legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:12,padding:8}},tooltip:CD.plugins.tooltip}}});
+  const mb=[['Gross Margin','ARM 97.5% vs Settore ~65%',97.5,'ac'],['Revenue Growth YoY','ARM +26% vs Settore ~12%',72,'gr'],['P/E vs Settore (invertito)','ARM 130x vs Settore 36x (premio)',88,'rd'],['Momentum (6M)','ARM +47% vs Nasdaq +8%',75,'pu'],['Analyst Buy %','82% Buy (27/30)',82,'am']];
+  document.getElementById('metricBars').innerHTML=mb.map(m=>`<div style="margin-bottom:10px"><div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:3px"><span style="color:var(--mu)">${m[0]}</span><span>${m[1]}</span></div><div class="sbar"><div class="sfill" style="width:${m[2]}%;background:var(--${m[3]})"></div></div></div>`).join('')+'<div style="margin-top:10px;padding:8px 10px;background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.1);border-radius:6px;font-size:11px;color:var(--mu)"><strong style="color:var(--ac)">Sintesi:</strong> ARM domina su margin e crescita, ma paga premio valutazione 130x. Differenziale si giustifica solo con execution AGI CPU 2031.</div>';
+}
+function setScrFilter(f,btn){
+  document.querySelectorAll('#scrFilters .fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); scrFilter=f; renderScr();
+}
+function sortScr(k){
+  if(scrSort===k) scrSort=''; else scrSort=k; renderScr();
+}
+function renderScr(){
+  let d=[...scrD];
+  if(scrFilter!=='all') d=d.filter(x=>x.r===scrFilter);
+  if(scrSort==='ytd') d.sort((a,b)=>b.ytd-a.ytd);
+  if(scrSort==='pe') d.sort((a,b)=>(isNaN(a.pe)?999:+a.pe)-(isNaN(b.pe)?999:+b.pe));
+  const rc={'buy':'<span class="bge bg">BUY</span>','hold':'<span class="bge ba">HOLD</span>','sell':'<span class="bge br">SELL</span>'};
+  const tc=t=>t.includes('Strong Buy')||t==='Buy'?'color:var(--gr)':t==='Hold'||t==='Neutro'?'color:var(--am)':'color:var(--rd)';
+  const ac=a=>a.includes('Buy')?'color:var(--gr)':a==='Hold'?'color:var(--am)':'color:var(--rd)';
+  document.getElementById('scrBody').innerHTML=d.map(x=>`<tr${x.t==='ARM'?' style="background:rgba(0,212,255,.03)"':''}><td><span style="font-family:var(--sa);font-weight:700;font-size:12px;color:${x.c}">${x.t}</span><span style="font-size:10px;color:var(--mu);margin-left:5px">${x.n}</span></td><td style="font-family:var(--sa);font-weight:600">${x.p}</td><td style="color:${x.ytd>=0?'#00E676':'#FF4444'};font-weight:600">${x.ytd>=0?'+':''}${x.ytd}%</td><td>${x.pe}</td><td style="color:${x.rg>=0?'#00E676':'#FF4444'}">${x.rg>=0?'+':''}${x.rg}%</td><td>${x.gm}%</td><td>${x.cap}</td><td style="${ac(x.an)}">${x.an}</td><td style="${tc(x.tech)};font-size:11px">${x.tech}</td><td>${rc[x.r]}</td></tr>`).join('');
+}
+
+// ── SENTIMENT
+function initSentiment(){
+  const volD=[8.2,14.5,9.1,11.8,6.4,22.3,37.4,18.9,12.4,29.8];
+  const vl=['24M','25M','26M','27M','28M','31M','1A','2A','3A','4A'];
+  new Chart('volChart',{type:'bar',data:{labels:vl,datasets:[{type:'bar',label:'Volume (M)',data:volD,backgroundColor:volD.map(v=>v>15?'rgba(255,179,0,.75)':'rgba(0,212,255,.35)'),borderRadius:4},{type:'line',label:'Media 20gg',data:Array(10).fill(11.7),borderColor:'rgba(255,68,68,.7)',borderWidth:1.5,borderDash:[5,3],fill:false,pointRadius:0}]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:12,padding:8}}},scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'M'}}}}});
+  const obvD=[100,140,175,210,185,245,310,380,340,295,270,360,342,355];
+  new Chart('obvChart',{type:'line',data:{labels:months,datasets:[{label:'OBV',data:obvD,borderColor:'#9D5CFF',borderWidth:2,fill:false,tension:.4,pointRadius:0,yAxisID:'y'},{label:'Prezzo',data:prices,borderColor:'rgba(0,212,255,.5)',borderWidth:1.5,borderDash:[4,3],fill:false,tension:.4,pointRadius:0,yAxisID:'y2'}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:12,padding:8}},tooltip:CD.plugins.tooltip},scales:{x:CD.scales.x,y:{...CD.scales.y,position:'left'},y2:{...CD.scales.y,position:'right',grid:{drawOnChartArea:false},ticks:{...CD.scales.y.ticks,callback:v=>'$'+v}}}}});
+  const sb=[['Retail Sentiment','Reddit bullish',72,'gr'],['X/Twitter bullish',null,65,'gr'],['StockTwits bullish',null,58,'am'],['Prob. Squeeze Score','SI 18.4% + RVOL 1.8×',44,'am'],['Analyst Buy coverage','27/30 analisti',82,'gr'],['Options Call flow','81% vs 19% put',81,'gr']];
+  document.getElementById('sentBars').innerHTML=sb.map(s=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:9px"><div style="font-size:11px;color:var(--mu);min-width:130px">${s[0]}</div><div class="sbar"><div class="sfill" style="width:${s[2]}%;background:var(--${s[3]})"></div></div><div style="font-size:11px;font-weight:600;color:var(--${s[3]});min-width:32px;text-align:right">${s[2]}%</div></div>`).join('');
+  const tl=[{d:'Set 2023',ev:'IPO Nasdaq a $51',desc:'Debutto. Val. $65B. Alta domanda istituzionale.',imp:'+25% 1°gg',c:'pu'},{d:'Feb 2024',ev:'Earnings Q3 FY24 esplosivi',desc:'EPS + guidance superiori. Euforia AI al picco.',imp:'+48% in un giorno',c:'gr'},{d:'Apr 2025',ev:'Min 52W $95.32',desc:'Sell-off macro dazi + rotazione AI. Forte accumulazione.',imp:'Min $95.32',c:'rd'},{d:'Ott 2025',ev:'Max 52W $183.16',desc:'Rally culmina al massimo storico post-IPO.',imp:'Max $183.16',c:'gr'},{d:'Dic 2025',ev:'Goldman Sachs SELL',desc:'Downgrade — limitata leva AI cycle, R&D troppo elevato.',imp:'-5.4%',c:'rd'},{d:'25 Mar 2026',ev:'🚀 AGI CPU + Meta',desc:'136-core CPU AI, $15B target 2031. Evento storico.',imp:'+20.5%',c:'gr'},{d:'2 Apr 2026',ev:'Partnership IBM',desc:'Dual-arch AI enterprise mainframe Z-series.',imp:'+2.5%',c:'gr'},{d:'5 Apr 2026',ev:'Sell-off macro dazi',desc:'Nasdaq -10%. ARM crolla a $111 con RSI 27.',imp:'-25%',c:'rd'},{d:'7 Apr 2026',ev:'Rimbalzo + Cramer BUY',desc:'Morgan Stanley ↑ $150. Cramer difende ARM.',imp:'+8.5%',c:'gr'},{d:'15 Apr 2026',ev:'Wayve — AI auto $60M',desc:'ARM+AMD+Qualcomm investono in startup guida autonoma.',imp:'+2.5%',c:'gr'},{d:'16 Apr 2026',ev:'Susquehanna target $210',desc:'Target alzato da $170. Pre-earnings ottimismo.',imp:'+5.85%',c:'gr'},{d:'17 Apr 2026',ev:'BofA alza target $180',desc:'Da $155 a $180. EPS FY27 +21% atteso.',imp:'+3%',c:'gr'}];
+  const cc={'gr':'var(--gr)','rd':'var(--rd)','pu':'var(--pu)','am':'var(--am)'};
+  document.getElementById('timeline').innerHTML=tl.map(t=>`<div style="display:flex;gap:10px;margin-bottom:6px"><div style="font-size:10px;color:var(--mu);min-width:68px;padding-top:9px;text-align:right">${t.d}</div><div style="display:flex;flex-direction:column;align-items:center"><div style="width:8px;height:8px;border-radius:50%;background:${cc[t.c]};margin-top:10px;flex-shrink:0"></div><div style="width:1px;background:var(--dm);flex:1;margin-top:3px"></div></div><div style="background:var(--bg3);border:1px solid var(--b);border-radius:7px;padding:9px 11px;flex:1;margin-bottom:0"><div style="font-family:var(--sa);font-size:11px;font-weight:700;margin-bottom:2px">${t.ev}</div><div style="font-size:11px;color:var(--mu);margin-bottom:4px">${t.desc}</div><div style="font-size:11px;font-weight:600;color:${cc[t.c]}">${t.imp}</div></div></div>`).join('');
+}
+
+// ── AVANZATI
+const xData=[
+  {g:'vol',icon:'📏',n:'VWAP',sub:'Intraday',sig:'SOPRA',sc:'gr',rows:[['VWAP daily','$158.20'],['Prezzo attuale','$166.73 (+5.4%)'],['VWAP settimanale','$163.40'],['Bias','Bullish — sopra VWAP']]},
+  {g:'vol',icon:'〰️',n:'Bollinger Bands',sub:'20p, 2σ',sig:'BANDA SUP.',sc:'am',rows:[['Banda superiore','$183.80'],['Media SMA20','$150.00'],['Banda inferiore','$116.20'],['%B','~0.85 — zona OB']]},
+  {g:'vol',icon:'📈',n:'OBV',sub:'On Balance Volume',sig:'DIV. BULLISH',sc:'gr',rows:[['OBV trend','↑ crescente'],['Prezzo trend','↑ allineato'],['Divergenza','Confermata — bull'],['Note','Accumulazione istituzionale']]},
+  {g:'vol',icon:'🔊',n:'RVOL',sub:'Relative Volume',sig:'1.8× NORM.',sc:'am',rows:[['RVOL','1.8× (normalizzato)'],['Volume avg 20gg','11.7M'],['ATR (14)','$8.75/giorno'],['Beta 1Y','4.13 — altissimo']]},
+  {g:'mom',icon:'🕯️',n:'Candlestick',sub:'Daily ultimi 5gg',sig:'BULLISH',sc:'gr',rows:[['17 Apr','Marubozu bullish'],['15 Apr','Long body verde'],['14 Apr','Doji — consolidamento'],['11 Apr','Bullish engulfing'],['10 Apr','Morning star']]},
+  {g:'mom',icon:'🌀',n:'Fibonacci',sub:'$95 → $183',sig:'ZONA 0%',sc:'gr',rows:[['0% (Max)','$183.16'],['23.6%','$162.40'],['38.2%','$152.40'],['50.0%','$139.08'],['61.8%','$125.76 ← supporto'],['Attuale','$166.73 — sopra 23.6%']]},
+  {g:'mom',icon:'☁️',n:'Ichimoku',sub:'Daily',sig:'SOPRA CLOUD',sc:'gr',rows:[['Tenkan-sen (9)','$162.50'],['Kijun-sen (26)','$148.90'],['Span A','$155.70 — sotto prezzo'],['Span B','$145.20 — sotto prezzo'],['Nuvola','Verde (bullish)'],['Chikou','Sopra prezzo (bull)']]},
+  {g:'mom',icon:'💰',n:'MFI',sub:'Money Flow (14)',sig:'NEUTRO-BULL',sc:'am',rows:[['MFI (14)','55.4'],['Zona','Neutro (50–70)'],['Positive MF','$8.2B (14gg)'],['Negative MF','$4.1B (14gg)'],['Flusso netto','POSITIVO ↑']]},
+  {g:'fond',icon:'📉',n:'Short Interest',sub:'Aggiornato',sig:'18.4% FLOAT',sc:'am',rows:[['Azioni short','13.38M'],['% float','18.4%'],['Days to cover','2.43'],['vs mese prec.','↓ da 14.4M (-6.9%)'],['Squeeze risk','Moderato — earnings']]},
+  {g:'fond',icon:'📊',n:'Earnings Preview',sub:'6 Maggio 2026',sig:'16 GIORNI',sc:'bb',rows:[['Data','6 Maggio 2026'],['EPS atteso','$0.52 consensus'],['Rev. attesa','$1.31B (+22%)'],['Beat rate storico','78% (7/9)'],['Mossa attesa','±14.2%'],['Guidance chiave','AGI CPU + royalty v9']]},
+  {g:'fond',icon:'📋',n:'SEC Filings',sub:'Insider activity',sig:'INSIDER SELL',sc:'rd',rows:[['CEO (Mar 26)','Vendita -30,433 az'],['CFO (Mar 25)','Vendita -21,280 az'],['Contesto','Giorno del +20% AGI CPU'],['Net 90gg','NETTO VENDITA'],['Note','Probabile piano 10b5-1']]},
+  {g:'fond',icon:'💬',n:'Social Sentiment',sub:'Reddit · X · Stocktwits',sig:'BUZZ 7.8/10',sc:'pu',rows:[['Reddit (7gg)','↑ bullish trend'],['X/Twitter','↑ positivo'],['Sentiment retail','72% bullish'],['Options flow','81% call'],['Tendenza','Costruttiva pre-earnings']]}
+];
+const xSigC={'gr':'rgba(0,230,118,.12);color:var(--gr)','am':'rgba(255,179,0,.12);color:var(--am)','rd':'rgba(255,68,68,.12);color:var(--rd)','bb':'rgba(0,212,255,.12);color:var(--ac)','pu':'rgba(157,92,255,.12);color:var(--pu)'};
+function initAvanzati(){
+  ['xVol','xMom','xFond'].forEach(id=>{
+    const grp=id==='xVol'?'vol':id==='xMom'?'mom':'fond';
+    document.getElementById(id).innerHTML=`<div style="display:grid;grid-template-columns:repeat(2,1fr);gap:8px">`+xData.filter(x=>x.g===grp).map((x,i)=>`<div class="xcard" id="xc${id}${i}"><div class="xhdr" onclick="toggleX('xc${id}${i}')"><div class="xl"><div class="xi" style="background:rgba(255,255,255,.05)">${x.icon}</div><div><div class="xn">${x.n}</div><div style="font-size:10px;color:var(--mu)">${x.sub}</div></div></div><div style="display:flex;align-items:center;gap:7px"><span class="xs" style="background:${xSigC[x.sc]}">${x.sig}</span><span class="xch">▼</span></div></div><div class="xbody">${x.rows.map(r=>`<div class="row"><span class="rl">${r[0]}</span><span class="rv">${r[1]}</span></div>`).join('')}</div></div>`).join('')+`</div>`;
+  });
+}
+function toggleX(id){document.getElementById(id).classList.toggle('open');}
+
+// ── RISK
+function initRisk(){
+  new Chart('riskRadar',{type:'radar',data:{labels:['Volatilità','Valutazione','Liquidità','Geopolitico','Esecuzione','Sentiment'],datasets:[{label:'ARM',data:[92,75,45,72,62,70],borderColor:'#FF4444',backgroundColor:'rgba(255,68,68,.08)',borderWidth:2,pointBackgroundColor:'#FF4444',pointRadius:4}]},options:{responsive:true,maintainAspectRatio:false,scales:{r:{min:0,max:100,grid:{color:'rgba(255,255,255,.05)'},angleLines:{color:'rgba(255,255,255,.05)'},ticks:{display:false},pointLabels:{color:'#7A8899',font:{family:F,size:11}}}},plugins:{legend:{display:false},tooltip:CD.plugins.tooltip}}});
+  const pl=[-7173,-3673,-873,0,1627,3327,4327];
+  new Chart('pnlChart',{type:'bar',data:{labels:['$95 Min','$130 Bear','$157 S2','$167 Now','$183 Max','$195','$210 Bull'],datasets:[{data:pl,backgroundColor:pl.map(v=>v>=0?'rgba(0,230,118,.6)':'rgba(255,68,68,.6)'),borderRadius:4}]},options:{...CD,scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>(v>=0?'+':'')+v.toLocaleString()+'$'}}}}});
+  const rules=[['Rischia max 1-2% per trade','Su ARM con Beta 4.13 considera 1% max del capitale.'],['Stop loss sempre predefinito','Stop MA100 $157.99 o -5.3% sull\'entrata corrente.'],['Non mediare in perdita','Su high-beta può essere catastrofico.'],['R/R minimo 1:2','Con entrata $167 e stop $158, target minimo $184+.'],['Rispetta il trend principale','Daily e weekly sono bullish — favorire lati long.'],['Attenzione agli earnings','6 Maggio: mossa attesa ±14.2%. Ridurre o coprire.'],['Conferma volume sugli ingressi','RVOL >1.5× per validare le mosse.'],['Non tradare le prime 15 min','ARM ha spread ampi a apertura mercato.'],['Tieni un diario di trading','ARM è molto analizzato — confronta con la thesis.']]
+  document.getElementById('rules').innerHTML=rules.map((r,i)=>`<div class="rule"><div class="rn">${String(i+1).padStart(2,'0')}</div><div style="color:#9AABB8;font-size:12px;line-height:1.5"><strong style="color:var(--tx)">${r[0]}:</strong> ${r[1]}</div></div>`).join('');
+}
+function calcR(){
+  const cap=+document.getElementById('ri-cap').value||0,rsk=+document.getElementById('ri-rsk').value||2,ent=+document.getElementById('ri-ent').value||0,stp=+document.getElementById('ri-stp').value||0,tgt=+document.getElementById('ri-tgt').value||0;
+  if(!cap||!ent||!stp||ent<=stp)return;
+  const rAmt=cap*(rsk/100),stopD=ent-stp,sh=Math.floor(rAmt/stopD),posV=sh*ent,maxL=sh*stopD,gain=tgt>ent?sh*(tgt-ent):0,rr=gain/maxL;
+  document.getElementById('r-sh').textContent=sh.toLocaleString();
+  document.getElementById('r-pv').textContent='$'+Math.round(posV).toLocaleString();
+  document.getElementById('r-ml').textContent='-$'+Math.round(maxL).toLocaleString();
+  document.getElementById('r-gn').textContent=gain>0?'+$'+Math.round(gain).toLocaleString():'—';
+  const el=document.getElementById('r-rr'),bar=document.getElementById('r-rrb'),vrd=document.getElementById('r-vrd');
+  if(rr>0){el.textContent='1 : '+rr.toFixed(2);bar.style.width=Math.min(rr/5*100,100)+'%';
+    if(rr>=3){el.style.color='#00E676';bar.style.background='#00E676';vrd.textContent='✅ Ottimo R/R — trade valido.';}
+    else if(rr>=2){el.style.color='#FFB300';bar.style.background='#FFB300';vrd.textContent='⚖️ R/R accettabile — minimo raccomandato.';}
+    else{el.style.color='#FF4444';bar.style.background='#FF4444';vrd.textContent='❌ R/R insufficiente — spostare il target.';}}
+}
+
+// ── NEWS
+const newsD=[
+  {t:'bull',d:'17 Apr 2026',s:'BofA',h:'📈 BofA alza target $180 — EPS FY27 +21%',desc:'Target da $155 a $180 (Neutral). EPS FY2027 +21%, FY2028 +35% attesi.',imp:'+3.01%',iv:3.01,tags:['BofA','Target','Neutral']},
+  {t:'bull',d:'16 Apr 2026',s:'Susquehanna',h:'🎯 Susquehanna target ARM $210',desc:'Da $170 a $210, mantiene Positive. ARM domina nel mercato AI CPU server. Pre-earnings upgrade.',imp:'+5.85%',iv:5.85,tags:['Susquehanna','$210','AI CPU']},
+  {t:'bull',d:'15 Apr 2026',s:'AMD+QCOM+ARM',h:'🚗 Wayve $60M — AI guida autonoma',desc:'Alleanza ARM-AMD-Qualcomm per AI inference data center sovereign + automotive.',imp:'+2.5%',iv:2.5,tags:['Wayve','Auto AI','$60M']},
+  {t:'bull',d:'7 Apr 2026',s:'MS + Cramer',h:'💪 Morgan Stanley ↑ $150 · Cramer BUY',desc:'MS porta target da $135 a $150. Cramer: "ultimo titolo da vendere nel settore semi".',imp:'+8.5%',iv:8.5,tags:['Morgan Stanley','Cramer','CNBC']},
+  {t:'bull',d:'25 Mar 2026',s:'ARM Investor Day',h:'🚀 AGI CPU — $15B entro 2031',desc:'136 core, Meta co-developer. Barclays ↑ $200, Needham upgrade Buy, Wells Fargo ↑ $175.',imp:'+20.5%',iv:20.5,tags:['AGI CPU','Meta','$15B']},
+  {t:'bull',d:'2 Apr 2026',s:'IBM + ARM',h:'🤝 Partnership IBM dual-architecture AI',desc:'Espansione mainframe Z-series. Mercato enterprise mission-critical.',imp:'+2.5%',iv:2.5,tags:['IBM','Enterprise','AI']},
+  {t:'bear',d:'5 Apr 2026',s:'Trump / Macro',h:'🌍 Sell-off dazi — RSI crolla a 27',desc:'Nasdaq -10%+. ARM scende a $111 in 2 giorni. RSI 27, ipervenduto estremo.',imp:'-25%',iv:-25,tags:['Macro','Dazi','Nasdaq']},
+  {t:'bear',d:'18 Dic 2025',s:'Goldman Sachs',h:'📉 Goldman SELL — limitata leva AI',desc:'Downgrade da Neutral. R&D elevato ridurrà leva finanziaria.',imp:'-5.4%',iv:-5.4,tags:['Goldman','Downgrade','R&D']},
+  {t:'bull',d:'13 Ott 2025',s:'Qualcomm',h:'💻 Qualcomm adotta arch. ARM — PC market',desc:'Windows on ARM raggiunge parità con Apple M-series. Nuovo flusso royalty PC.',imp:'+11.1%',iv:11.1,tags:['Qualcomm','PC','Royalty']},
+  {t:'bull',d:'4 Feb 2024',s:'ARM Earnings',h:'💥 Earnings Q3 FY24 +48% — record',desc:'EPS + guidance esplosive. Euforia AI. Uno dei maggiori rally giornalieri della storia.',imp:'+48%',iv:48,tags:['Earnings','Guidance','Record']}
+];
+let nwFilter='all';
+function initNews(){
+  const nf=document.getElementById('newsFilters');
+  nf.innerHTML=[['all','Tutte'],['bull','🐂 Rialziste'],['bear','🐻 Ribassiste'],['neutro','⚖️ Neutre'],['macro','🌍 Macro']].map(([v,l])=>`<button class="fb${v==='all'?' active':''}" onclick="setNwFilter('${v}',this)">${l}</button>`).join('');
+  renderNews();
+  new Chart('impactChart',{type:'bar',data:{labels:newsD.map(n=>n.d.split(' ').slice(0,2).join(' ')),datasets:[{data:newsD.map(n=>n.iv),backgroundColor:newsD.map(n=>n.iv>=0?'rgba(0,230,118,.65)':'rgba(255,68,68,.65)'),borderRadius:3}]},options:{...CD,indexAxis:'y',scales:{x:{...CD.scales.x,ticks:{...CD.scales.x.ticks,callback:v=>v+'%'}},y:{...CD.scales.y,ticks:{color:'#3A4A5C',font:{family:F,size:9}}}}}});
+  const rb=[['Earnings surprise','±24%',95,'gr'],['Nuovi prodotti/chip','±20%',85,'gr'],['Macro/dazi','±15%',65,'rd'],['Partnership','±8%',55,'ac'],['Rating analisti','±6%',45,'am'],['Insider selling','±3%',30,'dm']];
+  document.getElementById('reactBars').innerHTML='<div style="font-size:10px;color:var(--mu);margin-bottom:8px">Quanto il mercato reagisce per categoria su ARM</div>'+rb.map(r=>`<div style="display:flex;align-items:center;gap:8px;margin-bottom:8px"><div style="font-size:11px;color:var(--mu);min-width:130px">${r[0]}</div><div class="sbar"><div class="sfill" style="width:${r[2]}%;background:var(--${r[3]==='dm'?'dm':r[3]})"></div></div><div style="font-size:11px;font-weight:600;min-width:34px;text-align:right;color:var(--${r[3]==='dm'?'mu':r[3]})">${r[1]}</div></div>`).join('');
+  const up=[['📊 Earnings Q4 FY2026','6 Mag 2026','16 giorni','Mossa ±14.2% attesa'],['🏛️ FOMC Meeting','7 Mag 2026','17 giorni','Tassi — impatto growth'],['🇺🇸 Dazi definitivi','TBD Apr-Mag','~20 giorni','Export controls'],['🚀 AGI CPU GA','H2 2026','~130 giorni','OEM/ODM availability']];
+  document.getElementById('upcoming').innerHTML=up.map(u=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:8px 9px;background:var(--bg3);border:1px solid var(--b);border-radius:6px;margin-bottom:5px;font-size:12px"><div><div style="color:var(--tx)">${u[0]}</div><div style="font-size:10px;color:var(--mu)">${u[3]}</div></div><div style="text-align:right"><div style="font-family:var(--sa);font-size:11px;color:var(--ac)">${u[1]}</div><div style="font-size:10px;color:var(--mu)">${u[2]}</div></div></div>`).join('');
+}
+function setNwFilter(f,btn){
+  document.querySelectorAll('#newsFilters .fb').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); nwFilter=f; renderNews();
+}
+function renderNews(){
+  const typeC={'bull':'rgba(0,230,118,.2)','bear':'rgba(255,68,68,.2)','neutro':'rgba(0,212,255,.2)','macro':'rgba(255,179,0,.2)'};
+  const typeI={'bull':'🐂','bear':'🐻','neutro':'⚖️','macro':'🌍'};
+  const impC=iv=>iv>=0?'var(--gr)':'var(--rd)';
+  let d=nwFilter==='all'?newsD:newsD.filter(n=>n.t===nwFilter);
+  document.getElementById('newsFeed').innerHTML=d.map(n=>`<div class="ni" style="border-left-color:${typeC[n.t]}"><div style="min-width:46px;text-align:center;background:${typeC[n.t]}22;border:1px solid ${typeC[n.t]};border-radius:6px;padding:5px 2px;align-self:flex-start"><div style="font-size:16px">${typeI[n.t]}</div><div style="font-size:10px;font-weight:700;color:${impC(n.iv)}">${n.imp}</div></div><div class="nb"><div class="nm">${n.d} · ${n.s}</div><div class="nh">${n.h}</div><div class="nd">${n.desc}</div><div style="display:flex;gap:4px;flex-wrap:wrap;margin-top:6px">${n.tags.map(t=>`<span style="font-size:10px;padding:2px 6px;border-radius:3px;background:rgba(255,255,255,.05);color:var(--mu)">${t}</span>`).join('')}</div></div></div>`).join('');
+}
+
+// ── FONDAMENTALI
+function initFond(){
+  const fv=[['P/E (TTM)','~130x','rd'],['P/E Forward','~65x','am'],['P/S (TTM)','30x',''],['EV/EBITDA','120x','rd'],['Price/Book','20x',''],['PEG Ratio','3.5x','am'],['Market Cap','$172.4B',''],['EV','$171.9B','']];
+  const fr=[['Revenue TTM','$4.67B',''],['Growth YoY','+26%','gr'],['Gross Margin','97.5%','gr'],['Op. Margin','19.8%',''],['Net Margin','17.1%',''],['EBITDA','$1.105B',''],['EPS TTM','$0.75',''],['ROE','11.3%','']];
+  const fb=[['Cash & Equiv.','$2.98B','gr'],['Total Debt','$490M',''],['Debt/Equity','0.31%','gr'],['R&D Expense','$2.6B','am'],['R&D / Revenue','55.7%','am'],['Float','~107M az',''],['SoftBank','~90%','am'],['Dividend','None','mu']];
+  const mkRow=(data)=>data.map(r=>`<div class="row"><span class="rl">${r[0]}</span><span class="rv" style="${r[2]==='gr'?'color:var(--gr)':r[2]==='rd'?'color:var(--rd)':r[2]==='am'?'color:var(--am)':''}">${r[1]}</span></div>`).join('');
+  document.getElementById('fondVal').innerHTML=mkRow(fv);
+  document.getElementById('fondRed').innerHTML=mkRow(fr);
+  document.getElementById('fondBil').innerHTML=mkRow(fb);
+  new Chart('segChart',{type:'doughnut',data:{labels:['Smartphone','Data Center','Auto/IoT','License','Compute'],datasets:[{data:[38,22,15,18,7],backgroundColor:['#9D5CFF','#00D4FF','#00E676','#FFB300','#FF4444'],borderColor:'#131B26',borderWidth:3,hoverOffset:5}]},options:{responsive:true,maintainAspectRatio:false,cutout:'60%',plugins:{legend:{display:true,position:'bottom',labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:10,padding:7}},tooltip:CD.plugins.tooltip}}});
+  new Chart('epsChart',{type:'bar',data:{labels:['FY22','FY23','FY24','FY25','FY26E','FY27E'],datasets:[{label:'EPS Actual',data:[0.32,0.41,0.52,0.75,null,null],backgroundColor:'rgba(0,212,255,.65)',borderRadius:4},{label:'EPS Stima',data:[null,null,null,null,1.95,3.40],backgroundColor:'rgba(157,92,255,.45)',borderRadius:4}]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:12,padding:8}}},scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>'$'+v}}}}});
+  const cb=[{t:'🚀 AGI CPU — primo chip proprietario',d:'136 core AI, Meta partner. Target $15B/anno 2031. Shift da licensor a produttore.',c:'gr'},{t:'📈 Armv9 — royalty 2× vs v8',d:'Ogni chip v9 genera doppio rispetto alla generazione precedente. CAGR royalty 20% fino FY2031.',c:'gr'},{t:'🤝 IBM + SK Telecom partnerships',d:'Enterprise mainframe + AI inference sovereign. Espansione oltre smartphone.',c:'gr'},{t:'💻 Windows on ARM — PC market',d:'Parità con Apple M-series. Nuovo flusso royalty multi-miliardario.',c:'ac'}];
+  document.getElementById('catBull').innerHTML=cb.map(c=>`<div style="background:var(--bg3);border:1px solid var(--b);border-radius:7px;padding:11px;border-left:3px solid var(--${c.c});margin-bottom:7px"><div style="font-family:var(--sa);font-size:11px;font-weight:700;margin-bottom:3px">${c.t}</div><div style="font-size:11px;color:#9AABB8;line-height:1.5">${c.d}</div></div>`).join('');
+  const cp=[{t:'Golden Cross in formazione',m:'Daily · Imminente',d:'MA50 $147 vs MA200 $133 — conferma bullish imminente.',c:'gr'},{t:'Pivot Bottom confermato',m:'Daily · 30 Mar',d:'+21.7% dal pivot. Struttura bullish di breve confermata.',c:'gr'},{t:'Volume cala sui rialzi',m:'Daily · Apr 2026',d:'Divergenza: prezzi salgono ma volume scende. Segnale cautela.',c:'am'},{t:'OBV divergenza bullish',m:'Medio termine',d:'OBV ai massimi mentre prezzi correggevano. Accumulazione.',c:'pu'}];
+  document.getElementById('catPat').innerHTML=cp.map(c=>`<div style="background:var(--bg3);border:1px solid var(--b);border-radius:7px;padding:11px;border-left:3px solid var(--${c.c});margin-bottom:7px"><div style="font-family:var(--sa);font-size:11px;font-weight:700;margin-bottom:2px">${c.t}</div><div style="font-size:10px;color:var(--mu);margin-bottom:4px">${c.m}</div><div style="font-size:11px;color:#9AABB8;line-height:1.5">${c.d}</div></div>`).join('');
+  const lv=[['R3','$183.16','Max 52W','rd',95],['R2','$178','Target BofA','rd',75],['R1','$168.35','High recente','rd',50],['▶','$166.73','Prezzo attuale','ac',100],['S1','$162.73','Low 17 Apr','gr',40],['S2','$157.99','MA100','gr',58],['S3','$149','Pivot 30 Mar','gr',70],['S4','$137.97','Stop area','gr',80],['S5','$95.32','Min 52W','gr',95]];
+  const lcc={'rd':'var(--rd)','ac':'var(--ac)','gr':'var(--gr)'};
+  document.getElementById('fondLevels').innerHTML=lv.map(l=>`<div class="lrow"${l[3]==='ac'?' style="background:rgba(0,212,255,.05);border-color:rgba(0,212,255,.2)"':''}><div class="lt2" style="color:${lcc[l[3]]}">${l[0]}</div><div class="lp" style="color:${lcc[l[3]]};font-size:12px">${l[1]}</div><div class="ld">${l[2]}</div><div class="lbw"><div class="lbf" style="width:${l[4]}%;background:${lcc[l[3]]}"></div></div></div>`).join('');
+}
+
+// ── SNAPSHOT
+function initSnapshot(){
+  const ohlc=[['Open','$162.33',''],['High','$168.35','gr'],['Low','$162.73','rd'],['Close 17 Apr','$166.73',''],['Volume','5.0M','am'],['52W High','$183.16','rd'],['52W Low','$95.32','gr'],['YTD','+47.4%','gr']];
+  document.getElementById('ohlcGrid').innerHTML=ohlc.map(o=>`<div class="card" style="text-align:center"><div style="font-size:10px;color:var(--mu);letter-spacing:.08em;text-transform:uppercase;margin-bottom:4px">${o[0]}</div><div style="font-family:var(--sa);font-size:17px;font-weight:700;${o[2]?'color:var(--'+o[2]+')':''}">${o[1]}</div></div>`).join('');
+  const sig=[['Trend primary (Weekly)','BULL','bg'],['Trend secondary (Daily)','BULL','bg'],['RSI (14)','65.83 — OK','bg'],['MACD','+7.28 BUY','bg'],['Stochastic','~72 — zona OB','ba'],['Bollinger %b','~0.85 banda sup.','ba'],['Ichimoku','Sopra nuvola verde','bg'],['SMA 5 / 50 / 200','Sopra tutte','bg'],['Options Flow','81% call bullish','bg'],['OBV','Ai massimi / accum.','bg']];
+  document.getElementById('snapSig').innerHTML=sig.map(s=>`<div style="display:flex;justify-content:space-between;align-items:center;padding:6px 9px;background:var(--bg3);border-radius:6px;border:1px solid var(--b);margin-bottom:5px;font-size:12px"><span style="color:var(--mu)">${s[0]}</span><span class="bge ${s[2]}">${s[1]}</span></div>`).join('');
+  document.getElementById('snapAnl').innerHTML=`<div style="text-align:center;padding:8px 0 12px"><div style="font-family:var(--sa);font-size:28px;font-weight:800;color:var(--gr)">BUY</div><div style="font-size:12px;color:var(--mu)">Consensus — 30 analisti</div><div style="font-family:var(--sa);font-size:20px;font-weight:700;margin-top:6px">$179.90</div><div style="font-size:11px;color:var(--mu)">Target medio · Upside: +7.9%</div></div>`+[['Strong Buy','39%','gr'],['Buy','51%','ac'],['Hold','3%','am'],['Sell','7%','rd']].map(a=>`<div class="abr"><span style="min-width:74px;color:var(--${a[2]})">${a[0]}</span><div class="sbar"><div class="sfill" style="width:${parseInt(a[1])}%;background:var(--${a[2]})"></div></div><span style="min-width:30px;text-align:right;color:var(--${a[2]})">${a[1]}</span></div>`).join('')+`<div style="margin-top:10px;display:flex;flex-direction:column;gap:4px">`+[['Susquehanna (16 Apr)','Positive · $210 ↑','gr'],['BofA (17 Apr)','Neutral · $180 ↑','am'],['Goldman (9 Apr)','Neutral · semi upside','am'],['Morgan Stanley (7 Apr)','Neutral · $150 ↑','am']].map(a=>`<div style="display:flex;justify-content:space-between;font-size:11px;padding:4px 0;border-top:1px solid var(--b)"><span style="color:var(--mu)">${a[0]}</span><span style="color:var(--${a[2]})">${a[1]}</span></div>`).join('')+'</div>';
+  document.getElementById('snapRisk').innerHTML=`<div style="margin-bottom:10px">`+[['📊 Earnings','6 Mag 2026','16 gg'],['🏛️ FOMC','7 Mag 2026','17 gg']].map(u=>`<div style="display:flex;justify-content:space-between;padding:7px 9px;background:var(--bg3);border:1px solid var(--b);border-radius:6px;margin-bottom:5px;font-size:12px"><span style="color:var(--tx)">${u[0]}</span><div style="text-align:right"><div style="font-family:var(--sa);font-size:11px;color:var(--ac)">${u[1]}</div><div style="font-size:10px;color:var(--mu)">${u[2]}</div></div></div>`).join('')+'</div>'+[['Beta (1Y)','4.13 — altissimo','rd'],['ATR (14)','$8.75 / giorno','am'],['Short Int.','18.4% float','am'],['Options','81% CALL bullish','gr'],['RVOL','1.8× normalizzato','mu'],['SoftBank','~90% — low float','am']].map(r=>`<div style="display:flex;justify-content:space-between;padding:6px 9px;background:var(--bg3);border:1px solid var(--b);border-radius:6px;margin-bottom:4px;font-size:12px"><span style="color:var(--mu)">${r[0]}</span><span style="color:var(--${r[2]});font-weight:600">${r[1]}</span></div>`).join('')+`<div style="margin-top:10px;padding:9px 11px;background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.15);border-radius:7px;font-size:11px;color:#9AABB8;line-height:1.6">⚡ <strong style="color:var(--gr)">Bias:</strong> Trend rialzista confermato. Volume cala sui rialzi — monitorare divergenza. Earnings 6 Maggio è il vero test.</div>`;
+  new Chart('snapPerfChart',{type:'bar',data:{labels:['1 gg','1 sett','1 mese','3 mesi','6 mesi','YTD','1 anno'],datasets:[{label:'ARM',data:[2.71,11.82,25.1,21.7,8.4,47.4,42.85],backgroundColor:'rgba(0,212,255,.7)',borderRadius:4},{label:'Nasdaq',data:[1.8,4.2,8.5,12.1,2.1,8.3,11.2],backgroundColor:'rgba(58,74,92,.5)',borderRadius:4}]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:12,padding:8}}},scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+  new Chart('snapVolChart',{type:'line',data:{labels:['Ott','Nov','Dic','Gen','Feb','Mar','Apr'],datasets:[{label:'Vol Storica 30gg',data:[42,38,55,48,52,68,62],borderColor:'#00D4FF',borderWidth:2,fill:false,tension:.4,pointRadius:3,pointBackgroundColor:'#00D4FF'},{label:'Vol Implicita ATM',data:[48,42,62,52,58,75,72],borderColor:'#FFB300',borderWidth:2,fill:false,tension:.4,pointRadius:3,borderDash:[4,3],pointBackgroundColor:'#FFB300'}]},options:{...CD,plugins:{...CD.plugins,legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:12,padding:8}}},scales:{x:CD.scales.x,y:{...CD.scales.y,ticks:{...CD.scales.y.ticks,callback:v=>v+'%'}}}}});
+}
+
+// ── TRADE
+function initTrade(){
+  const lr=[['📍 Entrata','$163–167 (pullback)'],['Trigger','Breakout sopra $168.35'],['🛑 Stop','$157.99 (-5.3%) MA100'],['🎯 T1','$178 (+6.8%) BofA target'],['🎯 T2','$183.16 (+9.9%) Max 52W'],['R/R T1','1 : 1.28'],['R/R T2','1 : 1.87'],['Timeframe','Swing 1–2 sett pre-earnings'],['Size','60-70% normale (RSI vicino OB)']];
+  const sr2=[['📍 Entrata','$172–178 (estensione OB)'],['Trigger','RSI >75 + rejection daily'],['🛑 Stop','$183.16 (Max 52W)'],['🎯 T1','$162.73 (-5.4%)'],['🎯 T2','$157.99 (-8.2%) MA100'],['R/R T1','1 : 1.45'],['R/R T2','1 : 2.25'],['Timeframe','3–7 giorni pre-earnings'],['Size','20–30% (squeeze risk SI 18.4%)']];
+  document.getElementById('longRows').innerHTML=lr.map(r=>`<div class="row"><span class="rl">${r[0]}</span><span class="rv">${r[1]}</span></div>`).join('');
+  document.getElementById('shortRows').innerHTML=sr2.map(r=>`<div class="row"><span class="rl">${r[0]}</span><span class="rv">${r[1]}</span></div>`).join('');
+  const ckL=[['✅','Trend daily bullish','Sì — tutti SMA allineati al rialzo'],['✅','MACD positivo','+7.28 sopra signal'],['✅','Pivot bottom','30 Mar confermato +21.7%'],['✅','Analisti bullish','Susquehanna $210, BofA $180'],['✅','Options 81% call','Forte bias bullish'],['⚠️','RSI zona OB','65.83 → si avvicina a >70'],['⚠️','Volume calante','Divergenza tecnica — monitorare'],['⚠️','Earnings 6 Mag','Ridurre/coprire prima del report']];
+  const ckS=[['⚠️','Trend rialzista','No — SHORT contro-trend (rischio!)'],['❌','Death Cross','No — Golden Cross in formazione'],['⚠️','RSI non ancora OB','Deve raggiungere >75 prima'],['✅','Volume cala','Divergenza presente'],['⏳','Rejection a $168–178','Attendere zona target'],['⏳','Bearish engulfing','Da attendere sul test R'],['⚠️','SI 18.4%','Squeeze violento possibile se earn beat'],['⚠️','Earnings 6 Mag','NON aprire short a ridosso']];
+  document.getElementById('ckLong').innerHTML=ckL.map(c=>`<div class="ci"><span style="font-size:13px;min-width:18px">${c[0]}</span><div><strong>${c[1]}:</strong> ${c[2]}</div></div>`).join('')+`<div style="margin-top:7px;padding:7px 9px;border-radius:6px;background:rgba(0,230,118,.06);border:1px solid rgba(0,230,118,.15);font-size:11px;color:var(--mu)">✅ 5/8 condizioni soddisfatte. Setup <strong style="color:var(--gr)">valido</strong> — convinzione 72/100.</div>`;
+  document.getElementById('ckShort').innerHTML=ckS.map(c=>`<div class="ci"><span style="font-size:13px;min-width:18px">${c[0]}</span><div><strong>${c[1]}:</strong> ${c[2]}</div></div>`).join('')+`<div style="margin-top:7px;padding:7px 9px;border-radius:6px;background:rgba(255,68,68,.04);border:1px solid rgba(255,68,68,.12);font-size:11px;color:var(--mu)">❌ Setup <strong style="color:var(--rd)">non consigliato ora</strong> — trend bull dominante. Valutare solo post-earnings.</div>`;
+  const ctx=document.getElementById('tradeLevelChart').getContext('2d');
+  const hL=(v,c,l)=>({type:'line',label:l,data:Array(8).fill(v),borderColor:c,borderWidth:1,borderDash:[5,4],fill:false,pointRadius:0,tension:0});
+  new Chart(ctx,{type:'line',data:{labels:['7A','9A','11A','13A','15A','17A','→T1','→T2'],datasets:[{label:'Prezzo',data:[131.2,140.5,148.8,157.2,162.3,166.73,null,null],borderColor:'#00D4FF',borderWidth:2.5,fill:false,tension:.3,pointRadius:[3,3,3,3,3,5,0,0],pointBackgroundColor:['#00D4FF','#00D4FF','#00D4FF','#00D4FF','#00D4FF','#FFB300','transparent','transparent'],pointBorderColor:'#080C10',pointBorderWidth:2},{label:'Long T1/T2',data:[null,null,null,null,null,166.73,178,183],borderColor:'rgba(0,230,118,.7)',borderWidth:2,borderDash:[6,4],fill:false,tension:.4,pointRadius:[0,0,0,0,0,0,5,5],pointBackgroundColor:'#00E676',pointBorderColor:'#080C10',pointBorderWidth:2},{label:'Short T1/T2',data:[null,null,null,null,null,166.73,163,158],borderColor:'rgba(255,68,68,.7)',borderWidth:2,borderDash:[6,4],fill:false,tension:.4,pointRadius:[0,0,0,0,0,0,5,5],pointBackgroundColor:'#FF4444',pointBorderColor:'#080C10',pointBorderWidth:2},hL(183.16,'rgba(255,68,68,.3)','R Max $183'),hL(178,'rgba(255,68,68,.2)','T1 Long $178'),hL(166.73,'rgba(0,212,255,.5)','▶ NOW'),hL(162.73,'rgba(255,179,0,.3)','S1 $162.73'),hL(157.99,'rgba(0,230,118,.25)','S2 MA100'),hL(149,'rgba(0,230,118,.3)','S3 Pivot')]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:true,labels:{color:'#7A8899',font:{family:F,size:10},boxWidth:14,padding:8,filter:i=>i.datasetIndex<3}},tooltip:{...CD.plugins.tooltip,filter:i=>i.datasetIndex<3}},scales:{x:CD.scales.x,y:{...CD.scales.y,min:128,max:196,ticks:{...CD.scales.y.ticks,callback:v=>'$'+v}}}}});
+}
+
+// ── REPORT
+function initReport(){
+  document.getElementById('reportContent').innerHTML=`
+  <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;padding:16px;margin-bottom:14px">
+    <div style="font-family:var(--sa);font-size:14px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--b);padding-bottom:8px;margin-bottom:12px">📊 Fondamentali aggiornati</div>
+    <p style="color:#9AABB8;font-size:12px;line-height:1.75;margin-bottom:10px">ARM Holdings si trova in una fase di forte ripresa tecnica dopo il sell-off macro di inizio aprile. Il titolo ha rimbalzato da $111 (minimo intraday del 5 apr) a $166.73 (+50% in 12 giorni), sostenuto dal pivot bottom del 30 marzo e da una serie di upgrade di analisti.</p>
+    <p style="color:#9AABB8;font-size:12px;line-height:1.75">Revenue TTM di $4.67 miliardi (+26% YoY), royalty record Q3 FY2026 di $737 milioni (+27%), gross margin 97.5%. Il prossimo earnings Q4 FY2026 del 6 maggio sarà il vero test: consensus $1.31B revenue (+22%), EPS $0.52. Beat rate storico 78%.</p>
+  </div>
+  <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-bottom:14px">
+    <div style="background:rgba(0,230,118,.04);border:1px solid rgba(0,230,118,.2);border-radius:10px;padding:14px">
+      <div style="font-family:var(--sa);font-size:10px;font-weight:700;color:var(--gr);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">🐂 BULL CASE</div>
+      <div style="font-family:var(--sa);font-size:22px;font-weight:700;color:var(--gr);margin-bottom:4px">$210–240</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Probabilità: 35%</div>
+      <ul style="font-size:11px;color:#7A8899;margin-left:14px;line-height:1.7"><li>Earnings beat + guidance 2031 confermata</li><li>Breakout $183 con short squeeze</li><li>AGI CPU adoption accelera</li><li>Susquehanna $210 raggiunto</li></ul>
+    </div>
+    <div style="background:rgba(0,212,255,.04);border:1px solid rgba(0,212,255,.2);border-radius:10px;padding:14px">
+      <div style="font-family:var(--sa);font-size:10px;font-weight:700;color:var(--ac);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">⚖️ BASE CASE</div>
+      <div style="font-family:var(--sa);font-size:22px;font-weight:700;color:var(--ac);margin-bottom:4px">$175–190</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Probabilità: 45%</div>
+      <ul style="font-size:11px;color:#7A8899;margin-left:14px;line-height:1.7"><li>Earnings in linea con stime</li><li>Range $160–183 consolidamento</li><li>Target consensus $179.90</li><li>P/E 65-80x forward giustificato</li></ul>
+    </div>
+    <div style="background:rgba(255,68,68,.04);border:1px solid rgba(255,68,68,.2);border-radius:10px;padding:14px">
+      <div style="font-family:var(--sa);font-size:10px;font-weight:700;color:var(--rd);letter-spacing:.1em;text-transform:uppercase;margin-bottom:8px">🐻 BEAR CASE</div>
+      <div style="font-family:var(--sa);font-size:22px;font-weight:700;color:var(--rd);margin-bottom:4px">$120–140</div>
+      <div style="font-size:11px;color:var(--mu);margin-bottom:8px">Probabilità: 20%</div>
+      <ul style="font-size:11px;color:#7A8899;margin-left:14px;line-height:1.7"><li>Earnings miss su guidance</li><li>Escalation dazi + Cina</li><li>RISC-V accelera quota mercato</li><li>P/E compresso a 50-60x</li></ul>
+    </div>
+  </div>
+  <div style="background:var(--card);border:1px solid var(--b);border-radius:10px;padding:14px;margin-bottom:14px">
+    <div style="font-family:var(--sa);font-size:14px;font-weight:700;color:var(--tx);border-bottom:1px solid var(--b);padding-bottom:8px;margin-bottom:12px">⚠️ Rischi principali</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      ${[['🇨🇳 Geopolitico Cina','25-30% ricavi da Cina. Export controls limitano licenze Neoverse avanzate.','rd'],['📉 Valutazione P/E ~130x','Zero margine per execution errors. CEO+CFO hanno venduto a fine marzo.','am'],['🔧 RISC-V open-source','25% quota mercato globale Jan 2026. Rischio strutturale sul modello royalty.','am'],['🏭 Conflitto con licensee','AGI CPU entra in competizione con Qualcomm/Apple/NVIDIA. Rischio relazioni.','rd']].map(r=>`<div style="background:var(--bg3);border:1px solid var(--b);border-radius:8px;padding:11px;border-left:3px solid var(--${r[2]})"><div style="font-family:var(--sa);font-size:11px;font-weight:700;color:var(--${r[2]});margin-bottom:4px">${r[0]}</div><div style="font-size:11px;color:var(--mu);line-height:1.55">${r[1]}</div></div>`).join('')}
+    </div>
+  </div>
+  <div style="padding:12px 15px;background:rgba(255,179,0,.05);border:1px solid rgba(255,179,0,.15);border-radius:9px;font-size:11px;color:#9AABB8;line-height:1.7">⚠️ <strong style="color:var(--am)">Disclaimer:</strong> Analisi puramente educativa. Non è consulenza finanziaria. I mercati comportano rischi significativi. Consulta sempre un professionista qualificato.</div>`;
+}
+
+// Init dashboard charts on load, then trigger Risk calc
+window.addEventListener('load',()=>{setTimeout(calcR,200);});
+</script>
+</body>
+</html>
