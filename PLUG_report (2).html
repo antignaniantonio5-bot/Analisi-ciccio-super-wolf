@@ -1,0 +1,803 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PLUG Power — Analisi Completa 24 Apr 2026</title>
+<link href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Syne:wght@400;500;600;700&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+  *{margin:0;padding:0;box-sizing:border-box}
+  :root{
+    --bg:#0a0c10;--bg2:#111318;--bg3:#181b22;--bg4:#1e2229;
+    --border:#2a2e38;--border2:#343a48;
+    --text:#e8eaf0;--text2:#9aa0b4;--text3:#5a6070;
+    --blue:#4a9eff;--blue2:#1a6fd4;--blue-bg:#0d1f3a;
+    --green:#2dd4a0;--green2:#1a9e76;--green-bg:#0a1f18;
+    --red:#ff5e5e;--red2:#c93a3a;--red-bg:#1f0d0d;
+    --amber:#f5a623;--amber-bg:#1f160a;
+    --accent:#4a9eff;
+  }
+  html{scroll-behavior:smooth}
+  body{font-family:'Syne',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;overflow-x:hidden;display:flex;flex-direction:column;align-items:center}
+  .page-wrapper{width:100%;max-width:1100px}
+
+  /* HEADER */
+  .header{background:var(--bg2);border-bottom:1px solid var(--border);padding:20px 28px 0;position:sticky;top:0;z-index:100;width:100%}
+  .header-top{display:flex;align-items:flex-end;gap:16px;margin-bottom:16px}
+  .ticker-badge{font-family:'DM Mono',monospace;font-size:11px;letter-spacing:.15em;color:var(--blue);background:var(--blue-bg);padding:4px 10px;border-radius:4px;border:1px solid var(--blue2)}
+  .price-main{font-size:32px;font-weight:700;letter-spacing:-.02em}
+  .price-change{font-size:13px;color:var(--red);font-weight:500;display:flex;align-items:center;gap:4px}
+  .price-change.up{color:var(--green)}
+  .header-meta{font-size:11px;color:var(--text3);margin-left:auto;font-family:'DM Mono',monospace}
+
+  /* TABS */
+  .tabs{display:flex;gap:0;border-bottom:none}
+  .tab-btn{padding:10px 20px;font-size:12px;font-weight:500;letter-spacing:.06em;text-transform:uppercase;background:none;border:none;color:var(--text3);cursor:pointer;border-bottom:2px solid transparent;transition:all .2s;white-space:nowrap;font-family:'Syne',sans-serif}
+  .tab-btn:hover{color:var(--text2)}
+  .tab-btn.active{color:var(--blue);border-bottom-color:var(--blue)}
+
+  /* CONTENT */
+  .content{padding:24px 28px;max-width:1100px}
+  .tab-panel{display:none}.tab-panel.active{display:block}
+
+  /* KPI GRID */
+  .kpi-grid{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:20px}
+  .kpi{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:12px 14px}
+  .kpi-label{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:6px;font-family:'DM Mono',monospace}
+  .kpi-value{font-size:18px;font-weight:600;line-height:1}
+  .kpi-sub{font-size:10px;color:var(--text3);margin-top:4px;font-family:'DM Mono',monospace}
+  .kpi-value.bull{color:var(--green)}.kpi-value.bear{color:var(--red)}.kpi-value.neu{color:var(--blue)}
+
+  /* CARDS */
+  .card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:18px}
+  .card-title{font-size:10px;font-weight:500;text-transform:uppercase;letter-spacing:.1em;color:var(--text3);margin-bottom:14px;font-family:'DM Mono',monospace}
+  .grid-2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .grid-3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+
+  /* CHARTS */
+  .chart-wrap{position:relative;width:100%}
+
+  /* SIGNALS GRID */
+  .sig-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}
+  .sig-box{text-align:center;border-radius:8px;padding:12px 6px}
+  .sig-box.bull{background:var(--green-bg);border:1px solid var(--green2)}
+  .sig-box.bear{background:var(--red-bg);border:1px solid var(--red2)}
+  .sig-box.neu{background:var(--blue-bg);border:1px solid var(--blue2)}
+  .sig-num{font-size:22px;font-weight:700}
+  .sig-lbl{font-size:11px;margin-top:2px}
+  .sig-box.bull .sig-num,.sig-box.bull .sig-lbl{color:var(--green)}
+  .sig-box.bear .sig-num,.sig-box.bear .sig-lbl{color:var(--red)}
+  .sig-box.neu .sig-num,.sig-box.neu .sig-lbl{color:var(--blue)}
+
+  /* BAR ROWS */
+  .bar-row{display:flex;align-items:center;gap:10px;margin-bottom:9px}
+  .bar-label{font-size:11px;color:var(--text2);width:150px;flex-shrink:0;font-family:'DM Mono',monospace}
+  .bar-track{flex:1;background:var(--bg4);border-radius:3px;height:6px;overflow:hidden}
+  .bar-fill{height:100%;border-radius:3px;transition:width .6s ease}
+  .bar-fill.bull{background:var(--green)}.bar-fill.bear{background:var(--red)}.bar-fill.neu{background:var(--blue)}
+  .bar-val{font-size:11px;font-weight:500;width:52px;text-align:right;flex-shrink:0;font-family:'DM Mono',monospace}
+  .bar-val.bull{color:var(--green)}.bar-val.bear{color:var(--red)}.bar-val.neu{color:var(--blue)}
+
+  /* PILLS */
+  .pill{display:inline-flex;align-items:center;font-size:10px;font-weight:500;padding:2px 9px;border-radius:20px;letter-spacing:.04em;font-family:'DM Mono',monospace}
+  .pill.bull{background:var(--green-bg);color:var(--green);border:1px solid var(--green2)}
+  .pill.bear{background:var(--red-bg);color:var(--red);border:1px solid var(--red2)}
+  .pill.neu{background:var(--blue-bg);color:var(--blue);border:1px solid var(--blue2)}
+  .pill.amb{background:var(--amber-bg);color:var(--amber);border:1px solid #7a5010}
+
+  /* REVENUE MIX */
+  .mix-row{margin-bottom:12px}
+  .mix-top{display:flex;justify-content:space-between;font-size:12px;margin-bottom:4px}
+  .mix-top span:first-child{color:var(--text2)}
+  .mix-top span:last-child{font-weight:500;font-family:'DM Mono',monospace}
+  .mix-track{height:6px;background:var(--bg4);border-radius:3px;overflow:hidden}
+  .mix-fill{height:100%;border-radius:3px}
+
+  /* NEWS TIMELINE */
+  .timeline{position:relative;padding-left:44px}
+  .timeline::before{content:'';position:absolute;left:16px;top:0;bottom:0;width:1px;background:var(--border)}
+  .news-item{position:relative;margin-bottom:18px}
+  .news-dot{position:absolute;left:-36px;width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;border:1px solid var(--border2)}
+  .news-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px 16px}
+  .news-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:7px;gap:8px;flex-wrap:wrap}
+  .news-date{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+  .news-move{font-size:12px;font-weight:600;font-family:'DM Mono',monospace}
+  .news-title{font-size:13px;font-weight:600;margin-bottom:6px;line-height:1.4}
+  .news-body{font-size:12px;color:var(--text2);line-height:1.65}
+  .news-card.high{border-left:3px solid var(--green)}
+  .news-card.neg{border-left:3px solid var(--red)}
+  .news-card.med{border-left:3px solid var(--blue)}
+  .news-card.low{border-left:3px solid var(--text3)}
+
+  /* OSCILLATORS TABLE */
+  .osc-row{display:flex;align-items:center;padding:9px 0;border-bottom:1px solid var(--border)}
+  .osc-row:last-child{border-bottom:none}
+  .osc-name{font-size:12px;font-weight:500;width:180px;flex-shrink:0}
+  .osc-note{font-size:11px;color:var(--text2);flex:1}
+  .osc-val{font-size:12px;font-weight:500;width:56px;text-align:right;flex-shrink:0;margin-right:10px;font-family:'DM Mono',monospace}
+
+  /* MA TABLE */
+  .ma-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border);font-size:12px}
+  .ma-row:last-child{border-bottom:none}
+  .ma-name{width:60px;font-weight:500;font-family:'DM Mono',monospace}
+  .ma-val{color:var(--text2);width:50px;font-family:'DM Mono',monospace}
+  .ma-sig{flex:1;font-size:11px}
+
+  /* PATTERNS */
+  .pattern-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+  .pattern-card{background:var(--bg3);border:1px solid var(--border);border-radius:10px;padding:14px;border-left-width:3px}
+  .pattern-head{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+  .pattern-name{font-size:13px;font-weight:600;flex:1;padding-right:8px;line-height:1.3}
+  .pattern-body{font-size:11px;color:var(--text2);line-height:1.6;margin-bottom:8px}
+  .pattern-target{font-size:11px;margin-bottom:3px}
+  .pattern-conf{font-size:10px;color:var(--text3);font-style:italic}
+
+  /* SCREENER TABLE */
+  .screener-table{width:100%;border-collapse:collapse;font-size:12px}
+  .screener-table th{text-align:left;padding:8px 10px;font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;border-bottom:1px solid var(--border);font-family:'DM Mono',monospace;font-weight:500}
+  .screener-table td{padding:9px 10px;border-bottom:1px solid var(--border)}
+  .screener-table tr.highlight td{background:var(--bg4)}
+  .screener-table tr:last-child td{border-bottom:none}
+
+  /* RADAR */
+  .radar-wrap{position:relative;width:100%;max-width:340px;margin:0 auto}
+
+  /* SCENARIOS */
+  .scenario{border-radius:10px;padding:16px 18px;margin-bottom:14px;border:1px solid}
+  .scenario-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;flex-wrap:wrap;gap:8px}
+  .scenario-title{font-size:14px;font-weight:700}
+  .scenario-meta{display:flex;gap:14px}
+  .scenario-tg,.scenario-pr{font-size:12px;font-weight:500;font-family:'DM Mono',monospace}
+  .scenario-body{font-size:12px;line-height:1.75;color:var(--text2)}
+
+  /* METRICS LIST */
+  .metrics-list .m-row{display:flex;align-items:center;padding:7px 0;border-bottom:1px solid var(--border);font-size:12px}
+  .metrics-list .m-row:last-child{border-bottom:none}
+  .m-key{color:var(--text2);width:200px;flex-shrink:0}
+  .m-val{font-weight:500;flex:1;font-family:'DM Mono',monospace}
+  .m-note{font-size:10px;color:var(--text3);font-family:'DM Mono',monospace}
+
+  /* FILTER BUTTONS */
+  .filter-btns{display:flex;gap:8px;margin-bottom:14px}
+  .filter-btn{padding:5px 16px;font-size:11px;border-radius:20px;border:1px solid var(--border2);background:transparent;color:var(--text2);cursor:pointer;font-family:'Syne',sans-serif;font-weight:500;transition:all .2s}
+  .filter-btn:hover{border-color:var(--blue);color:var(--blue)}
+  .filter-btn.active{background:var(--blue);color:#fff;border-color:var(--blue)}
+
+  /* SR LEGEND */
+  .sr-legend{display:flex;gap:18px;font-size:10px;margin-top:8px;font-family:'DM Mono',monospace;flex-wrap:wrap}
+  .sr-dot{width:12px;height:3px;border-radius:2px;display:inline-block;margin-right:4px}
+
+  /* DISCLAIMER */
+  .disclaimer{font-size:10px;color:var(--text3);font-style:italic;margin-top:16px;padding:10px 14px;background:var(--bg3);border-radius:6px;border-left:2px solid var(--border2)}
+
+  /* ANIMATIONS */
+  @keyframes fadeUp{from{opacity:0;transform:translateY(12px)}to{opacity:1;transform:translateY(0)}}
+  .tab-panel.active{animation:fadeUp .25s ease}
+
+  /* SCROLLBAR */
+  ::-webkit-scrollbar{width:4px;height:4px}
+  ::-webkit-scrollbar-track{background:var(--bg)}
+  ::-webkit-scrollbar-thumb{background:var(--border2);border-radius:2px}
+
+  @media(max-width:700px){
+    .kpi-grid{grid-template-columns:repeat(3,1fr)}
+    .grid-2,.grid-3,.pattern-grid{grid-template-columns:1fr}
+    .header-top{flex-wrap:wrap}
+    .content{padding:16px}
+  }
+</style>
+</head>
+<body>
+
+<div class="page-wrapper">
+<div class="header">
+  <div class="header-top">
+    <span class="ticker-badge">NASDAQ: PLUG</span>
+    <span class="price-main">$3.19</span>
+    <span class="price-change up">▲ +3.57% oggi</span>
+    <span class="pill bull" style="margin-left:4px">Bullish intraday</span>
+    <span class="header-meta">24 APR 2026 · SESSIONE IN CORSO · Range $3.04–$3.28 · Vol 66.21M</span>
+  </div>
+  <div class="tabs">
+    <button class="tab-btn active" onclick="showTab('dashboard',this)">Dashboard</button>
+    <button class="tab-btn" onclick="showTab('news',this)">News & Driver</button>
+    <button class="tab-btn" onclick="showTab('tecnica',this)">Analisi Tecnica</button>
+    <button class="tab-btn" onclick="showTab('screener',this)">Screener</button>
+    <button class="tab-btn" onclick="showTab('report',this)">Report</button>
+  </div>
+</div>
+
+<div class="content">
+
+<!-- ===== DASHBOARD ===== -->
+<div id="tab-dashboard" class="tab-panel active">
+  <div class="kpi-grid">
+    <div class="kpi"><div class="kpi-label">Prezzo oggi</div><div class="kpi-value bull">$3.19</div><div class="kpi-sub">+3.57% · 24 Apr 2026</div></div>
+    <div class="kpi"><div class="kpi-label">Market Cap</div><div class="kpi-value neu">$4.45B</div><div class="kpi-sub">+11.54% sett.</div></div>
+    <div class="kpi"><div class="kpi-label">RSI (14)</div><div class="kpi-value" style="color:var(--red)">72.5</div><div class="kpi-sub">⚠ overbought</div></div>
+    <div class="kpi"><div class="kpi-label">52W Low</div><div class="kpi-value bear">$0.69</div><div class="kpi-sub">Ago 2025</div></div>
+    <div class="kpi"><div class="kpi-label">52W High</div><div class="kpi-value bull">$4.58</div><div class="kpi-sub">Mag 2025</div></div>
+    <div class="kpi"><div class="kpi-label">Prossimi EPS</div><div class="kpi-value neu">13 Mag</div><div class="kpi-sub">Q1 2026</div></div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Andamento prezzo mensile — Gen 2025 / Apr 2026</div>
+    <div class="chart-wrap" style="height:200px"><canvas id="priceChart" role="img" aria-label="Grafico prezzo PLUG mensile 2025-2026">Prezzo PLUG da $2.42 gen 2025 a $2.84 apr 2026 con minimo a $0.69 ago 2025.</canvas></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title">Revenue trimestrale (M$)</div>
+      <div class="chart-wrap" style="height:180px"><canvas id="revChart" role="img" aria-label="Revenue trimestrale PLUG Q1 2024 - Q4 2025">Revenue da $120M Q1 2024 a $225M Q4 2025.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Performance comparata (base 100 = Ago 2025)</div>
+      <div class="chart-wrap" style="height:180px"><canvas id="perfChart" role="img" aria-label="Performance comparata PLUG vs SP500 vs ICLN">PLUG +412% vs SP500 +116% vs ICLN +115%.</canvas></div>
+      <div style="display:flex;gap:14px;font-size:10px;color:var(--text3);margin-top:8px;font-family:'DM Mono',monospace">
+        <span style="color:#4a9eff">— PLUG</span><span>- - S&P 500</span><span style="color:#2dd4a0">· · ICLN</span>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Mix ricavi 2025 (stima)</div>
+      <div style="margin-top:4px">
+        <div class="mix-row"><div class="mix-top"><span>Fuel Cell Systems</span><span>38%</span></div><div class="mix-track"><div class="mix-fill" style="width:38%;background:#4a9eff"></div></div></div>
+        <div class="mix-row"><div class="mix-top"><span>Idrogeno & Fuel</span><span>29%</span></div><div class="mix-track"><div class="mix-fill" style="width:29%;background:#2dd4a0"></div></div></div>
+        <div class="mix-row"><div class="mix-top"><span>Service & PPA</span><span>21%</span></div><div class="mix-track"><div class="mix-fill" style="width:21%;background:#f5a623"></div></div></div>
+        <div class="mix-row" style="margin-bottom:0"><div class="mix-top"><span>Elettrolizzatori</span><span>12%</span></div><div class="mix-track"><div class="mix-fill" style="width:12%;background:#ff5e5e"></div></div></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Segnale tecnico complessivo</div>
+      <div style="text-align:center;padding:8px 0 4px">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:4px;font-family:'DM Mono',monospace">14 INDICATORI ANALIZZATI</div>
+        <div style="font-size:24px;font-weight:700;color:var(--green)">RIALZISTA</div>
+        <div style="font-size:11px;color:var(--text3);margin-top:2px">RSI in overbought — cautela a breve</div>
+      </div>
+      <div class="sig-grid">
+        <div class="sig-box bull"><div class="sig-num">9</div><div class="sig-lbl">Bull</div></div>
+        <div class="sig-box neu"><div class="sig-num">2</div><div class="sig-lbl">Neutro</div></div>
+        <div class="sig-box bear"><div class="sig-num">3</div><div class="sig-lbl">Bear</div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== NEWS ===== -->
+<div id="tab-news" class="tab-panel">
+  <div class="grid-3" style="margin-bottom:20px">
+    <div class="kpi"><div class="kpi-label">Movimento oggi</div><div class="kpi-value bull">+3.57%</div><div class="kpi-sub">Momentum rialzista</div></div>
+    <div class="kpi"><div class="kpi-label">Volume oggi</div><div class="kpi-value neu">66.21M</div><div class="kpi-sub">vs media 73.78M (−10%)</div></div>
+    <div class="kpi"><div class="kpi-label">RSI aggiornato</div><div class="kpi-value bear">72.5</div><div class="kpi-sub">⚠ Zona overbought</div></div>
+  </div>
+
+  <div class="timeline">
+    <div class="news-item">
+      <div class="news-dot" style="background:#1a1f2a">⚡</div>
+      <div class="news-card med">
+        <div class="news-header">
+          <span class="news-date">24 APR 2026 · OGGI (5h fa)</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--amber)">sentiment misto</span>
+            <span class="pill neu">impatto neutro</span>
+          </div>
+        </div>
+        <div class="news-title">Elon Musk vs. Plug Power — cosa pensa il CEO di Tesla sull'idrogeno</div>
+        <div class="news-body">Motley Fool pubblica un'analisi che mette a confronto la visione di Elon Musk sull'idrogeno (scettico: lo chiama "fool's cell") con la tesi di investimento di Plug Power. L'articolo ricorda che Musk preferisce le batterie agli EV ma non esclude l'idrogeno industriale, dove PLUG opera. Ha generato dibattito retail ma nessun impatto direzionale netto sul prezzo intraday.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#1a1f2a">📊</div>
+      <div class="news-card low">
+        <div class="news-header">
+          <span class="news-date">24 APR 2026 · OGGI (12h fa)</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--red)">−1.41% intraday</span>
+            <span class="pill neu">impatto contenuto</span>
+          </div>
+        </div>
+        <div class="news-title">TipRanks — sentiment opzioni misto su PLUG vicino a $3.15</div>
+        <div class="news-body">Report TipRanks segnala sentiment misto nelle opzioni su PLUG, con le azioni in calo di $0.04 vicino ai $3.15. La zona $3.10–$3.20 rappresenta un'area tecnica chiave dove si concentra il maggiore open interest. Il titolo ha recuperato nel corso della sessione.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#0a1f18">📈</div>
+      <div class="news-card high">
+        <div class="news-header">
+          <span class="news-date">23 APR 2026 · IERI</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--green)">sentiment positivo</span>
+            <span class="pill bull">catalizzatore bull</span>
+          </div>
+        </div>
+        <div class="news-title">Motley Fool — "PLUG sembra un'occasione. Ecco cosa sapere prima di comprare" 🔑</div>
+        <div class="news-body">Analisi approfondita che evidenzia: PLUG ha già rallied del +260% negli ultimi 12 mesi, ma tratta ancora a sole 5x le vendite 2026. Revenue attesa $802M nel 2026, con CAGR del 17% fino al 2028. Il mercato green hydrogen crescerà al 30.2% CAGR fino al 2033. 74.000+ sistemi fuel cell deployati. Nuova hydrogen liquefaction plant in Louisiana con Olin. L'articolo è diventato uno dei più condivisi nel settore hydrogen energy nelle ultime 24h.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#1a0d0d">⚔️</div>
+      <div class="news-card neg">
+        <div class="news-header">
+          <span class="news-date">21 APR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--red)">PLUG −5% · FCEL +6%</span>
+            <span class="pill bear">impatto negativo</span>
+          </div>
+        </div>
+        <div class="news-title">FuelCell Energy +6% su vantaggio tecnologico mentre Plug Power cede −5% pre-earnings</div>
+        <div class="news-body">24/7 Wall St. riporta che FuelCell Energy ha guadagnato il 6% grazie a sviluppi tecnologici positivi, mentre PLUG è arretrata del 5% in avvicinamento agli earnings del 13 maggio. Il mercato inizia a prezzare la pressione pre-earnings: l'ultimo trimestre aveva deluso con EPS −$0.63 vs stima −$0.10. La rotazione settoriale ha penalizzato PLUG a vantaggio del competitor FCEL.</div>
+      </div>
+    </div>
+        <div class="news-header">
+          <span class="news-date">20 APR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--text2)">~+0.5% apertura</span>
+            <span class="pill neu">impatto basso</span>
+          </div>
+        </div>
+        <div class="news-title">Motley Fool — "PLUG sotto $4: è il momento di comprare?"</div>
+        <div class="news-body">Analisi pubblicata stamattina. Evidenzia il "Project Quantum Leap" (target profittabilità piena 2028) e il passaggio alla produzione interna di idrogeno. Ha generato attenzione retail senza spostare significativamente il prezzo. Il calo odierno del −2.39% con volume bassissimo (1.85M vs media 74M) è puro consolidamento tecnico post-rally — nessun catalizzatore negativo specifico.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#1a1f2a">💬</div>
+      <div class="news-card med">
+        <div class="news-header">
+          <span class="news-date">16 APR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--text2)">±0%</span>
+            <span class="pill neu">impatto neutro</span>
+          </div>
+        </div>
+        <div class="news-title">AMA Reddit — CEO Jose Luis Crespo risponde agli investitori</div>
+        <div class="news-body">Il CEO ha risposto in diretta alle domande degli investitori retail. Ha ribadito la roadmap verso la profittabilità e difeso la strategia di produzione interna di idrogeno. Nessuna guidance numerica aggiornata. Ha rafforzato il sentiment positivo verso il management, già prezzato dal mercato.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#1a0d0d">⚖️</div>
+      <div class="news-card neg">
+        <div class="news-header">
+          <span class="news-date">13 APR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--red)">−3% sessione 14 apr</span>
+            <span class="pill bear">impatto negativo</span>
+          </div>
+        </div>
+        <div class="news-title">Analisti divisi su PLUG — TipRanks evidenzia contraddizioni nel consensus</div>
+        <div class="news-body">Da una parte Craig-Hallum con target $7.00 (Buy, +146% upside). Dall'altra Jefferies e Wells Fargo con obiettivi medi a $2.18, implicando −25% di downside dai livelli attuali. La divisione ha aumentato l'incertezza e contribuito al pullback delle ultime sessioni. Susquehanna mantiene Hold con target $2.75.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#0d1a2a">📊</div>
+      <div class="news-card med">
+        <div class="news-header">
+          <span class="news-date">9 APR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--green)">+1.8% sessione</span>
+            <span class="pill neu">impatto lieve</span>
+          </div>
+        </div>
+        <div class="news-title">Susquehanna alza il target a $2.75 da $2.50 — rating Hold confermato</div>
+        <div class="news-body">Revisione al rialzo del price target. Susquehanna riconosce i progressi operativi ma mantiene cautela sulla traiettoria verso la profittabilità. Il mercato ha accolto l'aggiornamento con un moderato rialzo intraday senza impulso sostenuto, a conferma dello scetticismo di fondo degli istituzionali.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#0a1f18">⚡</div>
+      <div class="news-card high">
+        <div class="news-header">
+          <span class="news-date">6 APR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--green)">+11.62% · Vol 98.5M</span>
+            <span class="pill bull">driver principale</span>
+          </div>
+        </div>
+        <div class="news-title">PLUG +11.6% — Contratto 275 MW GenEco con Hy2gen Canada 🔑</div>
+        <div class="news-body">Il vero catalizzatore del recente rally: contratto FEED per un sistema elettrolizzatore PEM da 275 MW per il progetto "Courant" in Québec — una delle commesse più grandi della storia aziendale. Hy2gen utilizzerà energia idroelettrica di Hydro-Québec per produrre idrogeno verde, poi convertito in ammoniaca verde e nitrato d'ammonio rinnovabile per l'industria mineraria. Costruzione prevista 2027, commissioning completo 2029. Volume 98.5M azioni (+7% vs media trimestrale).</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#1a0d0d">🔨</div>
+      <div class="news-card neg">
+        <div class="news-header">
+          <span class="news-date">3 APR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--red)">−0.5% rumore</span>
+            <span class="pill bear">impatto contenuto</span>
+          </div>
+        </div>
+        <div class="news-title">Scadenza class action securities — deadline 3 aprile 2026</div>
+        <div class="news-body">Rosen Law Firm e altri studi legali hanno incoraggiato gli investitori con perdite superiori a $100K a farsi rappresentare prima della scadenza. La class action ha pesato sul sentiment istituzionale ma senza impatto diretto significativo, dato che il contratto Hy2gen aveva già dominato la narrativa di mercato in quelle sessioni.</div>
+      </div>
+    </div>
+
+    <div class="news-item">
+      <div class="news-dot" style="background:#0a1f18">📈</div>
+      <div class="news-card high">
+        <div class="news-header">
+          <span class="news-date">2 MAR 2026</span>
+          <div style="display:flex;gap:8px;align-items:center">
+            <span class="news-move" style="color:var(--green)">+15–20% post-earnings</span>
+            <span class="pill bull">catalizzatore chiave</span>
+          </div>
+        </div>
+        <div class="news-title">Earnings Q4 2025 — Revenue record $225.2M, gross margin positivo per la prima volta</div>
+        <div class="news-body">Risultati trimestrali superiori alle stime di fatturato ($225.2M vs attese $217.4M). Soprattutto, Plug Power ha raggiunto il gross margin positivo per la prima volta in anni — segnale strutturale fondamentale. L'EPS ha però deluso (−$0.63 vs stima −$0.10, miss del 504%). Il titolo è balzato immediatamente e ha mantenuto i guadagni nelle settimane successive, trainando il rally che ha portato da $2.15 a $2.84.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-top:4px;border-left:3px solid var(--green2)">
+    <div style="font-size:13px;font-weight:600;margin-bottom:6px">Perché sale oggi? +3.57% con volume 66M</div>
+    <div style="font-size:12px;color:var(--text2);line-height:1.7">Il rialzo odierno di <strong style="color:var(--green)">+3.57%</strong> (range $3.04–$3.28) con volume 66.21M è alimentato da una combinazione di <strong style="font-weight:600">momentum positivo post-rally</strong> e articoli bullish pubblicati negli ultimi 2 giorni (Motley Fool "bargain" e confronto con FCEL). Il titolo si avvicina alla resistenza chiave <strong style="color:var(--amber)">R1 a $3.15</strong>, zona di massimo open interest opzioni. <strong style="color:var(--red)">⚠ Attenzione: RSI ora a 72.5 — zona overbought.</strong> Il prossimo catalizzatore chiave rimane gli <strong style="color:var(--blue)">earnings Q1 2026 del 13 maggio 2026</strong>. Market cap salita a $4.45B (+11.54% settimana).</div>
+  </div>
+</div>
+
+<!-- ===== TECNICA ===== -->
+<div id="tab-tecnica" class="tab-panel">
+  <div class="grid-2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title">RSI (14) — ultimi 20 giorni</div>
+      <div class="chart-wrap" style="height:165px"><canvas id="rsiChart" role="img" aria-label="RSI 14 giorni PLUG">RSI da 42 a 64 nelle ultime 20 sedute, con picco a 72 il 2 aprile.</canvas></div>
+    </div>
+    <div class="card">
+      <div class="card-title">MACD (12,26,9)</div>
+      <div class="chart-wrap" style="height:165px"><canvas id="macdChart" role="img" aria-label="MACD PLUG">MACD sopra signal line, istogramma positivo ma in contrazione.</canvas></div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Oscillatori e indicatori momentum</div>
+    <div class="osc-row"><span class="osc-name">RSI (14)</span><span class="osc-note">⚠ Zona overbought — alta probabilità di pausa/correzione</span><span class="osc-val" style="color:var(--red)">72.5</span><span class="pill bear">Bear</span></div>
+    <div class="osc-row"><span class="osc-name">Stochastic %K (14,3)</span><span class="osc-note">82.7 — in zona ipercomprato, attenzionare</span><span class="osc-val" style="color:var(--red)">82.7</span><span class="pill bear">Bear</span></div>
+    <div class="osc-row"><span class="osc-name">CCI (20)</span><span class="osc-note">Positivo, non in zona estrema</span><span class="osc-val" style="color:var(--green)">90.9</span><span class="pill bull">Bull</span></div>
+    <div class="osc-row"><span class="osc-name">Williams %R</span><span class="osc-note">Vicino alla soglia overbought estrema</span><span class="osc-val" style="color:var(--amber)">−18.2</span><span class="pill neu">Neutro</span></div>
+    <div class="osc-row"><span class="osc-name">MACD (12,26,9)</span><span class="osc-note">MACD sopra la signal line — momentum positivo</span><span class="osc-val" style="color:var(--green)">+0.18</span><span class="pill bull">Bull</span></div>
+    <div class="osc-row"><span class="osc-name">Momentum (10)</span><span class="osc-note">Slancio positivo forte</span><span class="osc-val" style="color:var(--green)">+0.35</span><span class="pill bull">Bull</span></div>
+    <div class="osc-row"><span class="osc-name">ATR (14)</span><span class="osc-note">Volatilità media giornaliera in aumento</span><span class="osc-val" style="color:var(--amber)">$0.22</span><span class="pill amb">Info</span></div>
+    <div class="osc-row"><span class="osc-name">ADX (14)</span><span class="osc-note">Trend moderato e in rafforzamento (>25)</span><span class="osc-val" style="color:var(--green)">38.0</span><span class="pill bull">Bull</span></div>
+  </div>
+
+  <div class="grid-2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="card-title">Medie mobili — prezzo attuale $2.84</div>
+      <div class="ma-row"><span class="ma-name">MA 20</span><span class="ma-val">$2.74</span><span class="ma-sig" style="color:var(--green)">▲ Prezzo sopra</span><span class="pill bull">Bull</span></div>
+      <div class="ma-row"><span class="ma-name">MA 50</span><span class="ma-val">$2.55</span><span class="ma-sig" style="color:var(--green)">▲ Prezzo sopra</span><span class="pill bull">Bull</span></div>
+      <div class="ma-row"><span class="ma-name">MA 100</span><span class="ma-val">$2.28</span><span class="ma-sig" style="color:var(--green)">▲ Prezzo sopra</span><span class="pill bull">Bull</span></div>
+      <div class="ma-row"><span class="ma-name">MA 200</span><span class="ma-val">$2.71</span><span class="ma-sig" style="color:var(--green)">▲ Prezzo sopra</span><span class="pill bull">Bull</span></div>
+      <div class="ma-row"><span class="ma-name">EMA 12</span><span class="ma-val">$2.98</span><span class="ma-sig" style="color:var(--green)">▲ Prezzo sopra</span><span class="pill bull">Bull</span></div>
+      <div class="ma-row"><span class="ma-name">EMA 26</span><span class="ma-val">$2.80</span><span class="ma-sig" style="color:var(--green)">▲ Prezzo sopra</span><span class="pill bull">Bull</span></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Indicatori direzionali</div>
+      <div style="margin-bottom:4px">
+        <div class="bar-row"><div class="bar-label">Trend 1D</div><div class="bar-track"><div class="bar-fill bull" style="width:78%"></div></div><div class="bar-val bull">Rialzista</div></div>
+        <div class="bar-row"><div class="bar-label">Trend 1W</div><div class="bar-track"><div class="bar-fill bull" style="width:85%"></div></div><div class="bar-val bull">Forte ↑</div></div>
+        <div class="bar-row"><div class="bar-label">Trend 1M</div><div class="bar-track"><div class="bar-fill bull" style="width:72%"></div></div><div class="bar-val bull">Rialzista</div></div>
+        <div class="bar-row"><div class="bar-label">RSI (14)</div><div class="bar-track"><div class="bar-fill bear" style="width:72%"></div></div><div class="bar-val bear">72.5 ⚠</div></div>
+        <div class="bar-row"><div class="bar-label">vs MA200</div><div class="bar-track"><div class="bar-fill bull" style="width:90%"></div></div><div class="bar-val bull">+17.7%</div></div>
+        <div class="bar-row"><div class="bar-label">Volume oggi</div><div class="bar-track"><div class="bar-fill neu" style="width:89%"></div></div><div class="bar-val neu">66.21M</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:14px">
+    <div class="card-title">Supporti e resistenze chiave</div>
+    <div class="chart-wrap" style="height:175px"><canvas id="srChart" role="img" aria-label="Grafico supporti e resistenze PLUG">Prezzo attuale $2.84 tra supporto S1 $2.18 e resistenza R1 $3.15.</canvas></div>
+    <div class="sr-legend">
+      <span><span class="sr-dot" style="background:#ff5e5e"></span>R2 $4.58 (52W High)</span>
+      <span><span class="sr-dot" style="background:#f5a623"></span>R1 $3.64 (consensus target)</span>
+      <span><span class="sr-dot" style="background:#2dd4a0"></span>S1 $2.71 (MA200)</span>
+      <span><span class="sr-dot" style="background:#1a9e76"></span>S2 $2.18 (consensus bear)</span>
+    </div>
+  </div>
+
+  <div class="card-title" style="margin-bottom:10px">Pattern riconosciuti (4)</div>
+  <div class="pattern-grid">
+    <div class="pattern-card" style="border-left-color:var(--green)">
+      <div class="pattern-head"><span class="pattern-name">Breakout resistenza $3.15</span><span class="pill bull">1D</span></div>
+      <div class="pattern-body">Oggi il titolo ha superato e consolidato sopra la resistenza tecnica chiave di $3.15 (zona di massimo open interest opzioni). Un breakout confermato in chiusura sopra questo livello apre la strada verso il target successivo a $3.64 (consensus analisti).</div>
+      <div class="pattern-target">Target: <strong style="color:var(--green)">$3.64 (consensus) → $4.58 (R2)</strong></div>
+      <div class="pattern-conf">Conferma: chiusura daily sopra $3.15 con volume sostenuto</div>
+    </div>
+    <div class="pattern-card" style="border-left-color:var(--green)">
+      <div class="pattern-head"><span class="pattern-name">Base rialzista settimanale</span><span class="pill bull">1W</span></div>
+      <div class="pattern-body">Da novembre 2025 il titolo costruisce una base con minimi crescenti. Il +260% degli ultimi 12 mesi e il rally settimanale +11.54% confermano l'accumulazione istituzionale in corso. Il titolo ora sopra tutte le medie mobili principali.</div>
+      <div class="pattern-target">Target: <strong style="color:var(--green)">$4.58 (52W High) — poi zona $5</strong></div>
+      <div class="pattern-conf">Conferma: mantenimento sopra MA200 ($2.71) nelle prossime settimane</div>
+    </div>
+    <div class="pattern-card" style="border-left-color:var(--red)">
+      <div class="pattern-head"><span class="pattern-name">RSI Overbought (72.5)</span><span class="pill bear">1D</span></div>
+      <div class="pattern-body">RSI a 72.5 — zona di ipercomprato. Stochastic a 82.7. Storicamente quando PLUG entra in questa zona segue una pausa/correzione del 5–15%. Il setup è bullish di medio periodo ma richiede cautela nel breve sul timing di ingresso.</div>
+      <div class="pattern-target">Rischio correzione: <strong style="color:var(--red)">$2.85–$3.00 (supporto immediato)</strong></div>
+      <div class="pattern-conf">Segnale: divergenza RSI ribassista da monitorare nei prossimi giorni</div>
+    </div>
+    <div class="pattern-card" style="border-left-color:var(--amber)">
+      <div class="pattern-head"><span class="pattern-name">Pre-earnings nervosismo</span><span class="pill amb">19 giorni</span></div>
+      <div class="pattern-body">A 19 giorni dagli earnings del 13 maggio, il mercato inizia a prezzare l'incertezza. Il pattern pre-earnings tipico di PLUG prevede alta volatilità nelle ultime 2 settimane. FCEL +6% vs PLUG −5% il 21 aprile suggerisce rotazione settoriale difensiva.</div>
+      <div class="pattern-target">Scenario: <strong style="color:var(--amber)">range $2.80–$3.64 fino al 13 maggio</strong></div>
+      <div class="pattern-conf">EPS atteso Q1 2026: −$0.10/share. Prev. Q4 2025: miss −504%</div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== SCREENER ===== -->
+<div id="tab-screener" class="tab-panel">
+  <div class="filter-btns">
+    <button class="filter-btn active" onclick="filterTable('ALL',this)">Tutti</button>
+    <button class="filter-btn" onclick="filterTable('Buy',this)">Buy</button>
+    <button class="filter-btn" onclick="filterTable('Hold',this)">Hold</button>
+    <button class="filter-btn" onclick="filterTable('Sell',this)">Sell</button>
+  </div>
+  <div class="card" style="margin-bottom:14px;overflow-x:auto">
+    <div class="card-title">Comparazione peer hydrogen — Nasdaq</div>
+    <table class="screener-table" id="screenerTable">
+      <thead>
+        <tr>
+          <th>Ticker</th><th>Nome</th><th>Prezzo</th><th>Δ%</th><th>Mkt Cap</th>
+          <th>P/S</th><th>RSI</th><th>MA200</th><th>Rating</th><th>Target</th><th>Up/Dn</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight" data-rating="Hold">
+          <td><strong>PLUG</strong></td><td>Plug Power</td><td>$3.19</td>
+          <td style="color:var(--green)">+3.57%</td><td>$4.45B</td><td>5.5x</td><td style="color:var(--red)">72.5</td>
+          <td style="color:var(--green)">↑ sopra</td>
+          <td><span class="pill neu">Hold</span></td><td>$3.64</td>
+          <td style="color:var(--green)">+14%</td>
+        </tr>
+        <tr data-rating="Buy">
+          <td><strong>BE</strong></td><td>Bloom Energy</td><td>$135.00</td>
+          <td style="color:var(--green)">+0.46%</td><td>$8.2B</td><td>4.8x</td><td>58</td>
+          <td style="color:var(--green)">↑ sopra</td>
+          <td><span class="pill bull">Buy</span></td><td>$155.00</td>
+          <td style="color:var(--green)">+15%</td>
+        </tr>
+        <tr data-rating="Hold">
+          <td><strong>FCEL</strong></td><td>FuelCell Energy</td><td>$6.67</td>
+          <td style="color:var(--green)">+1.06%</td><td>$0.8B</td><td>3.2x</td><td>51</td>
+          <td style="color:var(--red)">↓ sotto</td>
+          <td><span class="pill neu">Hold</span></td><td>$7.20</td>
+          <td style="color:var(--green)">+8%</td>
+        </tr>
+        <tr data-rating="Hold">
+          <td><strong>BLDP</strong></td><td>Ballard Power</td><td>$2.21</td>
+          <td style="color:var(--red)">−0.90%</td><td>$0.7B</td><td>4.1x</td><td>45</td>
+          <td style="color:var(--red)">↓ sotto</td>
+          <td><span class="pill neu">Hold</span></td><td>$2.80</td>
+          <td style="color:var(--green)">+27%</td>
+        </tr>
+        <tr data-rating="Sell">
+          <td><strong>ITM</strong></td><td>ITM Power</td><td>$0.58</td>
+          <td style="color:var(--red)">−1.20%</td><td>$0.3B</td><td>6.8x</td><td>38</td>
+          <td style="color:var(--red)">↓ sotto</td>
+          <td><span class="pill bear">Sell</span></td><td>$0.50</td>
+          <td style="color:var(--red)">−14%</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+  <div class="card">
+    <div class="card-title">Radar fondamentale / momentum vs competitor</div>
+    <div style="display:flex;gap:16px;margin-bottom:12px">
+      <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace"><span style="width:10px;height:10px;border-radius:2px;background:#4a9eff;display:inline-block"></span>PLUG</span>
+      <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace"><span style="width:10px;height:10px;border-radius:2px;background:#2dd4a0;display:inline-block"></span>BE (Bloom)</span>
+      <span style="display:flex;align-items:center;gap:6px;font-size:11px;color:var(--text2);font-family:'DM Mono',monospace"><span style="width:10px;height:10px;border-radius:2px;background:#f5a623;display:inline-block"></span>FCEL</span>
+    </div>
+    <div class="radar-wrap" style="height:280px"><canvas id="radarChart" role="img" aria-label="Radar fondamentale PLUG vs Bloom Energy vs FuelCell">PLUG domina su Pipeline e Momentum, BE su Gross Margin, FCEL su Valuation.</canvas></div>
+  </div>
+</div>
+
+<!-- ===== REPORT ===== -->
+<div id="tab-report" class="tab-panel">
+  <div style="font-size:11px;color:var(--text3);font-style:italic;margin-bottom:18px;font-family:'DM Mono',monospace">REPORT ANALITICO · 24 APRILE 2026 · SOLO A SCOPO INFORMATIVO</div>
+
+  <div class="scenario" style="background:#0a1a10;border-color:var(--green2)">
+    <div class="scenario-head">
+      <span class="scenario-title" style="color:var(--green)">Scenario Bull 🟢</span>
+      <div class="scenario-meta">
+        <span class="scenario-tg" style="color:var(--green)">Target: $4.50–$5.17</span>
+        <span class="scenario-pr" style="color:var(--green)">Probabilità: 30%</span>
+      </div>
+    </div>
+    <div class="scenario-body">Il contratto da 275 MW con Hy2gen è la più grande commessa elettrolizzatori della storia dell'azienda. Se la pipeline si materializza con contratti analoghi e il management mantiene la traiettoria verso il breakeven (target 2027), il titolo potrebbe avvicinarsi al fair value Morningstar di $5.17. Il nuovo CEO Jose Luis Crespo sta dimostrando disciplina esecutiva: il passaggio dalla fornitura esterna di idrogeno alla produzione interna riduce strutturalmente i costi. Il piano di liquidità da $275M (inclusa la vendita del sito Project Gateway a Stream Data Centers per $132.5M) limita il rischio diluzione. <strong style="color:var(--green)">Catalyst principali:</strong> earnings Q1 2026 superiori alle attese (13 maggio); nuovi contratti elettrolizzatori in Europa o USA; conferma del breakeven del gross margin su base annua. Craig-Hallum mantiene Buy con target $7.00 (+146%).</div>
+  </div>
+
+  <div class="scenario" style="background:#0a1020;border-color:var(--blue2)">
+    <div class="scenario-head">
+      <span class="scenario-title" style="color:var(--blue)">Scenario Base ⚖️</span>
+      <div class="scenario-meta">
+        <span class="scenario-tg" style="color:var(--blue)">Target: $2.80–$3.64</span>
+        <span class="scenario-pr" style="color:var(--blue)">Probabilità: 50%</span>
+      </div>
+    </div>
+    <div class="scenario-body">Il consenso degli analisti (Hold, target medio $3.64 su 30 rating) prevede una consolidazione nella banda $2.50–$3.50 nei prossimi 6 mesi. La visibilità dell'80% dei ricavi 2026 e la base installata di 72.000 sistemi fuel cell garantiscono un floor di fatturato solido. Il rischio principale rimane la diluizione azionaria: negli ultimi 12 mesi le azioni sono aumentate del 50%, e il cash burn EBITDA è ancora a −$635M. Il mercato richiede prove concrete di breakeven del gross margin per tutto l'anno 2026, non solo per Q4 2025. <strong style="color:var(--blue)">La volatilità resta alta:</strong> ogni annuncio di contratto o guidance del management può muovere il titolo del 5–15% in una singola seduta. Prossimo catalizzatore: earnings 13 maggio.</div>
+  </div>
+
+  <div class="scenario" style="background:#1a0a0a;border-color:var(--red2)">
+    <div class="scenario-head">
+      <span class="scenario-title" style="color:var(--red)">Scenario Bear 🔴</span>
+      <div class="scenario-meta">
+        <span class="scenario-tg" style="color:var(--red)">Target: $1.50–$2.18</span>
+        <span class="scenario-pr" style="color:var(--red)">Probabilità: 20%</span>
+      </div>
+    </div>
+    <div class="scenario-body">I rischi al ribasso restano concreti. I dazi del 20% sulle componenti cinesi e sugli elettrolizzatori europei minacciano la supply chain e possono ritardare il raggiungimento del breakeven. La class action securities può comportare costi legali significativi e penalizzare il sentiment istituzionale. Se l'earnings del 13 maggio delude come il trimestre precedente (EPS −$0.63 vs stima −$0.10, miss del 504%), il titolo potrebbe correggere verso il supporto chiave a $2.18, poi verso $1.69 (S2 strutturale). <strong style="color:var(--red)">Il target implicito dei tre analisti più recenti</strong> (Susquehanna $2.75, Jefferies e Wells Fargo media $2.18) implica circa il 25% di downside. In 10 anni il numero di azioni è aumentato del 700% — la diluizione rimane il freno principale.</div>
+  </div>
+
+  <div class="card" style="margin-top:4px">
+    <div class="card-title">Metriche fondamentali chiave</div>
+    <div class="metrics-list">
+      <div class="m-row"><span class="m-key">Prezzo oggi (24 apr)</span><span class="m-val" style="color:var(--green)">$3.19</span><span class="m-note">+3.57% · range $3.04–$3.28</span></div>
+      <div class="m-row"><span class="m-key">Market Cap oggi</span><span class="m-val">$4.45B</span><span class="m-note">+11.54% nella settimana</span></div>
+      <div class="m-row"><span class="m-key">Volume oggi</span><span class="m-val">66.21M</span><span class="m-note">vs media 73.78M</span></div>
+      <div class="m-row"><span class="m-key">RSI (14) oggi</span><span class="m-val" style="color:var(--red)">72.5</span><span class="m-note">⚠ zona overbought</span></div>
+      <div class="m-row"><span class="m-key">Revenue FY2026 stimata</span><span class="m-val">$802M</span><span class="m-note">consensus analisti</span></div>
+      <div class="m-row"><span class="m-key">Revenue FY2025</span><span class="m-val">$710M</span><span class="m-note">~+15% YoY</span></div>
+      <div class="m-row"><span class="m-key">EPS Q4 2025</span><span class="m-val" style="color:var(--red)">−$0.63</span><span class="m-note">stima −$0.10 · miss −504%</span></div>
+      <div class="m-row"><span class="m-key">Gross Margin Q4 2025</span><span class="m-val" style="color:var(--green)">Positivo</span><span class="m-note">prima volta in anni</span></div>
+      <div class="m-row"><span class="m-key">EBITDA</span><span class="m-val" style="color:var(--red)">−$635M</span><span class="m-note">margine −89.45%</span></div>
+      <div class="m-row"><span class="m-key">Sistemi fuel cell deployati</span><span class="m-val">74.000+</span><span class="m-note">fine 2025</span></div>
+      <div class="m-row"><span class="m-key">Target EBITDA positivo</span><span class="m-val">2026</span><span class="m-note">obiettivo management</span></div>
+      <div class="m-row"><span class="m-key">Target Op. Income pos.</span><span class="m-val">2027</span><span class="m-note">Project Quantum Leap</span></div>
+      <div class="m-row"><span class="m-key">Target profittabilità piena</span><span class="m-val">2028</span><span class="m-note">obiettivo CEO Crespo</span></div>
+      <div class="m-row"><span class="m-key">Consensus analisti</span><span class="m-val">Hold</span><span class="m-note">target medio $3.64 · 30 rating</span></div>
+      <div class="m-row"><span class="m-key">Craig-Hallum (top bull)</span><span class="m-val" style="color:var(--green)">Buy $7.00</span><span class="m-note">+119% upside da $3.19</span></div>
+      <div class="m-row"><span class="m-key">Morningstar fair value</span><span class="m-val">$5.17</span><span class="m-note">sconto ~38% dall'attuale</span></div>
+    </div>
+  </div>
+
+  <div class="disclaimer">⚠️ Questo report è esclusivamente a scopo informativo. Non costituisce consulenza finanziaria, raccomandazione di investimento o sollecitazione all'acquisto/vendita di strumenti finanziari. I dati tecnici sono stime basate su fonti pubbliche disponibili al 20 aprile 2026.</div>
+</div>
+
+</div><!-- /content -->
+
+</div><!-- /page-wrapper -->
+
+<script>
+// TAB NAVIGATION
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('tab-'+id).classList.add('active');
+  btn.classList.add('active');
+  if(id==='tecnica' && !window.chartsBuilt) buildTechCharts();
+  if(id==='screener' && !window.radarBuilt) buildRadar();
+}
+
+// SCREENER FILTER
+function filterTable(rating, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#screenerTable tbody tr').forEach(row => {
+    row.style.display = (rating==='ALL' || row.dataset.rating===rating) ? '' : 'none';
+  });
+}
+
+// CHART DEFAULTS
+Chart.defaults.color = '#5a6070';
+Chart.defaults.borderColor = '#2a2e38';
+Chart.defaults.font.family = "'DM Mono', monospace";
+Chart.defaults.font.size = 10;
+
+// PRICE CHART
+const priceMonths = ['Gen 25','Feb','Mar','Apr','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic','Gen 26','Feb','Mar','Apr 20','Apr 24'];
+const priceVals   = [2.42,1.98,1.60,1.18,0.91,0.82,0.73,0.69,0.88,1.24,1.69,2.15,2.32,2.18,2.69,2.86,3.19];
+new Chart(document.getElementById('priceChart'),{
+  type:'line',
+  data:{labels:priceMonths,datasets:[
+    {label:'Prezzo',data:priceVals,borderColor:'#4a9eff',borderWidth:2,fill:true,
+     backgroundColor:(ctx)=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,200);g.addColorStop(0,'rgba(74,158,255,.18)');g.addColorStop(1,'rgba(74,158,255,0)');return g},
+     pointRadius:0,tension:.4},
+    {label:'MA200',data:Array(17).fill(2.71),borderColor:'rgba(255,94,94,.5)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false}
+  ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false},tooltip:{callbacks:{label:v=>`$${v.parsed.y}`}}},
+    scales:{x:{ticks:{maxRotation:0}},y:{min:.4,max:3.6,ticks:{callback:v=>`$${v}`}}}}
+});
+
+// REVENUE CHART
+new Chart(document.getElementById('revChart'),{
+  type:'bar',
+  data:{labels:['Q1\'24','Q2\'24','Q3\'24','Q4\'24','Q1\'25','Q2\'25','Q3\'25','Q4\'25'],
+    datasets:[{label:'Revenue M$',data:[120,143,175,191,152,162,172,225],
+      backgroundColor:['#1a6fd4','#1a6fd4','#1a6fd4','#1a6fd4','#1a9e76','#1a9e76','#1a9e76','#2dd4a0'],
+      borderRadius:3,borderSkipped:false}]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{x:{ticks:{maxRotation:0}},y:{ticks:{callback:v=>`$${v}M`}}}}
+});
+
+// PERFORMANCE CHART
+new Chart(document.getElementById('perfChart'),{
+  type:'line',
+  data:{labels:['Ago','Set','Ott','Nov','Dic','Gen','Feb','Mar','Apr'],
+    datasets:[
+      {label:'PLUG',data:[100,128,180,245,312,336,316,390,412],borderColor:'#4a9eff',borderWidth:2,pointRadius:0,tension:.4,fill:false},
+      {label:'S&P500',data:[100,104,107,110,112,115,113,118,116],borderColor:'#5a6070',borderWidth:1.5,borderDash:[4,3],pointRadius:0,tension:.4,fill:false},
+      {label:'ICLN',data:[100,103,106,109,111,114,112,116,115],borderColor:'#2dd4a0',borderWidth:1.5,borderDash:[2,2],pointRadius:0,tension:.4,fill:false}
+    ]},
+  options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+    scales:{y:{ticks:{callback:v=>v+'%'}}}}
+});
+
+// TECH CHARTS (lazy)
+window.chartsBuilt = false;
+window.radarBuilt = false;
+
+function buildTechCharts(){
+  if(window.chartsBuilt) return;
+  window.chartsBuilt = true;
+  const days = ['21/3','24/3','25/3','26/3','27/3','28/3','31/3','1/4','2/4','3/4','4/4','7/4','8/4','9/4','10/4','11/4','14/4','15/4','16/4','17/4'];
+  const rsiV = [42,48,55,60,58,52,56,61,72,68,65,58,62,64,67,63,60,65,68,72];
+  new Chart(document.getElementById('rsiChart'),{
+    type:'line',
+    data:{labels:days,datasets:[
+      {label:'RSI',data:rsiV,borderColor:'#4a9eff',borderWidth:2,fill:true,
+       backgroundColor:(ctx)=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,165);g.addColorStop(0,'rgba(74,158,255,.15)');g.addColorStop(1,'rgba(74,158,255,0)');return g},
+       pointRadius:0,tension:.3},
+      {label:'OB',data:Array(20).fill(70),borderColor:'rgba(255,94,94,.4)',borderWidth:1,borderDash:[3,2],pointRadius:0,fill:false},
+      {label:'OS',data:Array(20).fill(30),borderColor:'rgba(45,212,160,.4)',borderWidth:1,borderDash:[3,2],pointRadius:0,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{maxRotation:45,maxTicksLimit:8}},y:{min:20,max:85}}}
+  });
+  const macdV=[-.12,-.08,-.02,.05,.08,.06,.09,.14,.22,.18,.15,.11,.13,.15,.17,.14,.12,.14,.16,.18];
+  const sigV =[-.08,-.07,-.05,-.02,.01,.03,.05,.08,.12,.14,.14,.13,.13,.14,.15,.14,.13,.13,.14,.15];
+  const histV=macdV.map((v,i)=>+(v-sigV[i]).toFixed(3));
+  new Chart(document.getElementById('macdChart'),{
+    type:'bar',
+    data:{labels:days,datasets:[
+      {type:'line',label:'MACD',data:macdV,borderColor:'#4a9eff',borderWidth:1.5,pointRadius:0,tension:.3,fill:false,order:1},
+      {type:'line',label:'Signal',data:sigV,borderColor:'#ff5e5e',borderWidth:1.5,borderDash:[3,2],pointRadius:0,tension:.3,fill:false,order:2},
+      {type:'bar',label:'Histo',data:histV,backgroundColor:histV.map(v=>v>=0?'rgba(45,212,160,.5)':'rgba(255,94,94,.5)'),borderRadius:2,order:3}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{x:{ticks:{maxRotation:45,maxTicksLimit:8}},y:{ticks:{callback:v=>v.toFixed(2)}}}}
+  });
+  // SR Chart
+  const srM=['Set','Ott','Nov','Dic','Gen 26','Feb','Mar','Apr 20','Apr 24'];
+  const srP=[0.88,1.24,1.69,2.15,2.32,2.18,2.69,2.86,3.19];
+  new Chart(document.getElementById('srChart'),{
+    type:'line',
+    data:{labels:srM,datasets:[
+      {label:'Prezzo',data:srP,borderColor:'#4a9eff',borderWidth:2,fill:true,
+       backgroundColor:(ctx)=>{const g=ctx.chart.ctx.createLinearGradient(0,0,0,175);g.addColorStop(0,'rgba(74,158,255,.15)');g.addColorStop(1,'rgba(74,158,255,0)');return g},
+       pointRadius:3,pointBackgroundColor:'#4a9eff',tension:.4},
+      {label:'R2',data:Array(9).fill(4.58),borderColor:'rgba(255,94,94,.5)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false},
+      {label:'R1',data:Array(9).fill(3.64),borderColor:'rgba(245,166,35,.5)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false},
+      {label:'S1',data:Array(9).fill(2.71),borderColor:'rgba(45,212,160,.5)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false},
+      {label:'S2',data:Array(9).fill(2.18),borderColor:'rgba(26,158,118,.5)',borderWidth:1,borderDash:[4,3],pointRadius:0,fill:false}
+    ]},
+    options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{display:false}},
+      scales:{y:{min:1.3,max:5.0,ticks:{callback:v=>`$${v}`}}}}
+  });
+}
+
+function buildRadar(){
+  if(window.radarBuilt) return;
+  window.radarBuilt = true;
+  new Chart(document.getElementById('radarChart'),{
+    type:'radar',
+    data:{labels:['Revenue Growth','Gross Margin','Liquidità','Pipeline','Momentum','Valuation'],
+      datasets:[
+        {label:'PLUG',data:[72,55,60,85,80,50],borderColor:'#4a9eff',backgroundColor:'rgba(74,158,255,.2)',borderWidth:2,pointBackgroundColor:'#4a9eff'},
+        {label:'BE',data:[65,80,75,70,60,40],borderColor:'#2dd4a0',backgroundColor:'rgba(45,212,160,.08)',borderWidth:1.5,borderDash:[4,2],pointBackgroundColor:'#2dd4a0'},
+        {label:'FCEL',data:[45,40,35,50,45,55],borderColor:'#f5a623',backgroundColor:'rgba(245,166,35,.08)',borderWidth:1.5,borderDash:[2,2],pointBackgroundColor:'#f5a623'}
+      ]},
+    options:{responsive:true,maintainAspectRatio:false,
+      scales:{r:{min:0,max:100,ticks:{display:false},grid:{color:'rgba(255,255,255,.06)'},pointLabels:{color:'#9aa0b4',font:{size:11}}}},
+      plugins:{legend:{display:false}}}
+  });
+}
+</script>
+</body>
+</html>
