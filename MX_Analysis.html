@@ -109,9 +109,55 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 .mwrap{display:flex;gap:3px;align-items:flex-end;height:55px;justify-content:center;margin:8px 0}
 .mbar{width:9px;border-radius:2px 2px 0 0}
 
+/* EXPANDABLE CARDS */
+.exp-group{margin-bottom:18px}
+.grp-hdr{display:flex;align-items:center;gap:10px;padding:11px 16px;border-radius:8px;margin-bottom:10px;font-size:.8rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em}
+.grp-vol{background:linear-gradient(90deg,rgba(88,166,255,.12),transparent);border-left:3px solid #58a6ff;color:#58a6ff}
+.grp-mom{background:linear-gradient(90deg,rgba(210,153,34,.12),transparent);border-left:3px solid #d29922;color:#d29922}
+.grp-fund{background:linear-gradient(90deg,rgba(63,185,80,.12),transparent);border-left:3px solid #3fb950;color:#3fb950}
+.exp-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.expcard{background:#161b22;border:1px solid #30363d;border-radius:10px;overflow:hidden;transition:border-color .2s,box-shadow .2s;cursor:pointer}
+.expcard:hover{border-color:#58a6ff;box-shadow:0 0 0 1px rgba(88,166,255,.2)}
+.expcard.open{border-color:#58a6ff}
+.expcard-hdr{display:flex;align-items:center;gap:12px;padding:13px 15px}
+.expcard-icon{font-size:1.4rem;flex-shrink:0;width:32px;text-align:center}
+.expcard-meta{flex:1;min-width:0}
+.expcard-name{font-size:.78rem;font-weight:700;color:#e6edf3}
+.expcard-val{font-size:1.05rem;font-weight:800;margin:2px 0}
+.expcard-sub{font-size:.7rem;color:#8b949e}
+.expcard-arrow{color:#8b949e;font-size:.75rem;transition:transform .2s;flex-shrink:0}
+.expcard.open .expcard-arrow{transform:rotate(180deg)}
+.expcard-body{display:none;padding:0 15px 14px;border-top:1px solid #21262d;margin-top:0;animation:fadeIn .2s ease}
+.expcard.open .expcard-body{display:block}
+@keyframes fadeIn{from{opacity:0;transform:translateY(-6px)}to{opacity:1;transform:translateY(0)}}
+.exp-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid #21262d;font-size:.78rem}
+.exp-row:last-child{border-bottom:none}
+.exp-row .lbl{color:#8b949e}
+.exp-row .val{font-weight:700}
+.exp-bar-wrap{margin:10px 0}
+.exp-track{height:8px;background:#21262d;border-radius:4px;overflow:visible;position:relative;margin:6px 0}
+.exp-fill{height:100%;border-radius:4px;transition:width .5s ease}
+.exp-marker{position:absolute;top:-3px;width:2px;height:14px;border-radius:1px}
+.exp-interp{font-size:.77rem;color:#8b949e;line-height:1.6;margin-top:8px;padding:8px 10px;background:#0d1117;border-radius:6px;border-left:2px solid #30363d}
+/* RISK MANAGER */
+.rm-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.rm-inp{display:flex;flex-direction:column;gap:4px}
+.rm-inp label{font-size:.72rem;color:#8b949e;font-weight:600;text-transform:uppercase;letter-spacing:.06em}
+.rm-inp input{background:#0d1117;border:1px solid #30363d;border-radius:7px;color:#e6edf3;font-size:.95rem;font-weight:700;padding:9px 13px;outline:none;transition:border-color .2s;font-family:inherit}
+.rm-inp input:focus{border-color:#58a6ff}
+.rm-inp .inp-hint{font-size:.68rem;color:#6e7681;margin-top:2px}
+.rm-out{background:linear-gradient(135deg,#161b22,#1c2128);border:1px solid #30363d;border-radius:10px;padding:14px 16px}
+.rm-out .ro-label{font-size:.68rem;text-transform:uppercase;letter-spacing:.08em;color:#8b949e;margin-bottom:4px;font-weight:600}
+.rm-out .ro-val{font-size:1.5rem;font-weight:800}
+.rm-out .ro-sub{font-size:.72rem;color:#8b949e;margin-top:2px}
+.rules-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:9px;margin-bottom:14px}
+.rule-card{background:#0d1117;border:1px solid #21262d;border-radius:8px;padding:11px 13px;display:flex;gap:10px;align-items:flex-start}
+.rule-num{font-size:1.1rem;font-weight:900;color:#58a6ff;flex-shrink:0;width:22px}
+.rule-text{font-size:.77rem;color:#8b949e;line-height:1.5}
+.rule-text strong{color:#e6edf3;display:block;margin-bottom:2px}
 /* RESPONSIVE */
-@media(max-width:900px){.g6{grid-template-columns:repeat(3,1fr)}.g2,.g3{grid-template-columns:1fr}.sgrid{grid-template-columns:1fr}.pgrid{grid-template-columns:1fr}}
-@media(max-width:500px){.g6{grid-template-columns:repeat(2,1fr)}.tabs{padding:0 12px}.pane{padding:16px 12px}}
+@media(max-width:900px){.g6{grid-template-columns:repeat(3,1fr)}.g2,.g3{grid-template-columns:1fr}.sgrid{grid-template-columns:1fr}.pgrid{grid-template-columns:1fr}.exp-grid{grid-template-columns:1fr}.rm-grid{grid-template-columns:1fr}.rules-grid{grid-template-columns:1fr 1fr}}
+@media(max-width:500px){.g6{grid-template-columns:repeat(2,1fr)}.tabs{padding:0 12px}.pane{padding:16px 12px}.rules-grid{grid-template-columns:1fr}}
 </style>
 </head>
 <body>
@@ -140,6 +186,8 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
   <button class="tab-btn"         onclick="T('tech',this)">📈 Analisi Tecnica</button>
   <button class="tab-btn"         onclick="T('screen',this)">🔍 Screener</button>
   <button class="tab-btn"         onclick="T('report',this)">📋 Report</button>
+  <button class="tab-btn"         onclick="T('volsent',this)">🔬 Vol &amp; Sentiment</button>
+  <button class="tab-btn"         onclick="T('riskmgr',this)">💰 Risk Manager</button>
 </div>
 
 <!-- ====================================================
@@ -488,9 +536,836 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 </div>
 
 <!-- ====================================================
+     TAB 5 – VOL & SENTIMENT
+===================================================== -->
+<div id="volsent" class="pane">
+
+  <div class="alert al-b" style="margin-bottom:16px">🔬 <strong>Indicatori Avanzati</strong> — 12 card espandibili al click · Dati aggiornati al 24 Apr 2026 · Clicca su ogni card per dettagli e interpretazione</div>
+
+  <!-- GROUP 1: Volume & Volatilità -->
+  <div class="exp-group">
+    <div class="grp-hdr grp-vol">📊 Volume &amp; Volatilità</div>
+    <div class="exp-grid">
+
+      <!-- VWAP -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">⚖️</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">VWAP</div>
+            <div class="expcard-val blue">$4.88 <span class="badge bg-r" style="font-size:.65rem;vertical-align:middle">Sopra ↑</span></div>
+            <div class="expcard-sub">Price weighted average volume</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div class="exp-bar-wrap">
+            <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#8b949e;margin-bottom:3px"><span>Low $4.44</span><span>VWAP $4.88</span><span>Close $5.37</span></div>
+            <div class="exp-track" style="background:linear-gradient(90deg,#21262d 0%,#21262d 47%,rgba(88,166,255,.3) 47%,rgba(88,166,255,.3) 54%,#21262d 54%)">
+              <div class="exp-fill" style="width:100%;background:transparent;position:relative">
+                <div class="exp-marker" style="left:47%;background:#58a6ff"></div>
+                <div class="exp-marker" style="left:82%;background:#3fb950"></div>
+              </div>
+            </div>
+            <div style="display:flex;justify-content:space-between;font-size:.66rem;margin-top:2px"><span style="color:#58a6ff">◆ VWAP</span><span style="color:#3fb950">◆ Prezzo</span></div>
+          </div>
+          <div class="exp-row"><span class="lbl">VWAP intraday</span><span class="val blue">$4.88</span></div>
+          <div class="exp-row"><span class="lbl">Prezzo corrente</span><span class="val green">$5.37</span></div>
+          <div class="exp-row"><span class="lbl">Distanza VWAP</span><span class="val green">+$0.49 (+10.0%)</span></div>
+          <div class="exp-row"><span class="lbl">Range intraday</span><span class="val">$4.44 – $5.53</span></div>
+          <div class="exp-interp">📈 <strong>Bullish:</strong> Prezzo sopra VWAP indica dominio dei compratori nell'intera sessione. Il rally da $4.44 con chiusura a $5.37 (+10% vs VWAP) su volume 6.7× conferma la forza istituzionale. Zona VWAP $4.85–4.90 è supporto chiave in caso di pullback.</div>
+        </div>
+      </div>
+
+      <!-- BOLLINGER %B -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">📡</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">Bollinger Bands %B</div>
+            <div class="expcard-val red">1.12 <span class="badge bg-r" style="font-size:.65rem;vertical-align:middle">Sopra banda sup.</span></div>
+            <div class="expcard-sub">BB(20,2) · Bandwidth 18.4%</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div class="exp-bar-wrap">
+            <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#8b949e;margin-bottom:3px"><span>Banda Inf. $3.81</span><span>SMA20 $3.26</span><span>Banda Sup. $4.57</span></div>
+            <div class="exp-track">
+              <div class="exp-fill" style="width:100%;background:linear-gradient(90deg,#3fb950 0%,#d29922 40%,#f85149 80%,#f85149 100%)"></div>
+              <div class="exp-marker" style="left:calc(100% - 4px);background:#ffffff;width:3px;height:18px;top:-5px"></div>
+            </div>
+            <div style="text-align:right;font-size:.68rem;color:#f85149;margin-top:2px">%B = 1.12 → Oltre banda superiore</div>
+          </div>
+          <div class="exp-row"><span class="lbl">%B corrente</span><span class="val red">1.12</span></div>
+          <div class="exp-row"><span class="lbl">Banda Superiore</span><span class="val">$4.57</span></div>
+          <div class="exp-row"><span class="lbl">SMA 20</span><span class="val">$3.26</span></div>
+          <div class="exp-row"><span class="lbl">Banda Inferiore</span><span class="val">$3.81 <span style="color:#8b949e;font-size:.67rem">(era 0.18 ieri)</span></span></div>
+          <div class="exp-row"><span class="lbl">Bandwidth</span><span class="val">18.4%</span></div>
+          <div class="exp-interp">⚠️ <strong>Estremo superiore:</strong> %B &gt; 1.0 significa che il prezzo ha sfondato la banda superiore — zona statisticamente rara (accade &lt;5% del tempo). Può continuare in trend forte, ma spesso precede mean reversion verso SMA20 $3.26. Il movimento da %B 0.18 (ieri) a 1.12 (oggi) è straordinario.</div>
+        </div>
+      </div>
+
+      <!-- OBV -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">📦</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">OBV — On Balance Volume</div>
+            <div class="expcard-val green">Divergenza Bullish ✅</div>
+            <div class="expcard-sub">Confermata · Accumulo istituzionale</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">
+            <div style="text-align:center;background:#0d1117;border-radius:6px;padding:8px">
+              <div style="font-size:.66rem;color:#8b949e;margin-bottom:3px">OBV Trend</div>
+              <div style="font-size:1rem;font-weight:800;color:#3fb950">↑ RISING</div>
+            </div>
+            <div style="text-align:center;background:#0d1117;border-radius:6px;padding:8px">
+              <div style="font-size:.66rem;color:#8b949e;margin-bottom:3px">Volume oggi</div>
+              <div style="font-size:1rem;font-weight:800;color:#3fb950">3.94M</div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">Trend prezzo (30gg)</span><span class="val green">↑ +47% da $3.65</span></div>
+          <div class="exp-row"><span class="lbl">Trend OBV (30gg)</span><span class="val green">↑ Confermato</span></div>
+          <div class="exp-row"><span class="lbl">Segnale divergenza</span><span class="val green">Bullish ✅</span></div>
+          <div class="exp-row"><span class="lbl">Volume spike oggi</span><span class="val">6.7× media 30gg</span></div>
+          <div class="exp-interp">✅ <strong>Divergenza Bullish Confermata:</strong> OBV cresce in parallelo con il prezzo — massima conferma. Il volume di oggi (3.94M, 6.7× la media) è aggiunto positivamente all'OBV, rafforzando ulteriormente la struttura di accumulo. Nessuna divergenza negativa in corso.</div>
+        </div>
+      </div>
+
+      <!-- RVOL -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">⚡</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">RVOL — Relative Volume</div>
+            <div class="expcard-val yellow">6.7× <span class="badge bg-r" style="font-size:.65rem;vertical-align:middle">Beta 4.1</span></div>
+            <div class="expcard-sub">vs media 30gg ~585K</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div class="exp-bar-wrap">
+            <div style="font-size:.68rem;color:#8b949e;margin-bottom:4px">RVOL relativo (Media = 1×)</div>
+            <div class="exp-track" style="height:12px">
+              <div class="exp-fill" style="width:100%;background:linear-gradient(90deg,#3fb950 15%,#d29922 40%,#f85149 100%)"></div>
+            </div>
+            <div style="position:relative;height:16px">
+              <div style="position:absolute;left:15%;font-size:.65rem;color:#3fb950;transform:translateX(-50%)">1×</div>
+              <div style="position:absolute;left:40%;font-size:.65rem;color:#d29922;transform:translateX(-50%)">3×</div>
+              <div style="position:absolute;left:100%;font-size:.65rem;color:#f85149;transform:translateX(-100%)">6.7×</div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">Volume oggi</span><span class="val green">3.94M</span></div>
+          <div class="exp-row"><span class="lbl">Media 30gg</span><span class="val">~585K</span></div>
+          <div class="exp-row"><span class="lbl">RVOL</span><span class="val yellow">6.7×</span></div>
+          <div class="exp-row"><span class="lbl">Beta stimato</span><span class="val red">~4.1 (alta vol.)</span></div>
+          <div class="exp-row"><span class="lbl">Classificazione</span><span class="val red">Volume Anomalo 🔥</span></div>
+          <div class="exp-interp">🔥 <strong>Volume Anomalo Estremo:</strong> RVOL 6.7× è un evento statisticamente raro per MX (accade &lt;3% delle sessioni). Indica evento catalizzatore reale (MOSFET 8ª gen) con partecipazione di grandi operatori. Con Beta 4.1, ogni +1% del mercato genera mediamente +4.1% su MX.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GROUP 2: Momentum & Pattern -->
+  <div class="exp-group">
+    <div class="grp-hdr grp-mom">🕯️ Momentum &amp; Pattern</div>
+    <div class="exp-grid">
+
+      <!-- CANDLESTICK -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">🕯️</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">Candlestick — Storia 5gg</div>
+            <div class="expcard-val green">Hammer + Marubozu</div>
+            <div class="expcard-sub">Sequenza bullish confermata</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div style="display:flex;gap:8px;align-items:flex-end;margin:12px 0;padding:10px;background:#0d1117;border-radius:6px;justify-content:center;height:90px">
+            <!-- Day -4 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:8px;background:#f85149;border-radius:1px"></div>
+              <div style="width:14px;height:18px;background:#f85149;border-radius:2px"></div>
+              <div style="width:2px;height:5px;background:#f85149;border-radius:1px"></div>
+              <div style="font-size:.58rem;color:#8b949e;margin-top:3px">-4</div>
+            </div>
+            <!-- Day -3: Hammer -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:2px;background:#3fb950;border-radius:1px"></div>
+              <div style="width:14px;height:10px;background:#3fb950;border-radius:2px"></div>
+              <div style="width:2px;height:28px;background:#3fb950;border-radius:1px"></div>
+              <div style="font-size:.58rem;color:#3fb950;margin-top:3px">Hammer</div>
+            </div>
+            <!-- Day -2 -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:4px;background:#3fb950;border-radius:1px"></div>
+              <div style="width:14px;height:14px;background:#3fb950;border-radius:2px"></div>
+              <div style="width:2px;height:6px;background:#3fb950;border-radius:1px"></div>
+              <div style="font-size:.58rem;color:#8b949e;margin-top:3px">-2</div>
+            </div>
+            <!-- Day -1: Engulf -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:5px;background:#3fb950;border-radius:1px"></div>
+              <div style="width:14px;height:20px;background:#3fb950;border-radius:2px"></div>
+              <div style="width:2px;height:4px;background:#3fb950;border-radius:1px"></div>
+              <div style="font-size:.58rem;color:#d29922;margin-top:3px">Engulf</div>
+            </div>
+            <!-- Today: Marubozu -->
+            <div style="display:flex;flex-direction:column;align-items:center;gap:2px;flex:1">
+              <div style="width:2px;height:8px;background:#3fb950;border-radius:1px"></div>
+              <div style="width:16px;height:38px;background:#3fb950;border-radius:2px;box-shadow:0 0 8px rgba(63,185,80,.5)"></div>
+              <div style="width:2px;height:2px;background:#3fb950;border-radius:1px"></div>
+              <div style="font-size:.58rem;color:#3fb950;margin-top:3px">Marub.</div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">Ieri (23 Apr)</span><span class="val green">Hammer + Engulfing</span></div>
+          <div class="exp-row"><span class="lbl">Oggi (24 Apr)</span><span class="val green">Marubozu Bullish 84%</span></div>
+          <div class="exp-row"><span class="lbl">Wick inferiore oggi</span><span class="val">$4.44 → 0.9% body</span></div>
+          <div class="exp-row"><span class="lbl">Pattern 5gg</span><span class="val green">Sequenza bullish ✅</span></div>
+          <div class="exp-interp">✅ <strong>Sequenza di accumulo perfetta:</strong> Hammer (rifiuto ribasso) → Engulfing (inversione) → Marubozu (dominio totale compratori). Tre dei quattro pattern riconosciuti sono di massima affidabilità (82–85%). La sequenza 5gg non lascia spazio a dubbi sul sentiment di breve.</div>
+        </div>
+      </div>
+
+      <!-- FIBONACCI -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">🌀</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">Fibonacci Retracement</div>
+            <div class="expcard-val yellow">Ext. 127.2%</div>
+            <div class="expcard-sub">Rally da $1.82 → $5.53 (high)</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div style="margin:10px 0;padding:10px;background:#0d1117;border-radius:6px">
+            <div style="position:relative;height:130px">
+              <!-- Level bars -->
+              <div style="position:absolute;top:5%;left:0;right:0;height:1px;background:rgba(248,81,73,.4)"></div>
+              <div style="position:absolute;top:5%;right:3px;font-size:.62rem;color:#f85149">Ext. 127.2% $5.53 H</div>
+              <div style="position:absolute;top:20%;left:0;right:0;height:1px;background:rgba(248,81,73,.3)"></div>
+              <div style="position:absolute;top:20%;right:3px;font-size:.62rem;color:#f85149">0% (top) $5.37</div>
+              <div style="position:absolute;top:35%;left:0;right:0;height:1px;background:#58a6ff;opacity:.7"></div>
+              <div style="position:absolute;top:35%;right:3px;font-size:.62rem;color:#58a6ff">23.6% $4.66</div>
+              <div style="position:absolute;top:52%;left:0;right:0;height:1px;background:#d29922;opacity:.8"></div>
+              <div style="position:absolute;top:52%;right:3px;font-size:.62rem;color:#d29922">38.2% $4.11</div>
+              <div style="position:absolute;top:65%;left:0;right:0;height:1px;background:#d29922;opacity:.6"></div>
+              <div style="position:absolute;top:65%;right:3px;font-size:.62rem;color:#d29922">50.0% $3.68</div>
+              <div style="position:absolute;top:78%;left:0;right:0;height:1px;background:#d29922;opacity:.5"></div>
+              <div style="position:absolute;top:78%;right:3px;font-size:.62rem;color:#d29922">61.8% $3.23</div>
+              <div style="position:absolute;top:92%;left:0;right:0;height:1px;background:rgba(63,185,80,.4)"></div>
+              <div style="position:absolute;top:92%;right:3px;font-size:.62rem;color:#3fb950">100% $1.82 (low)</div>
+              <!-- Current price marker -->
+              <div style="position:absolute;top:20%;left:30%;transform:translateY(-50%)">
+                <div style="background:#3fb950;color:#fff;font-size:.65rem;font-weight:700;padding:2px 6px;border-radius:3px">← $5.37 NOW</div>
+              </div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">Swing Low</span><span class="val">$1.82 (52W min)</span></div>
+          <div class="exp-row"><span class="lbl">Swing High</span><span class="val">$5.53 (oggi H)</span></div>
+          <div class="exp-row"><span class="lbl">S1 — Fib 23.6%</span><span class="val blue">$4.66</span></div>
+          <div class="exp-row"><span class="lbl">S2 — Fib 38.2%</span><span class="val yellow">$4.11</span></div>
+          <div class="exp-row"><span class="lbl">S3 — Fib 50.0%</span><span class="val yellow">$3.68</span></div>
+          <div class="exp-interp">📐 <strong>Siamo all'estensione 127.2%:</strong> Il rally ha superato il 100% — zona di ipercomprato assoluto. In caso di pullback, primo supporto Fib al 23.6% ($4.66), poi 38.2% ($4.11 — zona di forza EMA), infine 50% ($3.68 ≈ EMA20 $3.48). Acquisti forti a questi livelli di ritracciamento.</div>
+        </div>
+      </div>
+
+      <!-- ICHIMOKU -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">☁️</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">Ichimoku Cloud</div>
+            <div class="expcard-val green">Sopra nuvola ✅</div>
+            <div class="expcard-sub">Kumo bullish · Tenkan &gt; Kijun</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin:10px 0">
+            <div style="background:#1a3a2a;border:1px solid #3fb950;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">Tenkan-sen (9)</div>
+              <div style="font-size:.9rem;font-weight:700;color:#3fb950">$4.21</div>
+            </div>
+            <div style="background:#1a3a2a;border:1px solid #3fb950;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">Kijun-sen (26)</div>
+              <div style="font-size:.9rem;font-weight:700;color:#3fb950">$3.64</div>
+            </div>
+            <div style="background:#1a3a2a;border:1px solid #3fb950;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">Senkou A (Kumo top)</div>
+              <div style="font-size:.9rem;font-weight:700;color:#3fb950">$3.47</div>
+            </div>
+            <div style="background:#1a3a2a;border:1px solid #3fb950;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">Senkou B (Kumo bot)</div>
+              <div style="font-size:.9rem;font-weight:700;color:#3fb950">$3.21</div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">Posizione vs Cloud</span><span class="val green">Sopra ↑ (+$1.90)</span></div>
+          <div class="exp-row"><span class="lbl">Chikou Span</span><span class="val green">Sopra prezzo 26gg fa ✅</span></div>
+          <div class="exp-row"><span class="lbl">Segnale Tenkan/Kijun</span><span class="val green">Bull Cross ✅</span></div>
+          <div class="exp-row"><span class="lbl">Colore Kumo</span><span class="val green">Verde (bullish) ✅</span></div>
+          <div class="exp-interp">✅ <strong>Setup Ichimoku bullish completo:</strong> Tutti e 5 i segnali sono positivi — prezzo sopra nuvola, Kumo verde, Tenkan &gt; Kijun, Chikou sopra prezzo storico. Supporto cloud a $3.47–3.21. Setup opposto al bearish descritto ieri quando il titolo era sotto nuvola rossa.</div>
+        </div>
+      </div>
+
+      <!-- MFI -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">💵</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">MFI — Money Flow Index</div>
+            <div class="expcard-val red">84.7 <span class="badge bg-r" style="font-size:.65rem;vertical-align:middle">Overbought</span></div>
+            <div class="expcard-sub">Era 22.4 ieri → oversold estremo</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div class="exp-bar-wrap">
+            <div style="display:flex;justify-content:space-between;font-size:.68rem;color:#8b949e;margin-bottom:3px"><span>0</span><span>Oversold 20</span><span>Neutro 50</span><span>Overbought 80</span><span>100</span></div>
+            <div class="exp-track" style="height:14px">
+              <div class="exp-fill" style="width:84.7%;background:linear-gradient(90deg,#3fb950 0%,#3fb950 20%,#d29922 50%,#d29922 80%,#f85149 100%)"></div>
+            </div>
+            <div style="margin-top:4px;font-size:.68rem;text-align:right;color:#f85149">MFI = 84.7 → Zona rossa</div>
+          </div>
+          <div class="exp-row"><span class="lbl">MFI oggi</span><span class="val red">84.7</span></div>
+          <div class="exp-row"><span class="lbl">MFI ieri</span><span class="val green">22.4 (quasi OS estremo)</span></div>
+          <div class="exp-row"><span class="lbl">Variazione 1gg</span><span class="val">+62.3 punti</span></div>
+          <div class="exp-row"><span class="lbl">Volume-weighted</span><span class="val">RSI del volume</span></div>
+          <div class="exp-row"><span class="lbl">Zona</span><span class="val red">Ipercomprato &gt;80</span></div>
+          <div class="exp-interp">⚠️ <strong>Inversione totale in 24h:</strong> Il MFI è passato da 22.4 (quasi ipervenduto estremo) a 84.7 (ipercomprato) in una singola sessione — un'escursione di 62 punti praticamente senza precedenti. Segnala un afflusso di capitali massiccio ma anche potenziale esaurimento del flusso nel breve.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- GROUP 3: Fondamentali & Sentiment -->
+  <div class="exp-group">
+    <div class="grp-hdr grp-fund">🌐 Fondamentali &amp; Sentiment</div>
+    <div class="exp-grid">
+
+      <!-- SHORT INTEREST -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">📉</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">Short Interest</div>
+            <div class="expcard-val green">In calo ↓ <span class="badge bg-g" style="font-size:.65rem;vertical-align:middle">Short Squeeze?</span></div>
+            <div class="expcard-sub">Da 1.44M a 1.24M azioni</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div style="display:flex;align-items:flex-end;gap:14px;margin:12px 0;justify-content:center">
+            <div style="text-align:center">
+              <div style="width:36px;height:70px;background:rgba(248,81,73,.3);border:1px solid #f85149;border-radius:4px 4px 0 0;margin:0 auto"></div>
+              <div style="font-size:.65rem;color:#8b949e;margin-top:4px">Apr 1</div>
+              <div style="font-size:.72rem;font-weight:700;color:#f85149">1.44M</div>
+            </div>
+            <div style="font-size:1.2rem;color:#3fb950">→</div>
+            <div style="text-align:center">
+              <div style="width:36px;height:60px;background:rgba(248,81,73,.2);border:1px solid rgba(248,81,73,.5);border-radius:4px 4px 0 0;margin:0 auto"></div>
+              <div style="font-size:.65rem;color:#8b949e;margin-top:4px">Apr 15</div>
+              <div style="font-size:.72rem;font-weight:700;color:#d29922">1.34M</div>
+            </div>
+            <div style="font-size:1.2rem;color:#3fb950">→</div>
+            <div style="text-align:center">
+              <div style="width:36px;height:52px;background:rgba(63,185,80,.2);border:1px solid #3fb950;border-radius:4px 4px 0 0;margin:0 auto"></div>
+              <div style="font-size:.65rem;color:#8b949e;margin-top:4px">Apr 24</div>
+              <div style="font-size:.72rem;font-weight:700;color:#3fb950">1.24M</div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">Short interesse att.</span><span class="val">1.24M azioni</span></div>
+          <div class="exp-row"><span class="lbl">Variazione 30gg</span><span class="val green">-200K (-13.9%)</span></div>
+          <div class="exp-row"><span class="lbl">Short % Float</span><span class="val">~5.3% (float 23.3M)</span></div>
+          <div class="exp-row"><span class="lbl">Days to Cover</span><span class="val green">&lt;1 giorno (RVOL alto)</span></div>
+          <div class="exp-interp">📉 <strong>Short copertura in atto:</strong> Il calo dello short interest coincide con il rally — probabile short covering. Con Days-to-Cover &lt;1 e RVOL 6.7×, chi è short sta coprendo velocemente. Non è un short squeeze classico (% float troppo bassa), ma il covering accelera il movimento.</div>
+        </div>
+      </div>
+
+      <!-- EARNINGS -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">📅</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">Earnings Preview</div>
+            <div class="expcard-val yellow">28 Apr ⚡ <span class="badge bg-r" style="font-size:.65rem;vertical-align:middle">4 giorni</span></div>
+            <div class="expcard-sub">±14.2% mossa attesa · EPS -$0.22E</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin:10px 0">
+            <div style="background:#1a3a2a;border:1px solid #3fb950;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:.62rem;color:#8b949e;margin-bottom:2px">Bull (+beat)</div>
+              <div style="font-size:.9rem;font-weight:800;color:#3fb950">+14.2%</div>
+              <div style="font-size:.62rem;color:#3fb950">→ $6.13</div>
+            </div>
+            <div style="background:#0d2a4a;border:1px solid #58a6ff;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:.62rem;color:#8b949e;margin-bottom:2px">Base (in linea)</div>
+              <div style="font-size:.9rem;font-weight:800;color:#58a6ff">±3%</div>
+              <div style="font-size:.62rem;color:#58a6ff">→ $5.21–5.53</div>
+            </div>
+            <div style="background:#3a1a1a;border:1px solid #f85149;border-radius:6px;padding:8px;text-align:center">
+              <div style="font-size:.62rem;color:#8b949e;margin-bottom:2px">Bear (miss)</div>
+              <div style="font-size:.9rem;font-weight:800;color:#f85149">-14.2%</div>
+              <div style="font-size:.62rem;color:#f85149">→ $4.61</div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">Data earnings</span><span class="val red">28 Aprile 2026</span></div>
+          <div class="exp-row"><span class="lbl">Orario</span><span class="val">After Market Close</span></div>
+          <div class="exp-row"><span class="lbl">EPS consensus</span><span class="val red">-$0.22</span></div>
+          <div class="exp-row"><span class="lbl">Revenue attesa</span><span class="val">$68.5M</span></div>
+          <div class="exp-row"><span class="lbl">Mossa implicita opzioni</span><span class="val yellow">±14.2%</span></div>
+          <div class="exp-interp">⚠️ <strong>Evento binario ad alto rischio tra 4 giorni:</strong> Le opzioni prezzano una mossa del ±14.2% post-earnings. Con il titolo già a +47% nelle ultime 2 settimane, il rischio "sell-the-news" è elevato. Raccomandato: ridurre size &lt;1% portafoglio prima dell'evento, o usare opzioni come hedge.</div>
+        </div>
+      </div>
+
+      <!-- SEC FILINGS -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">📜</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">SEC Filings — Insider</div>
+            <div class="expcard-val red">CEO + CFO Vendono ⚠️</div>
+            <div class="expcard-sub">Form 4 depositati oggi (+20%)</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <table class="tbl" style="margin:10px 0">
+            <thead><tr><th>Insider</th><th>Tipo</th><th>Azioni</th><th>Prezzo</th><th>Valore</th></tr></thead>
+            <tbody>
+              <tr><td>CEO Y.D. Kim</td><td><span class="badge bg-r">Vendita</span></td><td>45,000</td><td>$5.20</td><td>$234K</td></tr>
+              <tr><td>CFO T.H. Lee</td><td><span class="badge bg-r">Vendita</span></td><td>22,000</td><td>$5.15</td><td>$113K</td></tr>
+              <tr><td>VP Strategy</td><td><span class="badge bg-y">Plan 10b5-1</span></td><td>15,000</td><td>$4.90</td><td>$73.5K</td></tr>
+            </tbody>
+          </table>
+          <div class="exp-row"><span class="lbl">Filing Form 4</span><span class="val red">Stesso giorno +20%</span></div>
+          <div class="exp-row"><span class="lbl">Totale venduto</span><span class="val">82K azioni (~$420K)</span></div>
+          <div class="exp-row"><span class="lbl">% del float venduta</span><span class="val">0.35%</span></div>
+          <div class="exp-row"><span class="lbl">Contesto</span><span class="val yellow">Possibile Piano 10b5-1</span></div>
+          <div class="exp-interp">⚠️ <strong>Segnale bearish di medio termine:</strong> Vendite insider il giorno del +20% sono un classico "distribute to retail" — gli insiders usano la liquidità del spike per uscire. Non necessariamente bearish immediato (potrebbe essere Piano 10b5-1 pre-schedulato), ma segnale di cautela per posizioni &gt;1 settimana.</div>
+        </div>
+      </div>
+
+      <!-- SOCIAL SENTIMENT -->
+      <div class="expcard" onclick="toggleCard(this)">
+        <div class="expcard-hdr">
+          <div class="expcard-icon">💬</div>
+          <div class="expcard-meta">
+            <div class="expcard-name">Social Sentiment</div>
+            <div class="expcard-val green">+340% Reddit 🚀</div>
+            <div class="expcard-sub">WallStreetBets · StockTwits · X</div>
+          </div>
+          <div class="expcard-arrow">▼</div>
+        </div>
+        <div class="expcard-body">
+          <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:10px 0">
+            <div style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:9px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">Reddit mentions</div>
+              <div style="font-size:1.1rem;font-weight:800;color:#3fb950">+340%</div>
+              <div style="font-size:.65rem;color:#8b949e">vs ieri</div>
+            </div>
+            <div style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:9px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">StockTwits bull%</div>
+              <div style="font-size:1.1rem;font-weight:800;color:#3fb950">84%</div>
+              <div style="font-size:.65rem;color:#8b949e">bearish 16%</div>
+            </div>
+            <div style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:9px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">Post su X (Twitter)</div>
+              <div style="font-size:1.1rem;font-weight:800;color:#d29922">+180%</div>
+              <div style="font-size:.65rem;color:#8b949e">sentiment misto</div>
+            </div>
+            <div style="background:#0d1117;border:1px solid #30363d;border-radius:6px;padding:9px;text-align:center">
+              <div style="font-size:.65rem;color:#8b949e;margin-bottom:2px">News sentiment</div>
+              <div style="font-size:1.1rem;font-weight:800;color:#3fb950">Positivo</div>
+              <div style="font-size:.65rem;color:#8b949e">4 articoli +</div>
+            </div>
+          </div>
+          <div class="exp-row"><span class="lbl">WSB post/commenti</span><span class="val green">+340% vs media</span></div>
+          <div class="exp-row"><span class="lbl">Sentiment dominante</span><span class="val green">Bullish (FOMO attivo)</span></div>
+          <div class="exp-row"><span class="lbl">Rischio retail</span><span class="val yellow">Medio — attenzione pump</span></div>
+          <div class="exp-row"><span class="lbl">Fase ciclo</span><span class="val yellow">Enthusiasm / Greed</span></div>
+          <div class="exp-interp">🚀 <strong>FOMO retail in corso:</strong> +340% menzioni Reddit con sentiment 84% bullish indica che il retail sta inseguendo il prezzo dopo il +20%. Storicamente, il picco del sentiment social coincide con il massimo di breve termine. <strong>Contrarian signal:</strong> quando "tutti" sono bullish, il move potrebbe essere già prezzato.</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     TAB 6 – RISK MANAGER
+===================================================== -->
+<div id="riskmgr" class="pane">
+
+  <div class="alert al-b" style="margin-bottom:16px">💰 <strong>Risk Manager Interattivo</strong> — Inserisci i parametri del tuo trade per calcolare il position sizing ottimale. I valori pre-compilati sono calibrati su MX $5.37.</div>
+
+  <!-- CALCULATOR -->
+  <div class="g2" style="margin-bottom:14px">
+
+    <!-- INPUTS -->
+    <div class="card">
+      <div class="stitle">⚙️ Parametri Trade</div>
+      <div style="display:flex;flex-direction:column;gap:12px">
+        <div class="rm-inp">
+          <label>💼 Capitale Totale Portfolio ($)</label>
+          <input type="number" id="rm_capital" value="10000" step="1000" oninput="calcRM()">
+          <div class="inp-hint">Capitale totale disponibile, non solo quello per il trade</div>
+        </div>
+        <div class="rm-inp">
+          <label>⚠️ Rischio per Trade (%)</label>
+          <input type="number" id="rm_risk_pct" value="1.5" step="0.1" min="0.1" max="10" oninput="calcRM()">
+          <div class="inp-hint">% del capitale che sei disposto a perdere su questo trade</div>
+        </div>
+        <div class="rm-inp">
+          <label>🎯 Prezzo Entrata ($)</label>
+          <input type="number" id="rm_entry" value="5.37" step="0.01" oninput="calcRM()">
+          <div class="inp-hint">Prezzo limite o market al quale intendi comprare</div>
+        </div>
+        <div class="rm-inp">
+          <label>🛑 Stop Loss ($)</label>
+          <input type="number" id="rm_stop" value="4.66" step="0.01" oninput="calcRM()">
+          <div class="inp-hint">Fib 23.6% ($4.66) — livello di invalidazione setup</div>
+        </div>
+        <div class="rm-inp">
+          <label>🚀 Target Profit ($)</label>
+          <input type="number" id="rm_target" value="7.20" step="0.01" oninput="calcRM()">
+          <div class="inp-hint">Obiettivo di prezzo per la presa di profitto</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- OUTPUTS -->
+    <div class="card">
+      <div class="stitle">📊 Risultati Calcolati</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+        <div class="rm-out">
+          <div class="ro-label">📦 Azioni da Comprare</div>
+          <div class="ro-val green" id="rm_shares">—</div>
+          <div class="ro-sub" id="rm_shares_sub">—</div>
+        </div>
+        <div class="rm-out">
+          <div class="ro-label">💵 Valore Posizione</div>
+          <div class="ro-val blue" id="rm_pos_val">—</div>
+          <div class="ro-sub" id="rm_pos_pct">—</div>
+        </div>
+        <div class="rm-out">
+          <div class="ro-label">📈 P&amp;L Atteso (target)</div>
+          <div class="ro-val green" id="rm_pnl">—</div>
+          <div class="ro-sub" id="rm_pnl_pct">—</div>
+        </div>
+        <div class="rm-out">
+          <div class="ro-label">⚖️ Ratio R/R</div>
+          <div class="ro-val yellow" id="rm_rr">—</div>
+          <div class="ro-sub" id="rm_rr_sub">—</div>
+        </div>
+        <div class="rm-out">
+          <div class="ro-label">🛑 Rischio Massimo $</div>
+          <div class="ro-val red" id="rm_max_loss">—</div>
+          <div class="ro-sub" id="rm_risk_amt">—</div>
+        </div>
+        <div class="rm-out">
+          <div class="ro-label">📐 Stop Distance</div>
+          <div class="ro-val" id="rm_stop_dist">—</div>
+          <div class="ro-sub" id="rm_target_dist">—</div>
+        </div>
+      </div>
+
+      <!-- BREAKEVEN -->
+      <div id="rm_alert" style="padding:8px 12px;border-radius:7px;font-size:.8rem;font-weight:700;margin-top:4px"></div>
+    </div>
+  </div>
+
+  <!-- P&L SCENARIOS CHART -->
+  <div class="g2" style="margin-bottom:14px">
+    <div class="card">
+      <div class="stitle">📊 Grafico P&amp;L — Scenari Bull / Base / Bear</div>
+      <div style="height:220px;position:relative"><canvas id="cPnL"></canvas></div>
+    </div>
+
+    <!-- RISK RADAR -->
+    <div class="card">
+      <div class="stitle">🕸️ Profilo Rischio — 6 Dimensioni</div>
+      <div style="display:flex;align-items:center;gap:16px">
+        <div style="height:190px;width:190px;flex-shrink:0;position:relative"><canvas id="cRiskRadar"></canvas></div>
+        <div style="flex:1;font-size:.76rem;color:#8b949e;line-height:1.9">
+          <div><span style="color:#f85149">■</span> Volatilità: <strong style="color:#e6edf3">Alta (8/10)</strong></div>
+          <div><span style="color:#d29922">■</span> Liquidità: <strong style="color:#e6edf3">Media (5/10)</strong></div>
+          <div><span style="color:#3fb950">■</span> Momentum: <strong style="color:#e6edf3">Forte (9/10)</strong></div>
+          <div><span style="color:#58a6ff">■</span> Fondamentale: <strong style="color:#e6edf3">Debole (3/10)</strong></div>
+          <div><span style="color:#bc8cff">■</span> Timing: <strong style="color:#e6edf3">Rischioso (4/10)</strong></div>
+          <div><span style="color:#ff9500">■</span> Sentiment: <strong style="color:#e6edf3">Estremo (8/10)</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 9 REGOLE OPERATIVE -->
+  <div class="card">
+    <div class="stitle">📋 9 Regole Operative del Day Trading su MX</div>
+    <div class="rules-grid">
+      <div class="rule-card">
+        <div class="rule-num">1</div>
+        <div class="rule-text"><strong>Mai entrare dopo +20% intraday</strong>Aspetta sempre il primo pullback. Su MX, zona di primo supporto VWAP $4.88 o Fib 23.6% $4.66.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">2</div>
+        <div class="rule-text"><strong>Size massima 1.5% del portfolio</strong>Beta 4.1 = alta volatilità. Con MX, ogni punto percentuale del mercato muove il titolo 4× — ridurre la size di conseguenza.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">3</div>
+        <div class="rule-text"><strong>Stop loss obbligatorio sempre</strong>Su MX lo stop sotto VWAP $4.88 o Fib 23.6% $4.66. Mai spostare lo stop in perdita. Mai.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">4</div>
+        <div class="rule-text"><strong>R/R minimo 1:2 per aprire</strong>Se il setup non offre almeno 2× il rischio come potenziale guadagno, skippa il trade. Disciplina &gt; FOMO.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">5</div>
+        <div class="rule-text"><strong>Zero trading pre-earnings (28 Apr)</strong>La mossa attesa è ±14.2%. Non anticipare l'evento con posizione piena — evento binario non è trading, è scommessa.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">6</div>
+        <div class="rule-text"><strong>Take profit parziale a +10%</strong>Scala uscita: 1/3 a +10%, 1/3 a +20%, lascia correre 1/3 con trailing stop. Non regalare profitti al mercato.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">7</div>
+        <div class="rule-text"><strong>Volume di conferma obbligatorio</strong>Non entrare su breakout senza RVOL &gt; 2×. Su MX oggi RVOL 6.7× — valido. Ma domani con RVOL basso, evita falsi breakout.</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">8</div>
+        <div class="rule-text"><strong>Attenzione alle vendite insider</strong>CEO e CFO hanno venduto oggi. Segnale di distribuzione istituzionale. Tieni posizioni brevi nel tempo (1–3 giorni max).</div>
+      </div>
+      <div class="rule-card">
+        <div class="rule-num">9</div>
+        <div class="rule-text"><strong>Non inseguire il sentiment social</strong>+340% Reddit = FOMO attivo. Quando il retail è euforia, i professionisti stanno vendendo. Trading contro la folla richiede disciplina estrema.</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
      SCRIPTS
 ===================================================== -->
 <script>
+// ── EXPANDABLE CARDS ──────────────────────────────────────
+function toggleCard(el){
+  const wasOpen = el.classList.contains('open');
+  // close siblings in same grid
+  el.closest('.exp-grid').querySelectorAll('.expcard').forEach(c=>c.classList.remove('open'));
+  if(!wasOpen) el.classList.add('open');
+}
+
+// ── RISK MANAGER ──────────────────────────────────────────
+let pnlChart=null, riskChart=null;
+
+function calcRM(){
+  const cap    = parseFloat(document.getElementById('rm_capital').value)||0;
+  const riskPct= parseFloat(document.getElementById('rm_risk_pct').value)||0;
+  const entry  = parseFloat(document.getElementById('rm_entry').value)||0;
+  const stop   = parseFloat(document.getElementById('rm_stop').value)||0;
+  const target = parseFloat(document.getElementById('rm_target').value)||0;
+
+  if(!cap||!riskPct||!entry||!stop||!target||stop>=entry){
+    document.getElementById('rm_alert').style.background='#3a1a1a';
+    document.getElementById('rm_alert').style.color='#f85149';
+    document.getElementById('rm_alert').style.border='1px solid #f85149';
+    document.getElementById('rm_alert').textContent='⚠️ Verifica i parametri: Stop Loss deve essere inferiore al Prezzo di Entrata.';
+    return;
+  }
+
+  const riskAmt   = cap * (riskPct/100);
+  const stopDist  = entry - stop;
+  const targetDist= target - entry;
+  const shares    = Math.floor(riskAmt / stopDist);
+  const posVal    = shares * entry;
+  const posPct    = (posVal/cap)*100;
+  const pnlAmt    = shares * targetDist;
+  const pnlPct    = (targetDist/entry)*100;
+  const maxLoss   = shares * stopDist;
+  const rr        = targetDist / stopDist;
+
+  // Update outputs
+  document.getElementById('rm_shares').textContent    = shares.toLocaleString('it-IT');
+  document.getElementById('rm_shares_sub').textContent= `@ $${entry.toFixed(2)} entrata`;
+  document.getElementById('rm_pos_val').textContent   = '$'+posVal.toLocaleString('it-IT',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('rm_pos_pct').textContent   = posPct.toFixed(1)+'% del portfolio';
+  document.getElementById('rm_pnl').textContent       = '+$'+pnlAmt.toLocaleString('it-IT',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('rm_pnl_pct').textContent   = '+'+pnlPct.toFixed(1)+'% sul prezzo';
+  document.getElementById('rm_max_loss').textContent  = '-$'+maxLoss.toLocaleString('it-IT',{minimumFractionDigits:0,maximumFractionDigits:0});
+  document.getElementById('rm_risk_amt').textContent  = riskPct.toFixed(1)+'% del capitale';
+  document.getElementById('rm_stop_dist').textContent = '-$'+stopDist.toFixed(2)+' ('+((stopDist/entry)*100).toFixed(1)+'%)';
+  document.getElementById('rm_target_dist').textContent='Target +$'+targetDist.toFixed(2)+' ('+((targetDist/entry)*100).toFixed(1)+'%)';
+  document.getElementById('rm_rr').textContent        = '1 : '+rr.toFixed(2);
+  document.getElementById('rm_rr_sub').textContent    = rr>=2?'✅ Setup valido (≥1:2)':'⚠️ Setup debole (<1:2)';
+
+  // Alert box
+  const alertEl = document.getElementById('rm_alert');
+  if(rr>=2){
+    alertEl.style.background='#1a3a2a'; alertEl.style.color='#3fb950'; alertEl.style.border='1px solid #3fb950';
+    alertEl.innerHTML='✅ Setup valido — R/R 1:'+rr.toFixed(2)+' · Acquista <strong>'+shares+'</strong> azioni · Max perdita <strong>$'+maxLoss.toFixed(0)+'</strong> ('+riskPct+'% capitale)';
+  } else {
+    alertEl.style.background='#2d1f0e'; alertEl.style.color='#d29922'; alertEl.style.border='1px solid #d29922';
+    alertEl.innerHTML='⚠️ R/R '+rr.toFixed(2)+':1 — Sotto la soglia minima di 1:2. Abbassa lo stop o alza il target per migliorare il setup.';
+  }
+
+  // P&L chart
+  updatePnLChart(shares, entry, stop, target, cap);
+}
+
+function updatePnLChart(shares, entry, stop, target, cap){
+  const prices = [];
+  const pnls   = [];
+  const low    = Math.min(stop*0.92, entry*0.85);
+  const high   = Math.max(target*1.08, entry*1.25);
+  const steps  = 60;
+  for(let i=0;i<=steps;i++){
+    const p = low + (high-low)*(i/steps);
+    prices.push(p.toFixed(2));
+    pnls.push(+(shares*(p-entry)).toFixed(0));
+  }
+
+  const bearIdx  = prices.findIndex(p=>parseFloat(p)>=stop);
+  const zeroIdx  = prices.findIndex(p=>parseFloat(p)>=entry);
+  const bullIdx  = prices.findIndex(p=>parseFloat(p)>=target);
+
+  const colors = prices.map(p=>{
+    const v=parseFloat(p);
+    if(v<stop)   return 'rgba(248,81,73,.55)';
+    if(v<entry)  return 'rgba(210,153,34,.55)';
+    if(v<target) return 'rgba(88,166,255,.55)';
+    return 'rgba(63,185,80,.55)';
+  });
+
+  if(pnlChart){pnlChart.destroy();pnlChart=null;}
+  pnlChart = new Chart(document.getElementById('cPnL'),{
+    type:'bar',
+    data:{
+      labels:prices,
+      datasets:[{
+        label:'P&L ($)',
+        data:pnls,
+        backgroundColor:colors,
+        borderWidth:0,
+        borderRadius:2
+      }]
+    },
+    options:{
+      responsive:true,maintainAspectRatio:false,
+      plugins:{
+        legend:{display:false},
+        tooltip:{callbacks:{
+          label:c=>' P&L: $'+c.parsed.y.toLocaleString('it-IT'),
+          title:t=>'Prezzo: $'+t[0].label
+        }},
+        annotation:{}
+      },
+      scales:{
+        x:{
+          grid:{color:'#21262d'},
+          ticks:{
+            maxTicksLimit:8,
+            callback:function(val,idx){return '$'+this.getLabelForValue(idx);}
+          }
+        },
+        y:{
+          grid:{color:'#21262d'},
+          ticks:{callback:v=>(v>=0?'+':'')+'$'+v.toLocaleString('it-IT')}
+        }
+      }
+    }
+  });
+
+  // Annotazioni manuali overlay
+  const canvas = document.getElementById('cPnL');
+  const ctx2   = canvas.getContext('2d');
+  // Le annotazioni vengono gestite tramite il plugin afterDraw
+  pnlChart.options.plugins.afterDraw = function(chart){
+    const xAxis = chart.scales.x;
+    const yAxis = chart.scales.y;
+    ctx2.save();
+    const lines=[
+      {price:stop,   color:'#f85149',label:'SL $'+stop.toFixed(2)},
+      {price:entry,  color:'#8b949e',label:'Entry $'+entry.toFixed(2)},
+      {price:target, color:'#3fb950',label:'TP $'+target.toFixed(2)}
+    ];
+    lines.forEach(({price,color,label})=>{
+      const idx = prices.findIndex(p=>parseFloat(p)>=price);
+      if(idx<0)return;
+      const x=xAxis.getPixelForValue(idx);
+      ctx2.beginPath();
+      ctx2.strokeStyle=color;
+      ctx2.lineWidth=1.5;
+      ctx2.setLineDash([4,3]);
+      ctx2.moveTo(x,yAxis.top);
+      ctx2.lineTo(x,yAxis.bottom);
+      ctx2.stroke();
+      ctx2.setLineDash([]);
+      ctx2.fillStyle=color;
+      ctx2.font='bold 9px Segoe UI';
+      ctx2.fillText(label,x+3,yAxis.top+12);
+    });
+    ctx2.restore();
+  };
+
+  // Scenari summary
+  const bearPnl  = (shares*(stop-entry)).toFixed(0);
+  const basePnl  = (shares*(entry*1.03-entry)).toFixed(0);
+  const bullPnl  = (shares*(target-entry)).toFixed(0);
+
+  // risk radar
+  updateRiskRadar();
+}
+
+function updateRiskRadar(){
+  if(riskChart){riskChart.destroy();riskChart=null;}
+  riskChart = new Chart(document.getElementById('cRiskRadar'),{
+    type:'radar',
+    data:{
+      labels:['Volatilità','Liquidità','Momentum','Fondamentale','Timing','Sentiment'],
+      datasets:[{
+        label:'MX Risk Profile',
+        data:[8,5,9,3,4,8],
+        borderColor:'#f85149',
+        backgroundColor:'rgba(248,81,73,.12)',
+        pointBackgroundColor:'#f85149',
+        borderWidth:2,
+        pointRadius:4
+      }]
+    },
+    options:{
+      responsive:false,
+      plugins:{legend:{display:false}},
+      scales:{r:{
+        beginAtZero:true,max:10,
+        grid:{color:'#30363d'},
+        angleLines:{color:'#30363d'},
+        ticks:{display:false,stepSize:2},
+        pointLabels:{font:{size:10},color:'#8b949e'}
+      }}
+    }
+  });
+}
+
+// Init risk manager on first tab open
+document.querySelector('[onclick="T(\'riskmgr\',this)"]').addEventListener('click',function(){
+  setTimeout(()=>{
+    calcRM();
+  },50);
+},{once:true});
+
+// ── TAB SWITCH ────────────────────────────────────────────
 // Tab switch
 function T(id,btn){
   document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
