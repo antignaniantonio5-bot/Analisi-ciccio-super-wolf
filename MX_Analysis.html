@@ -1,0 +1,627 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>NYSE:MX — MagnaChip Full Analysis</title>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#e6edf3;font-size:14px}
+a{color:#58a6ff;text-decoration:none}a:hover{text-decoration:underline}
+canvas{max-width:100%}
+
+/* HEADER */
+header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px solid #30363d;padding:16px 28px;display:flex;align-items:center;gap:20px;flex-wrap:wrap}
+.hd-ticker{font-size:1.8rem;font-weight:800;color:#58a6ff}
+.hd-name{font-size:.85rem;color:#8b949e;margin-top:2px}
+.hd-badges{margin-top:4px;display:flex;gap:6px;flex-wrap:wrap}
+.hd-badge{background:#1f2937;border:1px solid #374151;border-radius:20px;padding:2px 9px;font-size:.7rem;color:#9ca3af}
+.hd-right{margin-left:auto;text-align:right}
+.hd-price{font-size:2.2rem;font-weight:800;color:#3fb950}
+.hd-chg{font-size:.95rem;color:#3fb950;font-weight:700}
+.hd-meta{font-size:.72rem;color:#8b949e;margin-top:3px}
+.live{display:inline-block;width:7px;height:7px;background:#3fb950;border-radius:50%;margin-right:4px;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* TABS */
+.tabs{display:flex;background:#161b22;border-bottom:1px solid #30363d;padding:0 28px;overflow-x:auto}
+.tab-btn{padding:12px 22px;background:none;border:none;color:#8b949e;font-size:.87rem;font-weight:600;cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.tab-btn:hover{color:#e6edf3}
+.tab-btn.active{color:#58a6ff;border-bottom-color:#58a6ff}
+
+/* PANES */
+.pane{display:none;padding:22px 28px}
+.pane.active{display:block}
+
+/* LAYOUT */
+.g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
+.g3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px;margin-bottom:14px}
+.g6{display:grid;grid-template-columns:repeat(6,1fr);gap:10px;margin-bottom:14px}
+.mb{margin-bottom:14px}
+
+/* CARDS */
+.card{background:#161b22;border:1px solid #30363d;border-radius:10px;padding:15px 17px}
+.ctitle{font-size:.68rem;text-transform:uppercase;letter-spacing:.09em;color:#8b949e;margin-bottom:7px;font-weight:600}
+.cval{font-size:1.45rem;font-weight:700}
+.csub{font-size:.75rem;color:#8b949e;margin-top:3px}
+.green{color:#3fb950}.red{color:#f85149}.yellow{color:#d29922}.blue{color:#58a6ff}
+
+/* SECTION TITLE */
+.stitle{font-size:.72rem;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#8b949e;margin-bottom:11px;padding-bottom:7px;border-bottom:1px solid #30363d}
+
+/* BADGES */
+.badge{display:inline-block;padding:2px 8px;border-radius:20px;font-size:.7rem;font-weight:700}
+.bg-g{background:#1a3a2a;color:#3fb950}
+.bg-r{background:#3a1a1a;color:#f85149}
+.bg-y{background:#3a3010;color:#d29922}
+.bg-b{background:#0d2a4a;color:#58a6ff}
+.bg-x{background:#21262d;color:#8b949e}
+
+/* ALERTS */
+.alert{border-radius:8px;padding:10px 15px;font-size:.82rem;margin-bottom:11px;border:1px solid}
+.al-g{background:#1a3a2a;border-color:#3fb950;color:#3fb950}
+.al-y{background:#2d1f0e;border-color:#d29922;color:#d29922}
+.al-b{background:#0d1a2a;border-color:#58a6ff;color:#58a6ff}
+
+/* TABLES */
+.tbl{width:100%;border-collapse:collapse;font-size:.83rem}
+.tbl th{text-align:left;padding:8px 11px;font-size:.68rem;text-transform:uppercase;letter-spacing:.06em;color:#8b949e;border-bottom:1px solid #30363d;font-weight:600}
+.tbl td{padding:8px 11px;border-bottom:1px solid #21262d;vertical-align:middle}
+.tbl tr:last-child td{border-bottom:none}
+.tbl tr:hover td{background:#1c2128}
+
+/* OSCILLATOR ROWS */
+.orow{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid #21262d}
+.orow:last-child{border-bottom:none}
+.oname{width:110px;font-size:.8rem;color:#8b949e;flex-shrink:0}
+.obar{flex:1}
+.otrack{height:6px;background:#21262d;border-radius:3px;overflow:hidden}
+.ofill{height:100%;border-radius:3px}
+.oval{width:48px;text-align:right;font-size:.8rem;font-weight:700;flex-shrink:0}
+.osig{width:88px;text-align:right;flex-shrink:0}
+
+/* PATTERN GRID */
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.pcard{background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:13px;display:flex;gap:13px;align-items:flex-start}
+.pname{font-weight:700;font-size:.88rem;margin-bottom:4px}
+.pdesc{font-size:.77rem;color:#8b949e;line-height:1.5}
+.psig{margin-top:7px}
+
+/* SCENARIOS */
+.sgrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:13px;margin-bottom:14px}
+.scard{border-radius:10px;padding:15px;border:1px solid}
+.sc-bull{background:#1a3a2a;border-color:#3fb950}
+.sc-base{background:#0d1a2a;border-color:#58a6ff}
+.sc-bear{background:#3a1a1a;border-color:#f85149}
+.stit{font-weight:800;font-size:.88rem;margin-bottom:7px}
+.sc-bull .stit{color:#3fb950}.sc-base .stit{color:#58a6ff}.sc-bear .stit{color:#f85149}
+.sbody{font-size:.79rem;color:#8b949e;line-height:1.6}
+.starget{font-size:1.05rem;font-weight:700;margin-top:8px}
+.sc-bull .starget{color:#3fb950}.sc-base .starget{color:#58a6ff}.sc-bear .starget{color:#f85149}
+
+/* FILTER */
+.fbtn-wrap{display:flex;gap:7px;margin-bottom:12px;flex-wrap:wrap}
+.fbtn{padding:5px 15px;border-radius:6px;border:1px solid #30363d;background:#161b22;color:#8b949e;cursor:pointer;font-size:.8rem;font-weight:600;transition:all .2s}
+.fbtn:hover,.fbtn.active{background:#21262d;color:#e6edf3;border-color:#58a6ff}
+
+/* MACD BARS */
+.mwrap{display:flex;gap:3px;align-items:flex-end;height:55px;justify-content:center;margin:8px 0}
+.mbar{width:9px;border-radius:2px 2px 0 0}
+
+/* RESPONSIVE */
+@media(max-width:900px){.g6{grid-template-columns:repeat(3,1fr)}.g2,.g3{grid-template-columns:1fr}.sgrid{grid-template-columns:1fr}.pgrid{grid-template-columns:1fr}}
+@media(max-width:500px){.g6{grid-template-columns:repeat(2,1fr)}.tabs{padding:0 12px}.pane{padding:16px 12px}}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div>
+    <div class="hd-ticker">NYSE: MX</div>
+    <div class="hd-name">MagnaChip Semiconductor Corporation</div>
+    <div class="hd-badges">
+      <span class="hd-badge">Semiconduttori</span>
+      <span class="hd-badge">Korea · NYSE Small Cap</span>
+      <span class="hd-badge">Power &amp; Display IC</span>
+    </div>
+  </div>
+  <div class="hd-right">
+    <div class="hd-price">$5.37</div>
+    <div class="hd-chg">▲ +$0.89 (+20.67%)</div>
+    <div class="hd-meta"><span class="live"></span>Real-time · 24 Apr 2026 &nbsp;|&nbsp; H: $5.53 &nbsp; L: $4.44 &nbsp; Vol: 3.94M</div>
+  </div>
+</header>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active"  onclick="T('dash',this)">📊 Dashboard</button>
+  <button class="tab-btn"         onclick="T('tech',this)">📈 Analisi Tecnica</button>
+  <button class="tab-btn"         onclick="T('screen',this)">🔍 Screener</button>
+  <button class="tab-btn"         onclick="T('report',this)">📋 Report</button>
+</div>
+
+<!-- ====================================================
+     TAB 1 – DASHBOARD
+===================================================== -->
+<div id="dash" class="pane active">
+
+  <!-- KPI ROW -->
+  <div class="g6">
+    <div class="card"><div class="ctitle">Prezzo</div><div class="cval green">$5.37</div><div class="csub">Live close</div></div>
+    <div class="card"><div class="ctitle">Variazione</div><div class="cval green">+20.67%</div><div class="csub">+$0.89 da $4.45</div></div>
+    <div class="card"><div class="ctitle">Market Cap</div><div class="cval">$125M</div><div class="csub">~23.3M azioni</div></div>
+    <div class="card"><div class="ctitle">Volume</div><div class="cval">3.94M</div><div class="csub"><span class="badge bg-g">+550% media</span></div></div>
+    <div class="card"><div class="ctitle">52W H / L</div><div class="cval" style="font-size:1rem">$5.53 <span style="color:#8b949e">/</span> $1.82</div><div class="csub">Range 204%</div></div>
+    <div class="card"><div class="ctitle">RSI (14)</div><div class="cval red">88.8</div><div class="csub"><span class="badge bg-r">Ipercomprato</span></div></div>
+  </div>
+
+  <!-- PRICE CHART -->
+  <div class="card mb">
+    <div class="stitle">Andamento Prezzo &amp; Volume — Gen 2025 / Apr 2026</div>
+    <div style="height:280px;position:relative"><canvas id="cPrice"></canvas></div>
+  </div>
+
+  <!-- REVENUE + PERFORMANCE -->
+  <div class="g2">
+    <div class="card">
+      <div class="stitle">Revenue Trimestrale (M$)</div>
+      <div style="height:195px;position:relative"><canvas id="cRev"></canvas></div>
+    </div>
+    <div class="card">
+      <div class="stitle">Performance Comparata 2026 YTD (base 100)</div>
+      <div style="height:195px;position:relative"><canvas id="cPerf"></canvas></div>
+    </div>
+  </div>
+
+  <!-- MIX + GAUGE -->
+  <div class="g2">
+    <div class="card">
+      <div class="stitle">Mix Ricavi per Segmento</div>
+      <div style="display:flex;align-items:center;gap:18px">
+        <div style="height:150px;width:150px;flex-shrink:0;position:relative"><canvas id="cMix"></canvas></div>
+        <div style="font-size:.82rem;color:#8b949e;line-height:2.1">
+          <div><span style="color:#58a6ff">■</span> Power Solutions <strong style="color:#e6edf3">45%</strong></div>
+          <div><span style="color:#3fb950">■</span> Display Solutions <strong style="color:#e6edf3">35%</strong></div>
+          <div><span style="color:#d29922">■</span> Foundry &amp; Other <strong style="color:#e6edf3">20%</strong></div>
+          <div style="margin-top:6px;font-size:.74rem">Power Solutions guida la crescita<br>grazie ai MOSFET 8ª gen.</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="stitle">Segnale Tecnico Complessivo</div>
+      <div style="display:flex;flex-direction:column;align-items:center">
+        <div style="height:130px;width:220px;position:relative">
+          <canvas id="cGauge"></canvas>
+          <div style="position:absolute;bottom:12px;width:100%;text-align:center">
+            <div style="font-size:1.25rem;font-weight:800;color:#d29922">NEUTRALE</div>
+            <div style="font-size:.7rem;color:#8b949e">Trend bullish · Oscillatori ipercomprati</div>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:space-between;width:210px;font-size:.67rem;margin-top:2px">
+          <span style="color:#f85149">SELL</span><span style="color:#d29922">NEUTRAL</span><span style="color:#3fb950">BUY</span>
+        </div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;margin-top:12px;font-size:.78rem">
+          <div><span style="color:#8b949e">Buy signals:</span> <strong class="green">8</strong></div>
+          <div><span style="color:#8b949e">Sell signals:</span> <strong class="red">3</strong></div>
+          <div><span style="color:#8b949e">Neutral:</span> <strong>4</strong></div>
+          <div><span style="color:#8b949e">ADX:</span> <strong>30.4</strong></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     TAB 2 – ANALISI TECNICA
+===================================================== -->
+<div id="tech" class="pane">
+  <div class="alert al-g">✅ STRONG UPTREND — Golden Cross attivo · ADX 30.4 · +DI 64 vs -DI 5 · Prezzo sopra tutte le medie mobili</div>
+  <div class="alert al-y">⚠️ ATTENZIONE — RSI 88.8 · Stochastic 95 · Prezzo sopra Banda Superiore Bollinger → zona ipercomprato estremo</div>
+
+  <div class="g2">
+    <!-- OSCILLATORI -->
+    <div class="card">
+      <div class="stitle">Oscillatori</div>
+      <div class="orow"><div class="oname">RSI (14)</div><div class="obar"><div class="otrack"><div class="ofill" style="width:88.8%;background:linear-gradient(90deg,#3fb950 60%,#d29922 75%,#f85149 100%)"></div></div></div><div class="oval red">88.8</div><div class="osig"><span class="badge bg-r">Overbought</span></div></div>
+      <div class="orow"><div class="oname">Stoch K</div><div class="obar"><div class="otrack"><div class="ofill" style="width:95%;background:#f85149"></div></div></div><div class="oval red">94.97</div><div class="osig"><span class="badge bg-r">Overbought</span></div></div>
+      <div class="orow"><div class="oname">Stoch D</div><div class="obar"><div class="otrack"><div class="ofill" style="width:95.6%;background:#f85149"></div></div></div><div class="oval red">95.58</div><div class="osig"><span class="badge bg-r">Overbought</span></div></div>
+      <div class="orow"><div class="oname">ADX</div><div class="obar"><div class="otrack"><div class="ofill" style="width:30.4%;background:#58a6ff"></div></div></div><div class="oval blue">30.35</div><div class="osig"><span class="badge bg-b">Trend Forte</span></div></div>
+      <div class="orow"><div class="oname">+DI / -DI</div><div class="obar" style="display:flex;gap:4px"><div style="flex:1"><div class="otrack"><div class="ofill" style="width:64%;background:#3fb950"></div></div></div><div style="flex:1"><div class="otrack"><div class="ofill" style="width:5.4%;background:#f85149"></div></div></div></div><div class="oval"><span class="green">64</span>/<span class="red">5</span></div><div class="osig"><span class="badge bg-g">Bull DI</span></div></div>
+      <div class="orow"><div class="oname">MACD Line</div><div class="obar"><div class="otrack"><div class="ofill" style="width:65%;background:#3fb950"></div></div></div><div class="oval green">+0.41</div><div class="osig"><span class="badge bg-g">Bull X</span></div></div>
+      <div class="orow"><div class="oname">MACD Hist.</div><div class="obar"><div class="otrack"><div class="ofill" style="width:55%;background:#3fb950"></div></div></div><div class="oval green">+0.22</div><div class="osig"><span class="badge bg-g">Expanding</span></div></div>
+      <div style="margin-top:12px">
+        <div style="font-size:.7rem;color:#8b949e;margin-bottom:5px">MACD Histogram — ultimi 12 periodi</div>
+        <div class="mwrap">
+          <div class="mbar" style="height:15px;background:#f85149;border-radius:0 0 2px 2px;align-self:flex-end"></div>
+          <div class="mbar" style="height:22px;background:#f85149;border-radius:0 0 2px 2px;align-self:flex-end"></div>
+          <div class="mbar" style="height:18px;background:#f85149;border-radius:0 0 2px 2px;align-self:flex-end"></div>
+          <div class="mbar" style="height:7px;background:#8b949e;border-radius:0 0 2px 2px;align-self:flex-end"></div>
+          <div class="mbar" style="height:9px;background:#3fb950"></div>
+          <div class="mbar" style="height:17px;background:#3fb950"></div>
+          <div class="mbar" style="height:24px;background:#3fb950"></div>
+          <div class="mbar" style="height:29px;background:#3fb950"></div>
+          <div class="mbar" style="height:35px;background:#3fb950"></div>
+          <div class="mbar" style="height:40px;background:#3fb950"></div>
+          <div class="mbar" style="height:47px;background:#3fb950"></div>
+          <div class="mbar" style="height:55px;background:#3fb950"></div>
+        </div>
+        <div style="height:1px;background:#30363d;margin:0 6px"></div>
+      </div>
+    </div>
+
+    <!-- MEDIE MOBILI -->
+    <div class="card">
+      <div class="stitle">Medie Mobili vs Prezzo $5.37</div>
+      <table class="tbl">
+        <thead><tr><th>Media</th><th>Valore</th><th>Distanza</th><th>Segnale</th></tr></thead>
+        <tbody>
+          <tr><td>EMA 10</td><td>$3.89</td><td class="green">+38.0%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 20</td><td>$3.48</td><td class="green">+54.3%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 30</td><td>$3.30</td><td class="green">+62.7%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 50</td><td>$3.13</td><td class="green">+71.6%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 100</td><td>$3.01</td><td class="green">+78.4%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 200</td><td>$3.12</td><td class="green">+72.1%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>SMA 10</td><td>$3.66</td><td class="green">+46.7%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>SMA 20</td><td>$3.26</td><td class="green">+64.7%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>SMA 50</td><td>$2.97</td><td class="green">+80.8%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>SMA 200</td><td>$3.01</td><td class="green">+78.4%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+        </tbody>
+      </table>
+      <div class="alert al-g" style="margin-top:11px;font-size:.77rem;padding:7px 11px">✅ Golden Cross — EMA50 ($3.13) &gt; EMA200 ($3.12)</div>
+    </div>
+  </div>
+
+  <!-- S/R CHART -->
+  <div class="card mb">
+    <div class="stitle">Supporti &amp; Resistenze — Livelli chiave con prezzo corrente $5.37</div>
+    <div style="height:210px;position:relative"><canvas id="cSR"></canvas></div>
+  </div>
+
+  <!-- 4 PATTERNS -->
+  <div class="card">
+    <div class="stitle">4 Pattern Candlestick Riconosciuti</div>
+    <div class="pgrid">
+
+      <div class="pcard">
+        <svg width="28" height="76" viewBox="0 0 28 76" flex-shrink="0" style="flex-shrink:0">
+          <line x1="14" y1="1" x2="14" y2="10" stroke="#3fb950" stroke-width="2"/>
+          <rect x="5" y="10" width="18" height="56" rx="2" fill="#3fb950"/>
+          <line x1="14" y1="66" x2="14" y2="75" stroke="#3fb950" stroke-width="2"/>
+        </svg>
+        <div>
+          <div class="pname green">Marubozu Bullish <span class="badge bg-g" style="font-size:.63rem">Oggi</span></div>
+          <div class="pdesc">Body ratio 84%, wick inferiore quasi assente (0.9%), wick superiore 14.7%. Dominio totale dei compratori dall'apertura ($4.45) alla chiusura ($5.37). Pattern tipico di breakout su notizia catalizzatrice.</div>
+          <div class="psig"><span class="badge bg-g">Forza: Alta</span> <span class="badge bg-b" style="margin-left:4px">Affidabilità: 82%</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <svg width="44" height="76" viewBox="0 0 44 76" style="flex-shrink:0">
+          <line x1="13" y1="4" x2="13" y2="14" stroke="#f85149" stroke-width="2"/>
+          <rect x="7" y="14" width="12" height="26" rx="2" fill="#f85149"/>
+          <line x1="13" y1="40" x2="13" y2="48" stroke="#f85149" stroke-width="2"/>
+          <line x1="31" y1="1" x2="31" y2="11" stroke="#3fb950" stroke-width="2"/>
+          <rect x="23" y="11" width="16" height="52" rx="2" fill="#3fb950"/>
+          <line x1="31" y1="63" x2="31" y2="74" stroke="#3fb950" stroke-width="2"/>
+        </svg>
+        <div>
+          <div class="pname green">Engulfing Bullish <span class="badge bg-y" style="font-size:.63rem">22 Apr</span></div>
+          <div class="pdesc">La candela verde del 22 Apr ha inglobato completamente la candela ribassista precedente. Pattern di inversione a 2 candele. Segnala forte cambiamento di momentum in corrispondenza del lancio MOSFET 8ª gen.</div>
+          <div class="psig"><span class="badge bg-g">Forza: Alta</span> <span class="badge bg-b" style="margin-left:4px">Affidabilità: 78%</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <svg width="28" height="76" viewBox="0 0 28 76" style="flex-shrink:0">
+          <rect x="8" y="8" width="12" height="18" rx="2" fill="#3fb950"/>
+          <line x1="14" y1="26" x2="14" y2="74" stroke="#3fb950" stroke-width="2"/>
+          <line x1="14" y1="6" x2="14" y2="8" stroke="#3fb950" stroke-width="2"/>
+        </svg>
+        <div>
+          <div class="pname green">Hammer Bullish <span class="badge bg-x" style="font-size:.63rem">Mar 2026</span></div>
+          <div class="pdesc">Wick inferiore lungo (~3x il body) formatosi intorno $3.70–3.80 durante un ritracciamento. Indica netto rifiuto di livelli più bassi. Frequentemente associato alla fine dei pullback in uptrend forti.</div>
+          <div class="psig"><span class="badge bg-y">Forza: Media</span> <span class="badge bg-b" style="margin-left:4px">Affidabilità: 70%</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <svg width="52" height="76" viewBox="0 0 52 76" style="flex-shrink:0">
+          <rect x="3" y="54" width="12" height="19" rx="2" fill="#3fb950"/>
+          <line x1="9" y1="52" x2="9" y2="54" stroke="#3fb950" stroke-width="1.5"/>
+          <line x1="9" y1="73" x2="9" y2="75" stroke="#3fb950" stroke-width="1.5"/>
+          <rect x="20" y="38" width="12" height="24" rx="2" fill="#3fb950"/>
+          <line x1="26" y1="36" x2="26" y2="38" stroke="#3fb950" stroke-width="1.5"/>
+          <line x1="26" y1="62" x2="26" y2="65" stroke="#3fb950" stroke-width="1.5"/>
+          <rect x="37" y="14" width="12" height="32" rx="2" fill="#3fb950"/>
+          <line x1="43" y1="12" x2="43" y2="14" stroke="#3fb950" stroke-width="1.5"/>
+          <line x1="43" y1="46" x2="43" y2="49" stroke="#3fb950" stroke-width="1.5"/>
+        </svg>
+        <div>
+          <div class="pname green">Three White Soldiers <span class="badge bg-g" style="font-size:.63rem">Apr 2026</span></div>
+          <div class="pdesc">Tre candele bullish consecutive con chiusure progressivamente più alte, identificate nelle ultime 3 sedute di aprile. Pattern di continuazione tra i più affidabili: segnala accumulo consistente da grandi operatori.</div>
+          <div class="psig"><span class="badge bg-g">Forza: Alta</span> <span class="badge bg-b" style="margin-left:4px">Affidabilità: 85%</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- ====================================================
+     TAB 3 – SCREENER
+===================================================== -->
+<div id="screen" class="pane">
+
+  <div class="fbtn-wrap">
+    <button class="fbtn active" onclick="FR('all',this)">Tutti</button>
+    <button class="fbtn" onclick="FR('BUY',this)">BUY</button>
+    <button class="fbtn" onclick="FR('HOLD',this)">HOLD</button>
+    <button class="fbtn" onclick="FR('SELL',this)">SELL</button>
+    <button class="fbtn" onclick="FR('WATCH',this)">WATCH</button>
+  </div>
+
+  <div class="card mb" style="overflow-x:auto">
+    <table class="tbl" id="scTbl">
+      <thead>
+        <tr><th>Ticker</th><th>Azienda</th><th>Prezzo</th><th>Var%</th><th>RSI</th><th>MACD</th><th>ADX</th><th>EMA Cross</th><th>Trend</th><th>P/S</th><th>Rating</th></tr>
+      </thead>
+      <tbody>
+        <tr data-r="WATCH"><td><strong class="blue">MX</strong></td><td>MagnaChip Semi.</td><td><strong>$5.37</strong></td><td class="green">+20.67%</td><td><span class="badge bg-r">88.8</span></td><td><span class="badge bg-g">Bull</span></td><td>30.4</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-g">Strong Up</span></td><td>0.48x</td><td><span class="badge bg-y">WATCH</span></td></tr>
+        <tr data-r="BUY"><td><strong>ON</strong></td><td>ON Semiconductor</td><td>$44.50</td><td class="green">+0.8%</td><td><span class="badge bg-x">52.1</span></td><td><span class="badge bg-g">Bull</span></td><td>22.5</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-b">Uptrend</span></td><td>2.1x</td><td><span class="badge bg-g">BUY</span></td></tr>
+        <tr data-r="BUY"><td><strong>MPWR</strong></td><td>Monolithic Power Sys.</td><td>$398.20</td><td class="green">+1.5%</td><td><span class="badge bg-x">61.4</span></td><td><span class="badge bg-g">Bull</span></td><td>28.3</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-b">Uptrend</span></td><td>8.7x</td><td><span class="badge bg-g">BUY</span></td></tr>
+        <tr data-r="HOLD"><td><strong>DIOD</strong></td><td>Diodes Incorporated</td><td>$24.80</td><td class="red">-1.2%</td><td><span class="badge bg-x">48.3</span></td><td><span class="badge bg-r">Bear</span></td><td>18.2</td><td><span class="badge bg-r">Death X</span></td><td><span class="badge bg-x">Sideways</span></td><td>1.1x</td><td><span class="badge bg-y">HOLD</span></td></tr>
+        <tr data-r="BUY"><td><strong>SIMO</strong></td><td>Silicon Motion Tech.</td><td>$48.90</td><td class="green">+2.1%</td><td><span class="badge bg-x">58.7</span></td><td><span class="badge bg-g">Bull</span></td><td>25.1</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-b">Uptrend</span></td><td>3.2x</td><td><span class="badge bg-g">BUY</span></td></tr>
+        <tr data-r="SELL"><td><strong>AMBA</strong></td><td>Ambarella Inc.</td><td>$52.30</td><td class="red">-2.8%</td><td><span class="badge bg-x">38.5</span></td><td><span class="badge bg-r">Bear</span></td><td>15.8</td><td><span class="badge bg-r">Death X</span></td><td><span class="badge bg-r">Downtrend</span></td><td>4.5x</td><td><span class="badge bg-r">SELL</span></td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RADAR -->
+  <div class="card">
+    <div class="stitle">Radar Fondamentale &amp; Tecnico — MX vs Competitor</div>
+    <div style="display:flex;gap:20px;align-items:center;flex-wrap:wrap">
+      <div style="height:270px;width:290px;flex-shrink:0;position:relative"><canvas id="cRadar"></canvas></div>
+      <div style="flex:1;min-width:180px">
+        <div style="display:flex;flex-direction:column;gap:9px;font-size:.81rem;margin-bottom:14px">
+          <div style="display:flex;align-items:center;gap:7px"><div style="width:10px;height:10px;border-radius:50%;background:#58a6ff;flex-shrink:0"></div><strong>MX</strong> — MagnaChip Semi.</div>
+          <div style="display:flex;align-items:center;gap:7px"><div style="width:10px;height:10px;border-radius:50%;background:#3fb950;flex-shrink:0"></div><strong>ON</strong> — ON Semiconductor</div>
+          <div style="display:flex;align-items:center;gap:7px"><div style="width:10px;height:10px;border-radius:50%;background:#d29922;flex-shrink:0"></div><strong>MPWR</strong> — Monolithic Power</div>
+          <div style="display:flex;align-items:center;gap:7px"><div style="width:10px;height:10px;border-radius:50%;background:#f85149;flex-shrink:0"></div><strong>DIOD</strong> — Diodes Inc.</div>
+        </div>
+        <div style="font-size:.8rem;color:#8b949e;line-height:1.7">
+          <div style="margin-bottom:6px"><strong style="color:#e6edf3">Punti di forza MX:</strong><br>Momentum tecnico eccezionale, valutazione attraente (P/S 0.48x vs settore ~3x), innovazione MOSFET 8ª gen</div>
+          <div><strong style="color:#e6edf3">Punti di debolezza MX:</strong><br>EPS negativo, margini inferiori ai competitor, small cap (rischio liquidità)</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     TAB 4 – REPORT
+===================================================== -->
+<div id="report" class="pane">
+
+  <div class="alert al-b">📋 Report generato il 24 Aprile 2026 — Dati real-time TradingView · Solo scopi informativi, non costituisce consulenza finanziaria</div>
+
+  <!-- EXECUTIVE SUMMARY -->
+  <div class="mb">
+    <div style="font-size:1rem;font-weight:700;margin-bottom:9px">📊 Executive Summary</div>
+    <div style="font-size:.86rem;color:#8b949e;line-height:1.75">
+      <p style="margin-bottom:7px">MagnaChip Semiconductor (NYSE: MX) è un produttore sudcoreano di circuiti integrati analogici e misti, specializzato in soluzioni di potenza (MOSFET, IGBT) e display (driver IC). Quotato al NYSE, opera principalmente nel segmento consumer electronics e automotive.</p>
+      <p style="margin-bottom:7px">Il 24 aprile 2026 il titolo ha registrato un rialzo eccezionale del <strong style="color:#3fb950">+20.67%</strong> a <strong style="color:#3fb950">$5.37</strong>, livello non visto da oltre 12 mesi. Il catalizzatore principale è stato il lancio della linea MOSFET 8ª generazione per smartphone (-48% on-resistance, +185% densità di corrente). Il movimento si inserisce in un uptrend strutturale già avviato a inizio 2026, con un +47% nelle ultime 2 settimane.</p>
+      <p>Da un punto di vista tecnico il quadro è fortemente polarizzato: il trend di medio-lungo periodo è inequivocabilmente bullish (Golden Cross, ADX 30.4, prezzo sopra tutte le EMA/SMA), ma gli oscillatori di breve (RSI 88.8, Stochastic 95, prezzo sopra Bollinger superiore) indicano una zona di ipercomprato estremo che storicamente precede fasi di consolidamento o pullback.</p>
+    </div>
+  </div>
+
+  <!-- SCENARI -->
+  <div style="font-size:1rem;font-weight:700;margin-bottom:11px">🎯 Scenari Prezzo</div>
+  <div class="sgrid">
+    <div class="scard sc-bull">
+      <div class="stit">🚀 Scenario Rialzista</div>
+      <div class="sbody">Earnings 28 apr superano il consensus (-$0.22 EPS). La guidance Q2 sorprende positivamente. Adozione MOSFET 8ª gen da OEM tier-1 (Samsung supply chain) confermata. Momentum tecnico mantiene il prezzo sopra EMA20.<br><br><strong>Probabilità stimata: 25%</strong></div>
+      <div class="starget">Target: $7.50–$9.00</div>
+    </div>
+    <div class="scard sc-base">
+      <div class="stit">📊 Scenario Base</div>
+      <div class="sbody">Pullback fisiologico verso EMA20 ($3.48–$4.00) dopo il forte rialzo. Earnings in linea con attese. I MOSFET trovano conferma graduale nei trimestri successivi. Recupero entro Q3 2026.<br><br><strong>Probabilità stimata: 50%</strong></div>
+      <div class="starget">Target: $4.50–$6.00</div>
+    </div>
+    <div class="scard sc-bear">
+      <div class="stit">📉 Scenario Ribassista</div>
+      <div class="sbody">Earnings del 28 apr deludono in modo significativo. Rischi supply chain gas (guerra Iran) si materializzano. Vendite "sell-the-news" dopo +47% in 2 settimane. Rottura sotto EMA50 ($3.13).<br><br><strong>Probabilità stimata: 25%</strong></div>
+      <div class="starget">Target: $2.50–$3.20</div>
+    </div>
+  </div>
+
+  <!-- FONDAMENTALE + CATALYST -->
+  <div class="g2 mb">
+    <div class="card">
+      <div class="stitle">Dati Fondamentali Chiave</div>
+      <table class="tbl">
+        <tr><td style="color:#8b949e">Market Cap</td><td><strong>~$125M</strong></td></tr>
+        <tr><td style="color:#8b949e">P/S Ratio</td><td><strong>0.48x</strong> <span class="badge bg-g" style="font-size:.67rem">Economico</span></td></tr>
+        <tr><td style="color:#8b949e">Revenue (ann.)</td><td><strong>~$261M</strong></td></tr>
+        <tr><td style="color:#8b949e">EPS Q4 2025</td><td class="green"><strong>Beat +$0.24</strong></td></tr>
+        <tr><td style="color:#8b949e">EPS Q1 2026E</td><td class="red"><strong>-$0.22</strong></td></tr>
+        <tr><td style="color:#8b949e">Float</td><td><strong>~23.3M azioni</strong></td></tr>
+        <tr><td style="color:#8b949e">Beta stimato</td><td><strong>~1.8</strong> <span class="badge bg-r" style="font-size:.67rem">Alta vol.</span></td></tr>
+      </table>
+    </div>
+    <div class="card">
+      <div class="stitle">Catalyst &amp; Risk Factors</div>
+      <table class="tbl">
+        <tr><td><span class="badge bg-g">+</span></td><td>MOSFET 8ª gen: -48% R_on, +185% densità corrente</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>P/S 0.48x vs settore ~3x — forte sconto</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>EPS Q4 25: beat di $0.24 vs consensus</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>Consorzio semiconductor USA $4T (Trump)</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>EPS Q1 2026 atteso negativo (-$0.22)</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Rischi supply chain gas critici (He) — Iran</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Small cap: rischio liquidità e volatilità</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Dipendenza da pochi clienti chiave</td></tr>
+      </table>
+    </div>
+  </div>
+
+  <!-- STRATEGIA OPERATIVA -->
+  <div class="card mb">
+    <div class="stitle">Strategia Operativa</div>
+    <table class="tbl">
+      <thead><tr><th>Scenario d'ingresso</th><th>Zona prezzo</th><th>Condizione</th><th>R/R stimato</th></tr></thead>
+      <tbody>
+        <tr><td>🟡 Pullback moderato</td><td>$4.50–$4.80</td><td>RSI &lt; 75, candela di conferma</td><td>1:2.5</td></tr>
+        <tr><td>🟢 Pullback profondo</td><td>$3.50–$3.80 (EMA20)</td><td>RSI &lt; 60, volume in calo</td><td>1:3.5</td></tr>
+        <tr><td>⚠️ Pre-earnings</td><td>$5.00–$5.37</td><td>Solo con size &lt;1% portafoglio</td><td>Alto rischio</td></tr>
+        <tr><td>🔴 Short / Hedge</td><td>$5.40–$5.60</td><td>Solo su breakdown confermato sotto $4.90</td><td>1:2.0</td></tr>
+      </tbody>
+    </table>
+    <div class="alert al-y" style="margin-top:11px;font-size:.79rem">⚠️ <strong>Evento chiave:</strong> Earnings Q1 2026 — <strong>28 Aprile 2026</strong> dopo chiusura mercati. Consensus EPS: -$0.22. Ridurre l'esposizione prima dell'evento se già in posizione.</div>
+    <div style="margin-top:10px;font-size:.7rem;color:#6e7681;border-top:1px solid #21262d;padding-top:9px">
+      Fonti: <a href="https://stockstory.org/us/stocks/nyse/mx/news/why-up-down/why-magnachip-mx-stock-is-up-today-3">StockStory</a> · <a href="https://markets.financialcontent.com/stocks/article/stockstory-2026-4-22-why-magnachip-mx-stock-is-up-today">FinancialContent</a> · <a href="https://www.marketbeat.com/instant-alerts/magnachip-semiconductor-mx-projected-to-post-earnings-on-tuesday-2026-04-21/">MarketBeat</a> · TradingView Real-time Data
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     SCRIPTS
+===================================================== -->
+<script>
+// Tab switch
+function T(id,btn){
+  document.querySelectorAll('.pane').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+  btn.classList.add('active');
+}
+
+// Screener filter
+function FR(r,btn){
+  document.querySelectorAll('.fbtn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#scTbl tbody tr').forEach(row=>{
+    row.style.display=(r==='all'||row.dataset.r===r)?'':'none';
+  });
+}
+
+// Chart defaults
+Chart.defaults.color='#8b949e';
+Chart.defaults.borderColor='#30363d';
+Chart.defaults.font.family="'Segoe UI',system-ui,sans-serif";
+Chart.defaults.font.size=11;
+
+// PRICE + VOLUME
+new Chart(document.getElementById('cPrice'),{
+  type:'bar',
+  data:{
+    labels:['Gen 25','Feb 25','Mar 25','Apr 25','Mag 25','Giu 25','Lug 25','Ago 25','Set 25','Ott 25','Nov 25','Dic 25','Gen 26','Feb 26','Mar 26','Apr 26'],
+    datasets:[
+      {type:'line',label:'Prezzo ($)',data:[4.20,3.80,3.40,3.00,2.60,2.20,1.90,1.85,2.10,2.50,2.90,3.20,3.50,3.75,3.95,5.37],
+       borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.07)',borderWidth:2.5,tension:.4,fill:true,
+       pointBackgroundColor:[...[...Array(15)].map(()=>'#58a6ff'),'#3fb950'],
+       pointRadius:[...[...Array(15)].map(()=>3),7],yAxisID:'y',order:1},
+      {type:'bar',label:'Volume (K)',data:[850,780,920,840,710,660,580,540,620,750,880,920,980,1050,1120,3940],
+       backgroundColor:[...[...Array(15)].map(()=>'rgba(88,166,255,.18)'),'rgba(63,185,80,.5)'],
+       borderWidth:0,yAxisID:'y2',order:2}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{legend:{position:'top',labels:{usePointStyle:true}},
+      tooltip:{callbacks:{label:c=>c.dataset.type==='line'?` $${c.parsed.y.toFixed(2)}`:(` Vol: ${c.parsed.y}K`)}}},
+    scales:{
+      y:{position:'left',grid:{color:'#21262d'},ticks:{callback:v=>'$'+v.toFixed(2)}},
+      y2:{position:'right',grid:{display:false},ticks:{callback:v=>v+'K'}}
+    }
+  }
+});
+
+// REVENUE
+new Chart(document.getElementById('cRev'),{
+  type:'bar',
+  data:{
+    labels:['Q1 25','Q2 25','Q3 25','Q4 25','Q1 26E'],
+    datasets:[{label:'Revenue (M$)',data:[62.5,58.3,60.1,71.2,68.5],
+      backgroundColor:['#21262d','#21262d','#21262d','#3fb950','rgba(88,166,255,.35)'],
+      borderColor:['#30363d','#30363d','#30363d','#3fb950','#58a6ff'],
+      borderWidth:1,borderRadius:4}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` $${c.parsed.y}M`}}},
+    scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+v+'M'},min:50}}}
+});
+
+// PERFORMANCE
+new Chart(document.getElementById('cPerf'),{
+  type:'line',
+  data:{
+    labels:['Gen 26','Feb 26','Mar 26','Apr 26'],
+    datasets:[
+      {label:'MX',data:[100,107,113,153],borderColor:'#3fb950',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,tension:.3},
+      {label:'SOX Index',data:[100,103,101,108],borderColor:'#58a6ff',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[4,4]},
+      {label:'S&P 500',data:[100,102,104,105],borderColor:'#8b949e',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[2,4]},
+      {label:'DIOD',data:[100,98,96,97],borderColor:'#f85149',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[4,4]}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{position:'top',labels:{usePointStyle:true,boxWidth:8}}},
+    scales:{y:{grid:{color:'#21262d'},title:{display:true,text:'Base 100 = Gen 2026'}}}}
+});
+
+// MIX DONUT
+new Chart(document.getElementById('cMix'),{
+  type:'doughnut',
+  data:{labels:['Power Solutions','Display Solutions','Foundry & Other'],
+    datasets:[{data:[45,35,20],backgroundColor:['#58a6ff','#3fb950','#d29922'],borderColor:'#161b22',borderWidth:3}]},
+  options:{responsive:false,plugins:{legend:{display:false}},cutout:'70%'}
+});
+
+// GAUGE
+new Chart(document.getElementById('cGauge'),{
+  type:'doughnut',
+  data:{datasets:[{data:[3,4,4,1],
+    backgroundColor:['#f85149','#d29922','#d29922','#3fb950'],borderWidth:0}]},
+  options:{responsive:false,circumference:180,rotation:-90,
+    plugins:{legend:{display:false},tooltip:{enabled:false}},cutout:'65%'}
+});
+
+// S/R HORIZONTAL BARS
+new Chart(document.getElementById('cSR'),{
+  type:'bar',
+  data:{
+    labels:['S3 $1.82','S2 $2.33','S1 $2.57','Pivot $2.84','R1 $3.08','R2 $3.35','R3 $3.86','EMA20 $3.48','BB Sup $4.57','Prezzo $5.37'],
+    datasets:[{label:'Livello ($)',
+      data:[1.82,2.33,2.57,2.84,3.08,3.35,3.86,3.48,4.57,5.37],
+      backgroundColor:['rgba(63,185,80,.25)','rgba(63,185,80,.35)','rgba(63,185,80,.45)','rgba(139,148,158,.3)','rgba(248,81,73,.35)','rgba(248,81,73,.45)','rgba(248,81,73,.55)','rgba(88,166,255,.4)','rgba(210,153,34,.4)','rgba(63,185,80,.85)'],
+      borderColor:['#3fb950','#3fb950','#3fb950','#8b949e','#f85149','#f85149','#f85149','#58a6ff','#d29922','#3fb950'],
+      borderWidth:2,borderRadius:4}]
+  },
+  options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` $${c.parsed.x.toFixed(2)}`}}},
+    scales:{x:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+v.toFixed(2)},min:0,max:6.2},y:{grid:{display:false}}}}
+});
+
+// RADAR
+new Chart(document.getElementById('cRadar'),{
+  type:'radar',
+  data:{
+    labels:['Rev. Growth','Gross Margin','EPS','Momentum','Valuation','Innovazione'],
+    datasets:[
+      {label:'MX',data:[4,4,2,9,8,8],borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.12)',pointBackgroundColor:'#58a6ff',borderWidth:2},
+      {label:'ON Semi',data:[5,7,6,5,5,7],borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,.08)',pointBackgroundColor:'#3fb950',borderWidth:2},
+      {label:'MPWR',data:[7,9,8,6,3,8],borderColor:'#d29922',backgroundColor:'rgba(210,153,34,.08)',pointBackgroundColor:'#d29922',borderWidth:2},
+      {label:'DIOD',data:[4,6,6,3,6,4],borderColor:'#f85149',backgroundColor:'rgba(248,81,73,.08)',pointBackgroundColor:'#f85149',borderWidth:2}
+    ]
+  },
+  options:{responsive:false,
+    plugins:{legend:{display:false}},
+    scales:{r:{beginAtZero:true,max:10,grid:{color:'#30363d'},angleLines:{color:'#30363d'},ticks:{display:false,stepSize:2},pointLabels:{font:{size:11},color:'#8b949e'}}}}
+});
+</script>
+</body>
+</html>
