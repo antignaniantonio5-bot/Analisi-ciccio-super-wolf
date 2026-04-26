@@ -1,0 +1,1871 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>RYDE · Analisi Completa</title>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&family=Syne:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<style>
+:root {
+  --bg: #0a0a0f;
+  --surface: #111118;
+  --surface2: #1a1a24;
+  --border: rgba(255,255,255,0.08);
+  --accent: #00e5a0;
+  --accent2: #ff4d6d;
+  --accent3: #f0b429;
+  --text: #f0ede8;
+  --muted: #6b6b7a;
+  --green: #00e5a0;
+  --red: #ff4d6d;
+  --amber: #f0b429;
+  --blue: #4d9fff;
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { background: var(--bg); color: var(--text); font-family: 'Syne', sans-serif; min-height:100vh; }
+.mono { font-family: 'Space Mono', monospace; }
+
+/* NAV */
+.nav { display:flex; align-items:center; gap:0; border-bottom: 1px solid var(--border); background: var(--surface); position:sticky; top:0; z-index:100; }
+.nav-brand { padding: 14px 24px; font-size:15px; font-weight:800; letter-spacing:.05em; border-right: 1px solid var(--border); }
+.nav-brand span { color: var(--accent); }
+.nav-tabs { display:flex; flex:1; overflow-x:auto; }
+.tab { padding: 14px 20px; font-size:12px; font-weight:600; letter-spacing:.08em; text-transform:uppercase; cursor:pointer; color:var(--muted); white-space:nowrap; border-bottom: 2px solid transparent; transition: all .2s; background:none; border-left:none; border-right:none; border-top:none; }
+.tab:hover { color: var(--text); }
+.tab.active { color: var(--accent); border-bottom-color: var(--accent); }
+.nav-price { padding: 14px 24px; border-left: 1px solid var(--border); font-size:13px; }
+.nav-price .price { font-weight:700; color: var(--green); }
+.nav-price .change { font-size:11px; color: var(--green); }
+
+/* PAGES */
+.page { display:none; padding: 24px; max-width:1400px; margin:0 auto; }
+.page.active { display:block; }
+
+/* GRID UTILS */
+.grid2 { display:grid; grid-template-columns: 1fr 1fr; gap:16px; }
+.grid3 { display:grid; grid-template-columns: repeat(3,1fr); gap:16px; }
+.grid4 { display:grid; grid-template-columns: repeat(4,1fr); gap:16px; }
+
+/* CARD */
+.card { background: var(--surface); border: 1px solid var(--border); border-radius: 12px; padding: 20px; }
+.card-title { font-size:11px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--muted); margin-bottom:12px; }
+
+/* KPI CARD */
+.kpi { background: var(--surface); border: 1px solid var(--border); border-radius:12px; padding:20px; position:relative; overflow:hidden; }
+.kpi::before { content:''; position:absolute; top:0; left:0; right:0; height:2px; }
+.kpi.green::before { background: var(--green); }
+.kpi.red::before { background: var(--red); }
+.kpi.amber::before { background: var(--amber); }
+.kpi.blue::before { background: var(--blue); }
+.kpi-label { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); margin-bottom:8px; }
+.kpi-value { font-size:28px; font-weight:800; line-height:1; margin-bottom:6px; font-family:'Space Mono',monospace; }
+.kpi-sub { font-size:12px; color:var(--muted); }
+.kpi-badge { display:inline-block; padding:3px 8px; border-radius:4px; font-size:11px; font-weight:700; font-family:'Space Mono',monospace; }
+.badge-green { background: rgba(0,229,160,.15); color: var(--green); }
+.badge-red { background: rgba(255,77,109,.15); color: var(--red); }
+.badge-amber { background: rgba(240,180,41,.15); color: var(--amber); }
+.badge-blue { background: rgba(77,159,255,.15); color: var(--blue); }
+
+/* SECTION HEADER */
+.section-header { display:flex; align-items:center; gap:12px; margin-bottom:16px; }
+.section-title { font-size:18px; font-weight:800; }
+.section-line { flex:1; height:1px; background: var(--border); }
+
+/* SIGNAL METER */
+.signal-bar { height:8px; border-radius:4px; background: var(--surface2); position:relative; overflow:hidden; margin:6px 0; }
+.signal-fill { height:100%; border-radius:4px; transition: width .6s ease; }
+
+/* TABLE */
+table { width:100%; border-collapse:collapse; font-size:13px; }
+th { text-align:left; padding:10px 12px; font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; color:var(--muted); border-bottom:1px solid var(--border); }
+td { padding:10px 12px; border-bottom:1px solid rgba(255,255,255,.04); }
+tr:hover td { background: rgba(255,255,255,.02); }
+.dot { width:8px; height:8px; border-radius:50%; display:inline-block; margin-right:6px; }
+
+/* PATTERN CARD */
+.pattern-card { background: var(--surface); border: 1px solid var(--border); border-radius:12px; padding:20px; border-left:3px solid; }
+.pattern-card.bullish { border-left-color: var(--green); }
+.pattern-card.bearish { border-left-color: var(--red); }
+.pattern-card.neutral { border-left-color: var(--amber); }
+.pattern-name { font-size:15px; font-weight:800; margin-bottom:4px; }
+.pattern-type { font-size:11px; font-weight:700; letter-spacing:.08em; text-transform:uppercase; margin-bottom:10px; }
+.pattern-desc { font-size:13px; color:var(--muted); line-height:1.6; }
+.pattern-target { margin-top:10px; padding-top:10px; border-top:1px solid var(--border); font-size:12px; font-family:'Space Mono',monospace; }
+
+/* SCENARIO */
+.scenario { border-radius:12px; padding:20px; margin-bottom:12px; }
+.scenario.bull { background: rgba(0,229,160,.06); border:1px solid rgba(0,229,160,.2); }
+.scenario.base { background: rgba(77,159,255,.06); border:1px solid rgba(77,159,255,.2); }
+.scenario.bear { background: rgba(255,77,109,.06); border:1px solid rgba(255,77,109,.2); }
+.scenario-header { display:flex; align-items:center; justify-content:space-between; margin-bottom:12px; }
+.scenario-title { font-size:16px; font-weight:800; }
+.scenario-prob { font-family:'Space Mono',monospace; font-size:12px; padding:4px 10px; border-radius:4px; }
+.scenario-body { font-size:13px; color:var(--muted); line-height:1.7; }
+
+/* RADAR */
+.radar-wrap { display:flex; align-items:center; justify-content:center; }
+
+/* OSCILLATOR ROW */
+.osc-row { display:flex; align-items:center; gap:12px; padding:10px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.osc-name { width:130px; font-size:13px; font-weight:600; }
+.osc-value { width:80px; font-family:'Space Mono',monospace; font-size:12px; }
+.osc-bar-wrap { flex:1; height:6px; background:var(--surface2); border-radius:3px; position:relative; }
+.osc-fill { height:6px; border-radius:3px; }
+.osc-signal { width:80px; text-align:right; }
+
+/* MA TABLE */
+.ma-row { display:flex; gap:8px; align-items:center; padding:8px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:13px; }
+.ma-name { width:100px; color:var(--muted); font-size:12px; }
+.ma-val { font-family:'Space Mono',monospace; width:80px; }
+.ma-vs { flex:1; font-size:11px; color:var(--muted); }
+
+/* SR LEVELS */
+.sr-level { display:flex; align-items:center; gap:12px; padding:8px 12px; border-radius:6px; margin-bottom:6px; font-size:13px; }
+.sr-level.res { background: rgba(255,77,109,.08); border-left:3px solid var(--red); }
+.sr-level.sup { background: rgba(0,229,160,.08); border-left:3px solid var(--green); }
+.sr-level.cur { background: rgba(240,180,41,.08); border-left:3px solid var(--amber); }
+.sr-price { font-family:'Space Mono',monospace; font-weight:700; width:80px; }
+.sr-label { color:var(--muted); font-size:12px; }
+.sr-pct { margin-left:auto; font-family:'Space Mono',monospace; font-size:11px; }
+
+/* SCREENER FILTER */
+.filter-row { display:flex; gap:8px; margin-bottom:16px; }
+.filter-btn { padding:6px 16px; border-radius:20px; border:1px solid var(--border); background:none; color:var(--muted); font-family:'Syne',sans-serif; font-size:12px; font-weight:600; cursor:pointer; transition:all .2s; letter-spacing:.05em; }
+.filter-btn.active, .filter-btn:hover { border-color: var(--accent); color: var(--accent); background: rgba(0,229,160,.08); }
+
+/* CHART CONTAINER */
+.chart-wrap { position:relative; width:100%; }
+
+/* REPORT */
+.report-section { margin-bottom:28px; }
+.report-section h3 { font-size:13px; font-weight:700; letter-spacing:.1em; text-transform:uppercase; color:var(--accent); margin-bottom:10px; padding-bottom:6px; border-bottom:1px solid var(--border); }
+.report-section p { font-size:14px; color: rgba(240,237,232,.75); line-height:1.8; margin-bottom:10px; }
+.report-section ul { padding-left:20px; }
+.report-section li { font-size:14px; color: rgba(240,237,232,.75); line-height:1.8; margin-bottom:4px; }
+.highlight { color: var(--accent); font-weight:700; }
+.highlight-red { color: var(--red); font-weight:700; }
+.highlight-amber { color: var(--amber); font-weight:700; }
+
+/* DISCLAIMER */
+.disclaimer { margin-top:20px; padding:12px 16px; background: rgba(240,180,41,.06); border:1px solid rgba(240,180,41,.2); border-radius:8px; font-size:11px; color:var(--muted); line-height:1.6; }
+
+/* IND CARD (new tabs) */
+.ind-card-new { background:var(--surface); border:1px solid var(--border); border-radius:12px; padding:16px 18px; cursor:pointer; transition:border-color .15s; }
+.ind-card-new:hover { border-color:rgba(255,255,255,.2); }
+.ind-card-new.open .ind-detail-new { display:block; }
+.ind-detail-new { display:none; margin-top:12px; padding-top:12px; border-top:1px solid var(--border); font-size:12px; color:var(--muted); line-height:1.7; }
+.ind-top-new { display:flex; align-items:center; gap:12px; }
+.ind-icon-new { width:34px; height:34px; border-radius:8px; display:flex; align-items:center; justify-content:center; font-size:16px; flex-shrink:0; }
+.ind-body { flex:1; min-width:0; }
+.ind-name-new { font-size:13px; font-weight:700; margin-bottom:2px; }
+.ind-sub-new { font-size:11px; color:var(--muted); }
+.imp-dots { display:flex; gap:3px; }
+.imp-d { width:7px; height:7px; border-radius:50%; background:var(--border); }
+/* RISK */
+.risk-row { display:flex; align-items:center; gap:12px; padding:12px 0; border-bottom:1px solid rgba(255,255,255,.04); }
+.risk-label { width:160px; font-size:13px; }
+.risk-bar-wrap { flex:1; height:8px; background:var(--surface2); border-radius:4px; overflow:hidden; }
+.risk-fill { height:8px; border-radius:4px; }
+.risk-val { width:60px; text-align:right; font-family:'Space Mono',monospace; font-size:12px; }
+/* CALC */
+.calc-input { background:var(--surface2); border:1px solid var(--border); border-radius:8px; padding:10px 14px; font-family:'Space Mono',monospace; font-size:13px; color:var(--text); width:100%; margin-bottom:10px; }
+.calc-input:focus { outline:none; border-color:var(--accent); }
+.calc-btn { background:rgba(0,229,160,.1); border:1px solid rgba(0,229,160,.3); border-radius:8px; padding:10px 20px; color:var(--green); font-family:'Syne',sans-serif; font-weight:700; font-size:13px; cursor:pointer; width:100%; transition:all .2s; }
+.calc-btn:hover { background:rgba(0,229,160,.2); }
+.calc-result { margin-top:14px; padding:14px; background:var(--surface2); border-radius:8px; }
+.calc-result-row { display:flex; justify-content:space-between; padding:5px 0; border-bottom:1px solid rgba(255,255,255,.04); font-size:13px; }
+.calc-result-row:last-child { border:none; }
+/* NEWS FEED */
+.news-item { padding:14px 0; border-bottom:1px solid rgba(255,255,255,.04); display:flex; gap:14px; align-items:flex-start; }
+.news-dot { width:8px; height:8px; border-radius:50%; flex-shrink:0; margin-top:5px; }
+.news-date { font-size:11px; color:var(--muted); font-family:'Space Mono',monospace; white-space:nowrap; }
+.news-title { font-size:13px; font-weight:600; margin-bottom:3px; }
+.news-impact { font-size:11px; color:var(--muted); }
+
+/* DECISION TAB */
+.decision-btn { flex:1; padding:18px 12px; border-radius:14px; border:2px solid; font-family:'Syne',sans-serif; font-weight:800; font-size:16px; letter-spacing:.06em; cursor:pointer; transition:all .25s; text-transform:uppercase; position:relative; overflow:hidden; }
+.decision-btn::before { content:''; position:absolute; inset:0; opacity:0; transition:opacity .25s; }
+.decision-btn:hover::before { opacity:1; }
+.decision-btn.buy { border-color:var(--green); color:var(--green); background:rgba(0,229,160,.08); }
+.decision-btn.buy:hover, .decision-btn.buy.selected { background:rgba(0,229,160,.18); border-color:var(--green); box-shadow:0 0 24px rgba(0,229,160,.25); }
+.decision-btn.sell { border-color:var(--red); color:var(--red); background:rgba(255,77,109,.08); }
+.decision-btn.sell:hover, .decision-btn.sell.selected { background:rgba(255,77,109,.18); border-color:var(--red); box-shadow:0 0 24px rgba(255,77,109,.25); }
+.decision-btn.hold { border-color:var(--amber); color:var(--amber); background:rgba(240,180,41,.08); }
+.decision-btn.hold:hover, .decision-btn.hold.selected { background:rgba(240,180,41,.18); border-color:var(--amber); box-shadow:0 0 24px rgba(240,180,41,.25); }
+.verdict-box { border-radius:14px; padding:24px; border:1px solid; transition:all .3s; }
+.verdict-box.bull-v { background:rgba(0,229,160,.06); border-color:rgba(0,229,160,.25); }
+.verdict-box.bear-v { background:rgba(255,77,109,.06); border-color:rgba(255,77,109,.25); }
+.verdict-box.hold-v { background:rgba(240,180,41,.06); border-color:rgba(240,180,41,.25); }
+.chart-annotation { position:absolute; font-size:10px; font-family:'Space Mono',monospace; font-weight:700; padding:3px 7px; border-radius:4px; white-space:nowrap; }
+.signal-chip { display:inline-flex; align-items:center; gap:6px; padding:6px 12px; border-radius:20px; font-size:12px; font-weight:700; margin:3px; }
+.gauge-wrap { position:relative; width:180px; height:95px; margin:0 auto; }
+.score-ring { position:relative; display:flex; align-items:center; justify-content:center; width:120px; height:120px; margin:0 auto; }
+.score-ring svg { position:absolute; top:0; left:0; }
+.score-val { font-size:32px; font-weight:800; font-family:'Space Mono',monospace; }
+
+  .grid4 { grid-template-columns:1fr 1fr; }
+  .grid3 { grid-template-columns:1fr 1fr; }
+  .grid2 { grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <div class="nav-brand">RY<span>DE</span></div>
+  <div class="nav-tabs">
+    <button class="tab active" onclick="showPage('dashboard')">Dashboard</button>
+    <button class="tab" onclick="showPage('technical')">Analisi Tecnica</button>
+    <button class="tab" onclick="showPage('screener')">Screener</button>
+    <button class="tab" onclick="showPage('report')">Report</button>
+    <button class="tab" onclick="showPage('sentiment')">Volume & Sentiment</button>
+    <button class="tab" onclick="showPage('advanced')">Indicatori Avanzati</button>
+    <button class="tab" onclick="showPage('risk')">Risk Manager</button>
+    <button class="tab" onclick="showPage('decision')" style="color:var(--accent);border-bottom:2px solid transparent;">⚡ Chart & Decisione</button>
+  </div>
+  <div class="nav-price">
+    <div class="price mono">$1.2484</div>
+    <div class="change">+490%+ YTD · 25 apr 2026</div>
+  </div>
+</nav>
+
+<!-- ═══════════════════════════════════ DASHBOARD ═══════════════════════════════════ -->
+<div id="page-dashboard" class="page active">
+
+  <div class="grid4" style="margin-bottom:20px;">
+    <div class="kpi green">
+      <div class="kpi-label">Prezzo</div>
+      <div class="kpi-value" style="color:var(--green);">$1.2484</div>
+      <div class="kpi-sub"><span class="kpi-badge badge-green">+490%+ ultimi 12m</span></div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">Market Cap</div>
+      <div class="kpi-value" style="color:var(--amber);">$181M</div>
+      <div class="kpi-sub">Small-cap · NYSE American</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">52W Range</div>
+      <div class="kpi-value" style="font-size:18px; color:var(--blue); margin-top:4px;">$0.16–$1.49</div>
+      <div class="kpi-sub">Attuale: zona medio-alta</div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-label">Revenue TTM</div>
+      <div class="kpi-value" style="color:var(--amber);">$6.96M</div>
+      <div class="kpi-sub">EPS TTM: -$0.64 · Netto: -208%</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Prezzo RYDE — Apr 2025 → Apr 2026 (aggiornato)</div>
+      <div class="chart-wrap" style="height:260px;">
+        <canvas id="priceMainChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Revenue Trimestrale ($M)</div>
+      <div class="chart-wrap" style="height:260px;">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Performance relativa YTD (base 100)</div>
+      <div class="chart-wrap" style="height:220px;">
+        <canvas id="perfChart"></canvas>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+        <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#00e5a0;display:inline-block;"></span>RYDE +490%+ (12m)</span>
+        <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#4d9fff;display:inline-block;"></span>S&amp;P 500 -3.2% YTD</span>
+        <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#f0b429;display:inline-block;"></span>RBLX -18% YTD</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Mix Ricavi stimato</div>
+      <div style="display:flex;align-items:center;gap:20px;">
+        <div class="chart-wrap" style="height:200px;width:200px;flex-shrink:0;">
+          <canvas id="mixChart"></canvas>
+        </div>
+        <div style="flex:1;">
+          <div style="margin-bottom:12px;"><div style="font-size:13px;font-weight:700;">Mobility</div><div style="font-size:12px;color:var(--muted);">Ride-hailing + carpooling</div><div style="font-size:14px;color:var(--green);font-family:'Space Mono',monospace;font-weight:700;">~68%</div></div>
+          <div style="margin-bottom:12px;"><div style="font-size:13px;font-weight:700;">Quick Commerce</div><div style="font-size:12px;color:var(--muted);">Delivery & parcel</div><div style="font-size:14px;color:var(--blue);font-family:'Space Mono',monospace;font-weight:700;">~24%</div></div>
+          <div><div style="font-size:13px;font-weight:700;">RydePay / Subs</div><div style="font-size:12px;color:var(--muted);">RydePay & Ryde+</div><div style="font-size:14px;color:var(--amber);font-family:'Space Mono',monospace;font-weight:700;">~8%</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Segnale tecnico complessivo</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:20px;margin-top:4px;">
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Oscillatori (breve)</div>
+        <div style="font-size:20px;font-weight:800;color:var(--green);">BUY</div>
+        <div class="signal-bar"><div class="signal-fill" style="width:72%;background:var(--green);"></div></div>
+        <div style="font-size:11px;color:var(--muted);">Momentum forte post-rally</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Medie Mobili</div>
+        <div style="font-size:20px;font-weight:800;color:var(--green);">BUY</div>
+        <div class="signal-bar"><div class="signal-fill" style="width:80%;background:var(--green);"></div></div>
+        <div style="font-size:11px;color:var(--muted);">Prezzo sopra EMA 8/20/50</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Momentum 30 giorni</div>
+        <div style="font-size:20px;font-weight:800;color:var(--green);">STRONG BUY</div>
+        <div class="signal-bar"><div class="signal-fill" style="width:95%;background:var(--green);"></div></div>
+        <div style="font-size:11px;color:var(--muted);">+490%+ ultimi 12 mesi</div>
+      </div>
+      <div>
+        <div style="font-size:12px;color:var(--muted);margin-bottom:6px;">Segnale Globale</div>
+        <div style="font-size:20px;font-weight:800;color:var(--amber);">CAUTO</div>
+        <div class="signal-bar"><div class="signal-fill" style="width:55%;background:var(--amber);"></div></div>
+        <div style="font-size:11px;color:var(--muted);">Rally esteso — overbought risk</div>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════════════════════ TECNICA ═══════════════════════════════════ -->
+<div id="page-technical" class="page">
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Oscillatori</div>
+      <div class="osc-row">
+        <div class="osc-name">RSI (14)</div>
+        <div class="osc-value mono">68.2</div>
+        <div class="osc-bar-wrap"><div class="osc-fill" style="width:68%;background:var(--amber);"></div></div>
+        <div class="osc-signal"><span class="kpi-badge badge-amber">Ipercomprato</span></div>
+      </div>
+      <div class="osc-row">
+        <div class="osc-name">Stochastic</div>
+        <div class="osc-value mono">82.4</div>
+        <div class="osc-bar-wrap"><div class="osc-fill" style="width:82%;background:var(--red);"></div></div>
+        <div class="osc-signal"><span class="kpi-badge badge-red">Ipercomprato</span></div>
+      </div>
+      <div class="osc-row">
+        <div class="osc-name">StochRSI</div>
+        <div class="osc-value mono">91.3</div>
+        <div class="osc-bar-wrap"><div class="osc-fill" style="width:91%;background:var(--red);"></div></div>
+        <div class="osc-signal"><span class="kpi-badge badge-red">Ipercomprato</span></div>
+      </div>
+      <div class="osc-row">
+        <div class="osc-name">CCI (14)</div>
+        <div class="osc-value mono">+148</div>
+        <div class="osc-bar-wrap"><div class="osc-fill" style="width:80%;background:var(--amber);"></div></div>
+        <div class="osc-signal"><span class="kpi-badge badge-amber">Ipercomprato</span></div>
+      </div>
+      <div class="osc-row">
+        <div class="osc-name">MACD</div>
+        <div class="osc-value mono">+0.18</div>
+        <div class="osc-bar-wrap"><div class="osc-fill" style="width:75%;background:var(--green);"></div></div>
+        <div class="osc-signal"><span class="kpi-badge badge-green">Bullish</span></div>
+      </div>
+      <div class="osc-row">
+        <div class="osc-name">ATR (14)</div>
+        <div class="osc-value mono">0.142</div>
+        <div class="osc-bar-wrap"><div class="osc-fill" style="width:85%;background:var(--red);"></div></div>
+        <div class="osc-signal"><span class="kpi-badge badge-red">Vol. estrema</span></div>
+      </div>
+      <div class="osc-row">
+        <div class="osc-name">Williams %R</div>
+        <div class="osc-value mono">-12</div>
+        <div class="osc-bar-wrap"><div class="osc-fill" style="width:88%;background:var(--red);"></div></div>
+        <div class="osc-signal"><span class="kpi-badge badge-red">Ipercomprato</span></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Medie Mobili</div>
+      <div class="ma-row">
+        <div class="ma-name">SMA 8</div>
+        <div class="ma-val">$1.18</div>
+        <div style="flex:1;"><div class="signal-bar" style="height:4px;"><div class="signal-fill" style="width:100%;background:var(--green);"></div></div></div>
+        <span class="kpi-badge badge-green">BUY</span>
+      </div>
+      <div class="ma-row">
+        <div class="ma-name">EMA 8</div>
+        <div class="ma-val">$1.15</div>
+        <div style="flex:1;"><div class="signal-bar" style="height:4px;"><div class="signal-fill" style="width:100%;background:var(--green);"></div></div></div>
+        <span class="kpi-badge badge-green">BUY</span>
+      </div>
+      <div class="ma-row">
+        <div class="ma-name">SMA 20</div>
+        <div class="ma-val">$0.98</div>
+        <div style="flex:1;"><div class="signal-bar" style="height:4px;"><div class="signal-fill" style="width:100%;background:var(--green);"></div></div></div>
+        <span class="kpi-badge badge-green">BUY</span>
+      </div>
+      <div class="ma-row">
+        <div class="ma-name">EMA 20</div>
+        <div class="ma-val">$0.95</div>
+        <div style="flex:1;"><div class="signal-bar" style="height:4px;"><div class="signal-fill" style="width:100%;background:var(--green);"></div></div></div>
+        <span class="kpi-badge badge-green">BUY</span>
+      </div>
+      <div class="ma-row">
+        <div class="ma-name">SMA 50</div>
+        <div class="ma-val">$0.78</div>
+        <div style="flex:1;"><div class="signal-bar" style="height:4px;"><div class="signal-fill" style="width:100%;background:var(--green);"></div></div></div>
+        <span class="kpi-badge badge-green">BUY</span>
+      </div>
+      <div class="ma-row">
+        <div class="ma-name">EMA 50</div>
+        <div class="ma-val">$0.82</div>
+        <div style="flex:1;"><div class="signal-bar" style="height:4px;"><div class="signal-fill" style="width:100%;background:var(--green);"></div></div></div>
+        <span class="kpi-badge badge-green">BUY</span>
+      </div>
+
+      <div style="margin-top:16px;">
+        <div class="card-title">Supporti &amp; Resistenze</div>
+        <div class="sr-level res"><div class="sr-price">$1.80</div><div class="sr-label">Resistenza — Target Bull scenario</div><div class="sr-pct" style="color:var(--red);">+44%</div></div>
+        <div class="sr-level res"><div class="sr-price">$1.49</div><div class="sr-label">Resistenza — 52W High</div><div class="sr-pct" style="color:var(--red);">+19%</div></div>
+        <div class="sr-level cur"><div class="sr-price">$1.2484</div><div class="sr-label">◉ Prezzo attuale (24 apr 2026)</div><div class="sr-pct" style="color:var(--amber);">—</div></div>
+        <div class="sr-level sup"><div class="sr-price">$1.00</div><div class="sr-label">Supporto psicologico — area SMA 20</div><div class="sr-pct" style="color:var(--green);">-20%</div></div>
+        <div class="sr-level sup"><div class="sr-price">$0.80</div><div class="sr-label">Supporto — zona EMA 50</div><div class="sr-pct" style="color:var(--green);">-36%</div></div>
+        <div class="sr-level sup"><div class="sr-price">$0.627</div><div class="sr-label">Supporto storico — breakout marzo 2026</div><div class="sr-pct" style="color:var(--green);">-50%</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;">
+    <div class="card-title">Grafico con supporti/resistenze e medie mobili</div>
+    <div class="chart-wrap" style="height:300px;">
+      <canvas id="srChart"></canvas>
+    </div>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Pattern Riconosciuti</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="grid2">
+    <div class="pattern-card bullish">
+      <div class="pattern-name">Golden Cross Strutturale</div>
+      <div class="pattern-type" style="color:var(--green);">Bullish · Medio Periodo</div>
+      <div class="pattern-desc">Il prezzo ha attraversato e chiuso sopra tutte le medie mobili principali (SMA/EMA 8, 20, 50), configurando un Golden Cross multiplo. Il volume sostenuto durante il rally da $0.40 a $1.49 conferma la partecipazione acquirente. Il momentum a 12 mesi (+490%+) è il più forte della categoria small-cap mobility Asia.</div>
+      <div class="pattern-target"><span style="color:var(--green);">Supporto:</span> $1.00–1.10 · <span style="color:var(--amber);">Watch:</span> tenuta sopra EMA 20 nelle settimane</div>
+    </div>
+    <div class="pattern-card bearish">
+      <div class="pattern-name">Ipercomprato Estremo + Sell-the-News</div>
+      <div class="pattern-type" style="color:var(--red);">Bearish · Breve Periodo</div>
+      <div class="pattern-desc">RSI ~68, StochRSI >90, Williams %R -12: tutti gli oscillatori segnalano ipercomprato. Il pattern sell-the-news si è confermato sul catalyst Hong Kong (-13.5% nel giorno dell'annuncio), come già accaduto con GO-GENIE (-23%). Rischio fakeout elevato nella zona $1.30–1.49 (52W High).</div>
+      <div class="pattern-target"><span style="color:var(--red);">Resistenza:</span> $1.49 (52W High) · <span style="color:var(--muted);">Rottura con volume x3 per conferma</span></div>
+    </div>
+    <div class="pattern-card neutral">
+      <div class="pattern-name">Espansione Regionale — HK Catalyst</div>
+      <div class="pattern-type" style="color:var(--amber);">Strutturale Positivo · Lungo Periodo</div>
+      <div class="pattern-desc">L'annuncio del 14 apr 2026 segna una svolta categoriale: RYDE non è più solo una micro-cap Singapore-only. Il deposito refundable $14.5M per 50 licenze taxi + 50 EV a Hong Kong diversifica geograficamente il business. Execution risk elevato nel breve, ma narrativa trasformativa nel medio-lungo.</div>
+      <div class="pattern-target"><span style="color:var(--green);">Target medio:</span> $1.80 se HK genera revenue H2 2026 · <span style="color:var(--red);">Stop:</span> $0.90</div>
+    </div>
+    <div class="pattern-card bearish">
+      <div class="pattern-name">Shelf Registration F-3 — Rischio Diluzione</div>
+      <div class="pattern-type" style="color:var(--red);">Bearish Strutturale Latente</div>
+      <div class="pattern-desc">La società ha un'active F-3 shelf registration (scad. 2028), già usata almeno 2 volte per capital raise (37.25M azioni a $0.40). Con il prezzo attuale a $1.25, un ulteriore offering sarebbe diluitivo ma più vantaggioso rispetto al passato. Monitorare 424B5 prospectus supplements su EDGAR.</div>
+      <div class="pattern-target"><span style="color:var(--amber);">Attenzione:</span> 424B5 filing = segnale di potenziale offering imminente</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ SCREENER ═══════════════════════════════════ -->
+<div id="page-screener" class="page">
+
+  <div class="filter-row">
+    <button class="filter-btn active" onclick="filterScreener('all',this)">Tutti</button>
+    <button class="filter-btn" onclick="filterScreener('buy',this)">Buy</button>
+    <button class="filter-btn" onclick="filterScreener('hold',this)">Hold</button>
+    <button class="filter-btn" onclick="filterScreener('sell',this)">Sell</button>
+  </div>
+
+  <div class="card" style="margin-bottom:20px;overflow-x:auto;">
+    <table id="screenerTable">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Nome</th>
+          <th>Prezzo</th>
+          <th>YTD</th>
+          <th>Market Cap</th>
+          <th>P/S</th>
+          <th>P/E</th>
+          <th>Rev Growth</th>
+          <th>Rating</th>
+        </tr>
+      </thead>
+      <tbody id="screenerBody">
+      </tbody>
+    </table>
+  </div>
+
+  <div class="section-header">
+    <div class="section-title">Radar Fondamentale — RYDE vs Settore</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="grid2">
+    <div class="card">
+      <div class="card-title">Radar comparativo (normalizzato 0–10)</div>
+      <div class="chart-wrap" style="height:320px;">
+        <canvas id="radarChart"></canvas>
+      </div>
+      <div style="display:flex;gap:16px;margin-top:12px;flex-wrap:wrap;">
+        <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:2px;background:#00e5a0;display:inline-block;border-radius:1px;"></span>RYDE</span>
+        <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:2px;background:#4d9fff;display:inline-block;border-radius:1px;"></span>Settore Media</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Note comparativa</div>
+      <div style="space-y:12px;">
+        <div style="padding:12px;background:rgba(0,229,160,.06);border-radius:8px;margin-bottom:10px;border-left:2px solid var(--green);">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Punti di Forza RYDE (apr 2026)</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Modello 0% commissione unico nel segmento. Espansione Hong Kong (apr 2026) — primo mercato fuori Singapore. 50 licenze taxi + 50 EV, deposito refundable $14.5M. Licenza rinnovata 3 anni. Digital Asset Treasury Strategy.</div>
+        </div>
+        <div style="padding:12px;background:rgba(255,77,109,.06);border-radius:8px;margin-bottom:10px;border-left:2px solid var(--red);">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Criticità vs Peer</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">EPS TTM -$0.64, net margin -208%. Revenue TTM $6.96M con perdite crescenti. Market cap $181M senza profittabilità prevedibile. Sell-the-news pattern su ogni catalyst (HK -13.5%, GO-GENIE -23%).</div>
+        </div>
+        <div style="padding:12px;background:rgba(240,180,41,.06);border-radius:8px;border-left:2px solid var(--amber);">
+          <div style="font-size:13px;font-weight:700;margin-bottom:4px;">Fattori di Rischio Chiave</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Ipercomprato tecnico (RSI ~68, StochRSI >90). Short interest elevato. Rischio diluizione con shelf registration F-3 attiva. Esecuzione HK incerta. Concorrenza Grab/Gojek/HK taxi incumbents.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════ REPORT ═══════════════════════════════════ -->
+<div id="page-report" class="page">
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div>
+      <div class="report-section">
+        <h3>Profilo Societario</h3>
+        <p>Ryde Group Ltd (NYSE American: RYDE) è una piattaforma tecnologica singaporiana fondata nel 2014 che opera nel segmento mobility e quick commerce. Quotata su NYSE American, la società offre servizi di ride-hailing, carpooling e consegna pacchi a Singapore tramite un modello a <span class="highlight">commissione zero</span> per i driver-partner — elemento differenziante rispetto ai competitor regionali come Grab e Gojek.</p>
+        <p>Con un fatturato TTM di <span class="highlight">$6.96M</span>, EPS -$0.64 e net margin di <span class="highlight-red">-208%</span>, la società è ancora in fase pre-profittabilità. Tuttavia il market cap attuale di circa <span class="highlight">$181M</span> (apr 2026) la eleva dalla categoria micro-cap a <span class="highlight-amber">small-cap speculativa in forte espansione regionale</span>.</p>
+      </div>
+
+      <div class="report-section">
+        <h3>Catalyst Principali 2025–2026</h3>
+        <ul>
+          <li><span class="highlight">Dic 2024:</span> Rinnovo licenze ride-hail e carpooling per 3 anni (+24% in giornata)</li>
+          <li><span class="highlight">Dic 2025:</span> Capital raise da $14M tramite share offering (diluzione flottante)</li>
+          <li><span class="highlight">Dic 2025:</span> Espansione EV Rental con partnership strategiche</li>
+          <li><span class="highlight">Dic 2025:</span> Partnership Tencent Cloud / Weixin Mini Program + GO-GENIE last-mile</li>
+          <li><span class="highlight">Gen 2026:</span> Rebrand visivo "Human-Centred Mobility"</li>
+          <li><span class="highlight">Mar 2026:</span> Digital Asset Treasury Strategy (BTC/ETH/SOL)</li>
+          <li><span class="highlight">Apr 2026:</span> <strong style="color:var(--green);">Espansione Hong Kong</strong> — 50 licenze taxi + 50 EV, deposito refundable $14.5M · <em>NUOVO</em></li>
+          <li><span class="highlight-red">Costante:</span> Perdite crescenti, EPS H2 2025 miss del 51% vs stima</li>
+        </ul>
+      </div>
+
+      <div class="report-section">
+        <h3>Analisi Tecnica — Sintesi (aggiornata)</h3>
+        <p>Il pattern tecnico attuale è radicalmente cambiato rispetto all'analisi precedente. Con il prezzo a <span class="highlight">$1.2484</span> (+490%+ in 12 mesi), il titolo è ora in territorio di <span class="highlight-red">ipercomprato estremo</span> su tutti gli oscillatori principali: RSI ~68, StochRSI >90, Williams %R -12. Il MACD è positivo e il prezzo si trova al di sopra di tutte le medie mobili a breve (EMA 8/20/50).</p>
+        <p>La resistenza critica è ora il <span class="highlight">52W High a $1.49</span>, già testato nella fase pre-pullback post-Hong Kong. Il supporto immediato è la zona <span class="highlight-amber">$1.00–1.10</span> (ex-resistenza, ora floor psicologico). L'annuncio HK del 14 apr ha generato una reazione negativa iniziale (-13.5%), pattern già visto con GO-GENIE (-23%), suggerendo sell-the-news su ogni catalyst.</p>
+      </div>
+    </div>
+
+    <div>
+      <div class="scenario bull" style="margin-bottom:12px;">
+        <div class="scenario-header">
+          <div class="scenario-title" style="color:var(--green);">Scenario Bull</div>
+          <div class="scenario-prob badge-green kpi-badge">Prob. 25%</div>
+        </div>
+        <div class="scenario-body">
+          <strong style="color:var(--text);">Target: $1.80–2.50 (+44/+100%)</strong><br><br>
+          Rottura confermata del 52W High a $1.49 con volume sostenuto. L'espansione Hong Kong genera revenue concreti entro H2 2026, prime metriche positive sul mercato taxi/EV. Il crypto treasury strategy si rivaluta con BTC in rialzo. Riduzione delle perdite operative grazie all'ottimizzazione piattaforma. Partecipazione retail + momentum traders spingono verso i $2.
+        </div>
+      </div>
+
+      <div class="scenario base" style="margin-bottom:12px;">
+        <div class="scenario-header">
+          <div class="scenario-title" style="color:var(--blue);">Scenario Base</div>
+          <div class="scenario-prob badge-blue kpi-badge">Prob. 45%</div>
+        </div>
+        <div class="scenario-body">
+          <strong style="color:var(--text);">Target: $0.80–1.30 (range laterale)</strong><br><br>
+          Il rally si consolida tra $1.00–1.30, costruendo una base dopo l'esaurimento del momentum speculativo. Sell-the-news pattern continua su ogni annuncio (Hong Kong, crypto, EV). La società rimane in perdita ma il news flow mantiene interesse retail. Il titolo trade in un ampio range in attesa di risultati concreti dall'espansione HK (H2 2026).
+        </div>
+      </div>
+
+      <div class="scenario bear">
+        <div class="scenario-header">
+          <div class="scenario-title" style="color:var(--red);">Scenario Bear</div>
+          <div class="scenario-prob badge-red kpi-badge">Prob. 30%</div>
+        </div>
+        <div class="scenario-body">
+          <strong style="color:var(--text);">Target: $0.40–0.70 (-45/-68%)</strong><br><br>
+          Rottura del supporto $1.00 con chiusura settimanale convincente. L'espansione HK si rivela onerosa in termini di capitale (deposito $14.5M) senza revenue immediati. Nuova share offering per finanziare operazioni diluisce ulteriormente. Il crypto treasury perde valore con mercato bear. Perdite Q1 2026 peggiori delle stime. Retest della zona $0.60–0.70 (ex-breakout).
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <h3>Conclusione &amp; Considerazioni per l'Investitore (aggiornata apr 2026)</h3>
+    <p>RYDE ha completato una delle performance più spettacolari tra le micro-cap 2025–2026: da $0.16 a oltre $1.49 in poco più di un anno. Il titolo è ora classificabile come <span class="highlight-amber">small-cap speculativa</span> con market cap ~$181M — un cambio categoriale significativo rispetto all'analisi precedente. L'espansione a Hong Kong (apr 2026) rappresenta un catalyst strutturale nuovo: per la prima volta RYDE esce da Singapore, con un deposito refundable da $14.5M per 50 licenze taxi + 50 EV.</p>
+    <p>La dinamica di <span class="highlight-red">sell-the-news</span> si è confermata anche sul catalyst Hong Kong (-13.5% nel giorno dell'annuncio), come già accaduto con GO-GENIE (-23%). Chi detiene posizioni long deve monitorare attentamente il livello $1.00: una chiusura settimanale sotto questo floor psicologico aprirebbe uno scenario di ritracciamento profondo. I fondamentali rimangono negativi (EPS -$0.64 TTM, net margin -208%), ma il narrative è cambiato da "micro-cap di sopravvivenza" a "piattaforma regionale in espansione".</p>
+  </div>
+
+  <div class="disclaimer">
+    ⚠️ DISCLAIMER: Questo documento è prodotto esclusivamente a scopo informativo e non costituisce consulenza finanziaria, raccomandazione di investimento o sollecitazione all'acquisto/vendita di strumenti finanziari. L'investimento in titoli speculativi comporta rischi elevati inclusa la possibile perdita dell'intero capitale investito. Dati aggiornati al 25 aprile 2026. Catalyst HK: annuncio 14 aprile 2026 (Ryde 6-K, NYSE American).
+  </div>
+</div>
+
+<script>
+const _lazyCharts = {};
+function showPage(id) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('page-' + id).classList.add('active');
+  event.target.classList.add('active');
+  if (!_lazyCharts[id]) {
+    _lazyCharts[id] = true;
+    if (id === 'sentiment') initSentimentCharts();
+    if (id === 'risk') initRiskChart();
+    if (id === 'decision') initDecisionCharts();
+  }
+}
+
+// ── DECISION TAB ──────────────────────────────────────────────
+const _decisionData = {
+  buy: {
+    title: '▲ BUY — Rimbalzo da Demand Zone',
+    color: '#00e5a0',
+    boxClass: 'bull-v',
+    body: `
+      <strong style="color:#00e5a0;">Setup:</strong> entry $1.08–1.20 su rimbalzo confermato dalla demand zone (box azzurro chart).<br><br>
+      <strong style="color:#fff;">Condizioni necessarie:</strong><br>
+      ✅ Candela daily bullish (close > open) con corpo >60% della range<br>
+      ✅ Volume RVOL ≥ 1.8x rispetto alla media 20gg<br>
+      ✅ Chiusura sopra $1.15 in H4<br><br>
+      <strong style="color:#fff;">Livelli operativi:</strong><br>
+      <span style="color:#00e5a0;">Entry:</span> $1.08–1.20 &nbsp;|&nbsp; <span style="color:#ff4d6d;">Stop:</span> $1.00 chiusura daily &nbsp;|&nbsp; <span style="color:#00e5a0;">T1:</span> $1.49 &nbsp;|&nbsp; <span style="color:#00e5a0;">T2:</span> $1.80<br><br>
+      <span style="color:#f0b429;">⚠️ NON comprare sul catalyst announcement — il sell-the-news è pattern confermato. Aspetta il pullback post-news.</span>
+    `
+  },
+  hold: {
+    title: '◆ HOLD — Attendi la conferma',
+    color: '#f0b429',
+    boxClass: 'hold-v',
+    body: `
+      Il prezzo è dentro la demand zone $1.08–1.30. <strong style="color:#fff;">Non entrare né uscire adesso.</strong> Aspetta una di queste conferme:<br><br>
+      <span style="color:#00e5a0;">► BUY se:</span> rimbalzo da $1.08–1.15 con candela bullish + volume >2x media<br>
+      <span style="color:#ff4d6d;">► SELL/EXIT se:</span> chiusura H4 sotto $1.08 con volume in espansione<br><br>
+      <strong style="color:#fff;">Perché aspettare:</strong> MACD in contrazione, StochRSI ipercomprato, Williams %R in discesa. Il bias di fondo è rialzista (W1/MN) ma il 4H è ancora in distribuzione.<br><br>
+      <span style="color:#f0b429;">La struttura rialzista rimane intatta finché il prezzo è sopra EMA fan ($0.95+).</span>
+    `
+  },
+  sell: {
+    title: '▼ SELL / EXIT — Breakdown confermato',
+    color: '#ff4d6d',
+    boxClass: 'bear-v',
+    body: `
+      <strong style="color:#ff4d6d;">Trigger:</strong> chiusura daily (o H4) sotto il midpoint demand zone a $1.08, confermata da volume ≥ 1.5x media.<br><br>
+      <strong style="color:#fff;">Scenario:</strong> il pullback si trasforma in ritracciamento profondo verso il fascio EMA $0.95–1.00. In caso di rottura anche di $0.95, il next supporto è $0.80 (EMA 50).<br><br>
+      <strong style="color:#fff;">Exit parziale (per chi è già dentro):</strong><br>
+      ➜ Vendi 50% posizione se chiusura H4 < $1.08<br>
+      ➜ Vendi rimanente se chiusura daily < $0.95<br>
+      ➜ Mantieni una quota residua per eventuale rimbalzo EMA fan<br><br>
+      <span style="color:#f0b429;">⚠️ NON vendere su emozione intra-day. Agisci solo su chiusure di candela confermate, non su wick o spike momentanei.</span>
+    `
+  }
+};
+
+function selectDecision(choice) {
+  // Update buttons
+  ['buy','hold','sell'].forEach(c => {
+    const btn = document.getElementById('btn-' + c);
+    btn.classList.remove('selected');
+  });
+  document.getElementById('btn-' + choice).classList.add('selected');
+
+  // Update verdict panel
+  const d = _decisionData[choice];
+  const panel = document.getElementById('verdict-panel');
+  panel.className = 'verdict-box ' + d.boxClass;
+  document.getElementById('verdict-title').style.color = d.color;
+  document.getElementById('verdict-title').textContent = d.title;
+  document.getElementById('verdict-body').innerHTML = d.body;
+
+  // Update checklist
+  updateChecklist(choice);
+}
+
+function updateChecklist(choice) {
+  const items = {
+    buy: [
+      { icon:'✅', text:'Prezzo sopra tutte le EMA (8/20/50)', badge:'badge-green', label:'Bullish' },
+      { icon:'✅', text:'MACD positivo (momentum rialzista)', badge:'badge-green', label:'Bullish' },
+      { icon:'✅', text:'Candela bullish daily sopra $1.15', badge:'badge-green', label:'Confermato' },
+      { icon:'✅', text:'Volume RVOL ≥ 1.8x — partecipazione compratori', badge:'badge-green', label:'Confermato' },
+      { icon:'⚠️', text:'RSI ~68 — zona ipercomprato in avvicinamento', badge:'badge-amber', label:'Cautela' },
+      { icon:'⚠️', text:'StochRSI >90 — ipercomprato estremo', badge:'badge-amber', label:'Cautela' },
+      { icon:'✅', text:'Struttura trend rialzista (HH + HL)', badge:'badge-green', label:'Bullish' },
+    ],
+    hold: [
+      { icon:'✅', text:'Prezzo sopra tutte le EMA (8/20/50)', badge:'badge-green', label:'Bullish' },
+      { icon:'✅', text:'MACD positivo (momentum rialzista)', badge:'badge-green', label:'Bullish' },
+      { icon:'⚠️', text:'RSI ~68 — zona ipercomprato in avvicinamento', badge:'badge-amber', label:'Neutro' },
+      { icon:'⚠️', text:'StochRSI >90 — ipercomprato estremo', badge:'badge-amber', label:'Cautela' },
+      { icon:'❌', text:'Volume conferma rimbalzo da demand zone', badge:'badge-red', label:'Da confermare' },
+      { icon:'❌', text:'Candela bullish daily sopra $1.25', badge:'badge-red', label:'Da confermare' },
+      { icon:'✅', text:'Struttura trend rialzista (HH + HL)', badge:'badge-green', label:'Bullish' },
+    ],
+    sell: [
+      { icon:'❌', text:'Chiusura H4 sotto midpoint demand zone $1.08', badge:'badge-red', label:'Breakdown' },
+      { icon:'❌', text:'Volume espansione bearish ≥ 1.5x media', badge:'badge-red', label:'Pressione' },
+      { icon:'⚠️', text:'MACD in contrazione — convergenza bearish', badge:'badge-amber', label:'Attenzione' },
+      { icon:'❌', text:'Williams %R già uscito da ipercomprato', badge:'badge-red', label:'Bearish breve' },
+      { icon:'⚠️', text:'RSI scende da 68 — momentum in calo', badge:'badge-amber', label:'Cautela' },
+      { icon:'✅', text:'Struttura W1/MN ancora rialzista', badge:'badge-green', label:'Supporto fondo' },
+      { icon:'⚠️', text:'Sell-the-news confermato su ogni catalyst', badge:'badge-amber', label:'Pattern attivo' },
+    ]
+  };
+  const list = document.getElementById('checklist-panel');
+  list.innerHTML = items[choice].map((it, i) => `
+    <div style="display:flex;align-items:center;gap:10px;padding:8px 0;${i < items[choice].length-1 ? 'border-bottom:1px solid rgba(255,255,255,.04);':''}">
+      <span style="font-size:16px;">${it.icon}</span>
+      <div style="flex:1;font-size:12px;">${it.text}</div>
+      <span class="kpi-badge ${it.badge}">${it.label}</span>
+    </div>
+  `).join('');
+}
+
+function initDecisionCharts() {
+  // Nessun canvas chart nella tab decision — SVG inline già presente
+  // Imposta HOLD come default selezionato visivamente
+  document.getElementById('btn-hold').classList.add('selected');
+}
+function initSentimentCharts() {
+  new Chart(document.getElementById('volChart'), {
+    type:'bar',
+    data:{
+      labels:['7/4','8/4','9/4','10/4','11/4','14/4','15/4','16/4','oggi'],
+      datasets:[
+        { label:'Volume ($K)', data:[980,1100,1250,2800,3200,6500,4100,2900,2100], backgroundColor:[
+          'rgba(77,159,255,0.5)','rgba(77,159,255,0.5)','rgba(77,159,255,0.5)',
+          'rgba(0,229,160,0.6)','rgba(0,229,160,0.7)','rgba(0,229,160,0.9)',
+          'rgba(255,77,109,0.7)','rgba(77,159,255,0.5)','rgba(77,159,255,0.5)'
+        ], borderRadius:3 },
+        { label:'Media 20gg', data:[1800,1800,1800,1800,1800,1800,1800,1800,1800], type:'line', borderColor:'rgba(255,77,109,0.5)', borderDash:[4,3], borderWidth:1.5, pointRadius:0, fill:false }
+      ]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b6b7a',font:{size:10}}},
+               y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b6b7a',font:{size:10},callback:v=>v+'K'}} } }
+  });
+  new Chart(document.getElementById('obvChart'), {
+    type:'line',
+    data:{
+      labels:['Nov\'25','Dic','Gen\'26','Feb','Mar','Apr'],
+      datasets:[
+        { label:'Prezzo (norm.)', data:[59,100,51,35,53,200], borderColor:'#00e5a0', borderWidth:2, fill:false, tension:0.3, pointRadius:3 },
+        { label:'OBV (norm.)', data:[65,90,72,68,60,75], borderColor:'#ff4d6d', borderDash:[4,3], borderWidth:1.5, fill:false, tension:0.3, pointRadius:3 }
+      ]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b6b7a',font:{size:10}}},
+               y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b6b7a',font:{size:10}}} } }
+  });
+}
+function initRiskChart() {
+  new Chart(document.getElementById('pnlChart'), {
+    type:'bar',
+    data:{
+      labels:['Entry $1.25','Stop $1.00 (-20%)','Base $1.10 (-12%)','Target $1.50 (+20%)','Bull $1.80 (+44%)'],
+      datasets:[
+        { label:'Bull', data:[0,null,null,null,44], backgroundColor:'rgba(0,229,160,0.8)', borderRadius:4 },
+        { label:'Base', data:[0,null,-12,null,null], backgroundColor:'rgba(77,159,255,0.8)', borderRadius:4 },
+        { label:'Bear', data:[0,-20,null,null,null], backgroundColor:'rgba(255,77,109,0.8)', borderRadius:4 }
+      ]
+    },
+    options:{ responsive:true, maintainAspectRatio:false, plugins:{legend:{display:false}},
+      scales:{ x:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b6b7a',font:{size:10},maxRotation:30}},
+               y:{grid:{color:'rgba(255,255,255,0.04)'},ticks:{color:'#6b6b7a',font:{size:10},callback:v=>v+'%'}} } }
+  });
+}
+
+// PRICE MAIN CHART
+const priceLabels = ['Apr\'25','Mag','Giu','Lug','Ago','Set','Ott','Nov','Dic','Gen\'26','Feb','Mar','Apr'];
+const priceData =   [0.55, 0.48, 0.22, 0.19, 0.18, 0.16, 0.38, 0.52, 0.88, 0.45, 0.31, 0.47, 1.25];
+const ema20Data =   [0.62, 0.55, 0.45, 0.35, 0.28, 0.22, 0.26, 0.35, 0.52, 0.60, 0.55, 0.50, 0.95];
+
+new Chart(document.getElementById('priceMainChart'), {
+  type:'line',
+  data:{
+    labels: priceLabels,
+    datasets:[
+      { label:'RYDE', data: priceData, borderColor:'#00e5a0', backgroundColor:'rgba(0,229,160,0.06)', fill:true, tension:0.3, pointRadius:3, pointBackgroundColor:'#00e5a0', borderWidth:2 },
+      { label:'EMA 20', data: ema20Data, borderColor:'#ff4d6d', borderDash:[4,3], borderWidth:1.5, pointRadius:0, fill:false, tension:0.3 }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{mode:'index',intersect:false} },
+    scales:{
+      x:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#6b6b7a',font:{size:10}} },
+      y:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#6b6b7a',font:{size:10}, callback:v=>'$'+v.toFixed(2)}, min:0.10, max:1.60 }
+    }
+  }
+});
+
+// REVENUE CHART
+new Chart(document.getElementById('revenueChart'), {
+  type:'bar',
+  data:{
+    labels:['Q1 2024','Q2 2024','Q3 2024','Q4 2024','Q1 2025','Q2 2025','Q3 2025','Q4 2025'],
+    datasets:[
+      { label:'Revenue', data:[2.1,2.2,2.2,2.45,1.9,2.0,2.0,2.1], backgroundColor:'rgba(77,159,255,0.7)', borderRadius:4 },
+      { label:'Perdita netta', data:[-3.8,-4.2,-5.1,-5.55,-4.5,-4.7,-5.0,-5.2], backgroundColor:'rgba(255,77,109,0.7)', borderRadius:4 }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false}, tooltip:{mode:'index',intersect:false} },
+    scales:{
+      x:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6b6b7a',font:{size:10}, maxRotation:45} },
+      y:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6b6b7a',font:{size:10}, callback:v=>v+'M'} }
+    }
+  }
+});
+
+// PERF CHART
+new Chart(document.getElementById('perfChart'), {
+  type:'line',
+  data:{
+    labels:['Gen','Feb','Mar','Apr'],
+    datasets:[
+      { label:'RYDE', data:[100,56,85,227], borderColor:'#00e5a0', borderWidth:2, fill:false, tension:0.3, pointRadius:3 },
+      { label:'S&P 500', data:[100,99,98,96.8], borderColor:'#4d9fff', borderWidth:2, fill:false, tension:0.3, pointRadius:3, borderDash:[4,3] },
+      { label:'RBLX', data:[100,95,88,82], borderColor:'#f0b429', borderWidth:2, fill:false, tension:0.3, pointRadius:3, borderDash:[2,4] }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{
+      x:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6b6b7a',font:{size:10}} },
+      y:{ grid:{color:'rgba(255,255,255,0.04)'}, ticks:{color:'#6b6b7a',font:{size:10}, callback:v=>v} }
+    }
+  }
+});
+
+// MIX CHART
+new Chart(document.getElementById('mixChart'), {
+  type:'doughnut',
+  data:{
+    labels:['Mobility','Quick Commerce','RydePay/Subs'],
+    datasets:[{ data:[68,24,8], backgroundColor:['#00e5a0','#4d9fff','#f0b429'], borderWidth:0, hoverOffset:4 }]
+  },
+  options:{ responsive:true, maintainAspectRatio:false, plugins:{ legend:{display:false} }, cutout:'65%' }
+});
+
+// SR CHART
+const srCtx = document.getElementById('srChart');
+new Chart(srCtx, {
+  type:'line',
+  data:{
+    labels:['Nov\'25','Dic','Gen\'26','Feb','Mar','Apr'],
+    datasets:[
+      { label:'Prezzo', data:[0.52,0.88,0.45,0.31,0.47,1.25], borderColor:'#00e5a0', backgroundColor:'rgba(0,229,160,0.05)', fill:true, tension:0.3, pointRadius:4, borderWidth:2.5 },
+      { label:'SMA 50', data:[0.80,0.72,0.68,0.64,0.60,0.78], borderColor:'#ff4d6d', borderDash:[5,3], borderWidth:1.5, pointRadius:0, fill:false },
+      { label:'EMA 20', data:[0.60,0.62,0.58,0.52,0.49,0.95], borderColor:'#f0b429', borderDash:[3,3], borderWidth:1.5, pointRadius:0, fill:false }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{
+      legend:{display:false},
+      annotation:{}
+    },
+    scales:{
+      x:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#6b6b7a',font:{size:10}} },
+      y:{ grid:{color:'rgba(255,255,255,0.05)'}, ticks:{color:'#6b6b7a',font:{size:10},callback:v=>'$'+v.toFixed(2)}, min:0.10, max:1.60 }
+    }
+  }
+});
+
+// SCREENER DATA
+const screenerData = [
+  { ticker:'RYDE', name:'Ryde Group', price:'$1.2484', ytd:'+127%', ytdv:127, cap:'$181M', ps:'26x', pe:'N/A', rev:'+3.3%', rating:'hold', color:'#f0b429' },
+  { ticker:'GRAB', name:'Grab Holdings', price:'$4.12', ytd:'+12%', ytdv:12, cap:'$8.2B', ps:'4.8x', pe:'N/A', rev:'+17%', rating:'buy', color:'#00e5a0' },
+  { ticker:'UBER', name:'Uber Technologies', price:'$71.3', ytd:'-8%', ytdv:-8, cap:'$149B', ps:'3.2x', pe:'18x', rev:'+15%', rating:'buy', color:'#00e5a0' },
+  { ticker:'LYFT', name:'Lyft Inc.', price:'$10.8', ytd:'-22%', ytdv:-22, cap:'$4.1B', ps:'0.9x', pe:'N/A', rev:'+7%', rating:'hold', color:'#f0b429' },
+  { ticker:'DIDI', name:'DiDi Global', price:'$3.9', ytd:'+5%', ytdv:5, cap:'$19B', ps:'1.1x', pe:'N/A', rev:'+8%', rating:'hold', color:'#f0b429' },
+  { ticker:'MELI', name:'MercadoLibre', price:'$2100', ytd:'+18%', ytdv:18, cap:'$107B', ps:'8.2x', pe:'52x', rev:'+37%', rating:'buy', color:'#00e5a0' },
+  { ticker:'AMZN', name:'Amazon (logistics)', price:'$185', ytd:'-15%', ytdv:-15, cap:'$1.96T', ps:'3.5x', pe:'38x', rev:'+11%', rating:'buy', color:'#00e5a0' },
+  { ticker:'SE', name:'Sea Limited', price:'$98', ytd:'+22%', ytdv:22, cap:'$56B', ps:'4.5x', pe:'N/A', rev:'+23%', rating:'buy', color:'#00e5a0' }
+];
+
+function renderScreener(filter) {
+  const tbody = document.getElementById('screenerBody');
+  const filtered = filter === 'all' ? screenerData : screenerData.filter(d => d.rating === filter);
+  tbody.innerHTML = filtered.map(d => `
+    <tr>
+      <td><strong class="mono" style="color:${d.color}">${d.ticker}</strong></td>
+      <td style="color:#6b6b7a">${d.name}</td>
+      <td class="mono">${d.price}</td>
+      <td class="mono" style="color:${d.ytdv>=0?'#00e5a0':'#ff4d6d'}">${d.ytd}</td>
+      <td style="color:#6b6b7a">${d.cap}</td>
+      <td class="mono">${d.ps}</td>
+      <td class="mono">${d.pe}</td>
+      <td class="mono" style="color:${parseFloat(d.rev)>10?'#00e5a0':'#6b6b7a'}">${d.rev}</td>
+      <td><span class="kpi-badge ${d.rating==='buy'?'badge-green':d.rating==='sell'?'badge-red':'badge-amber'}">${d.rating.toUpperCase()}</span></td>
+    </tr>
+  `).join('');
+}
+renderScreener('all');
+
+function filterScreener(filter, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  renderScreener(filter);
+}
+
+// RISK CALCULATOR
+function calcRisk() {
+  const cap = parseFloat(document.getElementById('capital').value) || 10000;
+  const riskPct = parseFloat(document.getElementById('risk_pct').value) || 2;
+  const entry = parseFloat(document.getElementById('entry_price').value) || 0.627;
+  const stop = parseFloat(document.getElementById('stop_price').value) || 0.40;
+  const target = parseFloat(document.getElementById('target_price').value) || 0.80;
+  const maxDollar = cap * riskPct / 100;
+  const stopDist = entry - stop;
+  if (stopDist <= 0) return;
+  const shares = Math.floor(maxDollar / stopDist);
+  const posVal = shares * entry;
+  const pctPort = (posVal / cap * 100);
+  const stopLoss = shares * stopDist;
+  const profit = shares * (target - entry);
+  const rr = ((target - entry) / stopDist);
+  document.getElementById('r_max_dollar').textContent = '-$' + maxDollar.toFixed(2);
+  document.getElementById('r_shares').textContent = shares.toLocaleString() + ' azioni';
+  document.getElementById('r_position').textContent = '$' + posVal.toFixed(2);
+  document.getElementById('r_pct_port').textContent = pctPort.toFixed(1) + '%';
+  document.getElementById('r_stop').textContent = '-$' + stopLoss.toFixed(2);
+  document.getElementById('r_profit').textContent = '+$' + profit.toFixed(2);
+  document.getElementById('r_rr').textContent = '1 : ' + rr.toFixed(2);
+  document.getElementById('r_rr').style.color = rr >= 2 ? '#00e5a0' : rr >= 1 ? '#f0b429' : '#ff4d6d';
+  document.getElementById('calc-result').style.display = 'block';
+}
+new Chart(document.getElementById('radarChart'), {
+  type:'radar',
+  data:{
+    labels:['Revenue Growth','Margini','Liquidità','Market Pos.','Tecnico','Valutazione','Pipeline'],
+    datasets:[
+      { label:'RYDE', data:[2,1,3,5,4,6,5], borderColor:'#00e5a0', backgroundColor:'rgba(0,229,160,0.1)', pointBackgroundColor:'#00e5a0', borderWidth:2, pointRadius:4 },
+      { label:'Settore Media', data:[6,5,6,7,5,5,6], borderColor:'#4d9fff', backgroundColor:'rgba(77,159,255,0.08)', pointBackgroundColor:'#4d9fff', borderWidth:2, pointRadius:4, borderDash:[4,3] }
+    ]
+  },
+  options:{
+    responsive:true, maintainAspectRatio:false,
+    plugins:{ legend:{display:false} },
+    scales:{
+      r:{
+        min:0, max:10,
+        grid:{color:'rgba(255,255,255,0.08)'},
+        angleLines:{color:'rgba(255,255,255,0.08)'},
+        pointLabels:{color:'#6b6b7a',font:{size:11}},
+        ticks:{display:false}
+      }
+    }
+  }
+});
+
+</script>
+<!-- ═══════════════════ VOLUME & SENTIMENT ═══════════════════ -->
+<div id="page-sentiment" class="page">
+
+  <div class="grid4" style="margin-bottom:20px;">
+    <div class="kpi green">
+      <div class="kpi-label">RVOL oggi</div>
+      <div class="kpi-value" style="color:var(--green);">3.2x</div>
+      <div class="kpi-sub"><span class="kpi-badge badge-green">Anomalo</span></div>
+    </div>
+    <div class="kpi red">
+      <div class="kpi-label">Short Interest</div>
+      <div class="kpi-value" style="color:var(--red);">~25%</div>
+      <div class="kpi-sub">del flottante · squeeze risk</div>
+    </div>
+    <div class="kpi amber">
+      <div class="kpi-label">Fear & Greed</div>
+      <div class="kpi-value" style="color:var(--amber);">39</div>
+      <div class="kpi-sub">Fear · mercato risk-off</div>
+    </div>
+    <div class="kpi blue">
+      <div class="kpi-label">Social Buzz</div>
+      <div class="kpi-value" style="color:var(--blue);">↑ Alto</div>
+      <div class="kpi-sub">$RYDE trending su X</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Volume giornaliero — ultimi 10 giorni ($K)</div>
+      <div class="chart-wrap" style="height:220px;"><canvas id="volChart"></canvas></div>
+      <div style="display:flex;gap:16px;margin-top:10px;">
+        <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#00e5a0;display:inline-block;"></span>Volume</span>
+        <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:rgba(255,77,109,0.5);display:inline-block;"></span>Media 20gg</span>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">OBV (On Balance Volume) — trend</div>
+      <div class="chart-wrap" style="height:220px;"><canvas id="obvChart"></canvas></div>
+      <div style="margin-top:10px;padding:8px 12px;background:rgba(240,180,41,.08);border-radius:6px;border-left:2px solid var(--amber);font-size:12px;color:var(--muted);">OBV parzialmente conferma il rally ma diverge: prezzo +100% vs OBV +15% → distribuzione selettiva ancora in atto</div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Indicatori di Sentiment</div>
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:13px;">Fear & Greed Index</span>
+          <span class="kpi-badge badge-amber">39 — Fear</span>
+        </div>
+        <div class="signal-bar"><div class="signal-fill" style="width:39%;background:var(--amber);"></div></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:13px;">Sentiment retail $RYDE (X/StockTwits)</span>
+          <span class="kpi-badge badge-green">78% bullish</span>
+        </div>
+        <div class="signal-bar"><div class="signal-fill" style="width:78%;background:var(--green);"></div></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:13px;">Short Interest % flottante</span>
+          <span class="kpi-badge badge-red">~25% — alto</span>
+        </div>
+        <div class="signal-bar"><div class="signal-fill" style="width:25%;background:var(--red);"></div></div>
+      </div>
+      <div style="margin-bottom:14px;">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:13px;">Probabilità short squeeze</span>
+          <span class="kpi-badge badge-amber">Moderata-Alta</span>
+        </div>
+        <div class="signal-bar"><div class="signal-fill" style="width:55%;background:var(--amber);"></div></div>
+      </div>
+      <div>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+          <span style="font-size:13px;">Momentum istituzionale</span>
+          <span class="kpi-badge badge-amber">Emergente</span>
+        </div>
+        <div class="signal-bar"><div class="signal-fill" style="width:20%;background:var(--amber);"></div></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">News Catalyst Timeline (aggiornata)</div>
+      <div class="news-item">
+        <div class="news-dot" style="background:var(--green);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;"><div class="news-title">🆕 Espansione Hong Kong — 50 licenze taxi + 50 EV</div><div class="news-date">14 apr 26</div></div>
+          <div class="news-impact">Impatto: <span style="color:var(--red);">-13.5% sell-the-news</span> · Strutturale positivo medio termine</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-dot" style="background:var(--red);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;"><div class="news-title">Digital Asset Treasury (BTC/ETH/SOL)</div><div class="news-date">18 mar 26</div></div>
+          <div class="news-impact">Impatto: <span style="color:var(--green);">+35% in 3 giorni</span> · Speculativo</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-dot" style="background:var(--amber);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;"><div class="news-title">MOU con NPHVA — Platform Workers Act</div><div class="news-date">10 feb 26</div></div>
+          <div class="news-impact">Impatto: <span style="color:var(--muted);">neutro</span> · Operativo</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-dot" style="background:var(--blue);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;"><div class="news-title">Rebranding app + nuova UX</div><div class="news-date">13 gen 26</div></div>
+          <div class="news-impact">Impatto: <span style="color:var(--muted);">neutro</span> · Branding</div>
+        </div>
+      </div>
+      <div class="news-item">
+        <div class="news-dot" style="background:var(--amber);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;"><div class="news-title">Partnership GO-GENIE last-mile delivery</div><div class="news-date">16 dic 25</div></div>
+          <div class="news-impact">Impatto: <span style="color:var(--red);">-23% sell-the-news</span> · Operativo</div>
+        </div>
+      </div>
+      <div class="news-item" style="border:none;">
+        <div class="news-dot" style="background:var(--red);"></div>
+        <div style="flex:1;">
+          <div style="display:flex;justify-content:space-between;"><div class="news-title">Capital raise $14M + EV rental expansion</div><div class="news-date">3–10 dic 25</div></div>
+          <div class="news-impact">Impatto: <span style="color:var(--red);">-15% diluzione</span> · Strutturale</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Stack indicatori consigliato — day trading RYDE</div>
+    <div class="grid3" style="margin-top:8px;">
+      <div style="padding:14px;background:rgba(0,229,160,.06);border-radius:8px;border-left:3px solid var(--green);">
+        <div style="font-size:12px;font-weight:700;color:var(--green);margin-bottom:6px;">LIVELLO 1 — Obbligatorio</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">VWAP intraday · RVOL > 2x · Bollinger Bands · Short Interest (Fintel) · Alert SEC EDGAR 8-K</div>
+      </div>
+      <div style="padding:14px;background:rgba(77,159,255,.06);border-radius:8px;border-left:3px solid var(--blue);">
+        <div style="font-size:12px;font-weight:700;color:var(--blue);margin-bottom:6px;">LIVELLO 2 — Raccomandato</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">OBV · MFI · Candlestick patterns 15min · Fibonacci retracement · Fear & Greed Index</div>
+      </div>
+      <div style="padding:14px;background:rgba(240,180,41,.06);border-radius:8px;border-left:3px solid var(--amber);">
+        <div style="font-size:12px;font-weight:700;color:var(--amber);margin-bottom:6px;">LIVELLO 3 — Contesto</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">Social sentiment X/StockTwits · Ichimoku Cloud · DXY / tassi FED · Earnings date watch</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ INDICATORI AVANZATI ═══════════════════ -->
+<div id="page-advanced" class="page">
+
+  <div class="section-header" style="margin-bottom:16px;">
+    <div class="section-title">Volume & Volatilità</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(0,229,160,.15);">📊</div>
+        <div class="ind-body">
+          <div class="ind-name-new">VWAP — Volume Weighted Avg Price</div>
+          <div class="ind-sub-new">Riferimento istituzionale intraday</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div></div>
+          <span class="kpi-badge badge-green">Essenziale</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">Prezzo medio ponderato per il volume dall'apertura del mercato. Sopra VWAP = bias long; sotto = bias short. Su RYDE (volume ~$656K/gg) il VWAP si muove velocemente e funge da calamita per il prezzo. Un breakout + chiusura sopra VWAP + RVOL 2x è il setup long più affidabile in assoluto.<br><br><span style="color:var(--green);">Setup:</span> entry su pullback al VWAP con volume decrescente → rimbalzo atteso</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(0,229,160,.15);">🔥</div>
+        <div class="ind-body">
+          <div class="ind-name-new">Bollinger Bands (20,2)</div>
+          <div class="ind-sub-new">Volatilità + ipercomprato/ipervenduto</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div></div>
+          <span class="kpi-badge badge-green">Essenziale</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">Le bande si allargano durante alta volatilità (post-news su RYDE) e si restringono prima di movimenti esplosivi (Squeeze). Il Bollinger Squeeze — bande molto strette — ha anticipato tutti i movimenti +15% nelle ultime sessioni. Tocco banda inferiore + RSI ipervenduto = rimbalzo ad alta probabilità.<br><br><span style="color:var(--green);">Stato attuale RYDE:</span> bande allargate post-spike → fase di distribuzione probabile</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(0,229,160,.12);">⚡</div>
+        <div class="ind-body">
+          <div class="ind-name-new">OBV — On Balance Volume</div>
+          <div class="ind-sub-new">Conferma istituzionale del volume</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-green">Alta</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">Accumula volume nelle giornate rialziste, lo sottrae in quelle ribassiste. Divergenza OBV vs prezzo = segnale predittivo potente. Prezzo sale + OBV scende = distribuzione (rally falso). Attualmente su RYDE l'OBV non conferma lo spike → attenzione.<br><br><span style="color:var(--red);">Segnale attuale:</span> divergenza ribassista OBV — il rally ha bassa partecipazione reale</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(0,229,160,.12);">📈</div>
+        <div class="ind-body">
+          <div class="ind-name-new">RVOL — Relative Volume</div>
+          <div class="ind-sub-new">Volume attuale vs media storica</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d" style="background:var(--green)"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-green">Alta</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">RVOL = volume attuale / volume medio stesso orario storico. > 2x = interesse anomalo. > 5x nelle prime ore = sessione potenzialmente esplosiva. Su RYDE con float piccolo anche RVOL 3x può generare movimenti del 10–20% intraday.<br><br><span style="color:var(--green);">Regola:</span> non entrare su RYDE se RVOL < 1.5x — rischio trappola di liquidità</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-bottom:16px;">
+    <div class="section-title">Momentum & Pattern</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(77,159,255,.15);">🕯️</div>
+        <div class="ind-body">
+          <div class="ind-name-new">Candlestick Patterns</div>
+          <div class="ind-sub-new">Hammer, Engulfing, Doji, Pin Bar</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-blue">Alta</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">Fondamentali per il day trading. Hammer a $0.40 = rifiuto del supporto → buyers attivi. Shooting Star vicino $0.70 = esaurimento rally. Doji su resistenza = indecisione → probabile inversione. Engulfing ribassista dopo spike = distribuzione in corso. Da usare su timeframe 15min e 1h.<br><br><span style="color:var(--blue);">Su RYDE:</span> Pin Bar su $0.40 ha anticipato ogni rimbalzo degli ultimi 3 mesi</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(77,159,255,.15);">🌊</div>
+        <div class="ind-body">
+          <div class="ind-name-new">Fibonacci Retracement</div>
+          <div class="ind-sub-new">Livelli chiave 23.6% → 78.6%</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-blue">Media</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">Dal massimo $0.89 al minimo $0.16: livelli critici a 23.6% ($0.33), 38.2% ($0.44), 50% ($0.525), 61.8% ($0.61), 78.6% ($0.73). Il prezzo attuale $0.627 è esattamente sopra il 61.8% — zona di forte resistenza/supporto Fibonacci.<br><br><span style="color:var(--blue);">Target:</span> 61.8% → $0.61 resistenza immediata · 78.6% → $0.73 prossimo obiettivo</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(77,159,255,.12);">〰️</div>
+        <div class="ind-body">
+          <div class="ind-name-new">Ichimoku Cloud</div>
+          <div class="ind-sub-new">Supporto, resistenza e trend unificati</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-blue">Media</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">La "nuvola" (Kumo) visualizza zone di supporto/resistenza dinamiche. Prezzo sotto → bearish. La Tenkan/Kijun cross genera segnali di entrata. Attualmente RYDE è sotto la nuvola (stimata $0.65–0.80), confermando la struttura ribassista di medio termine.<br><br><span style="color:var(--blue);">Segnale cambio trend:</span> chiusura settimanale sopra $0.80 con volume confermato</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(77,159,255,.12);">🔄</div>
+        <div class="ind-body">
+          <div class="ind-name-new">MFI — Money Flow Index</div>
+          <div class="ind-sub-new">RSI ponderato per volume</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d" style="background:var(--blue)"></div><div class="imp-d"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-blue">Media</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">A differenza del RSI puro, l'MFI incorpora il volume e misura la "pressione del denaro". MFI < 20 = forte uscita di capitali. MFI > 80 = ingresso massiccio. Più affidabile del RSI su titoli a bassa liquidità come RYDE.<br><br><span style="color:var(--blue);">Combo vincente:</span> MFI in risalita + OBV crescente = segnale long confermato da volume reale</div>
+    </div>
+  </div>
+
+  <div class="section-header" style="margin-bottom:16px;">
+    <div class="section-title">Fondamentali & Sentiment</div>
+    <div class="section-line"></div>
+  </div>
+  <div class="grid2">
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(255,77,109,.15);">📉</div>
+        <div class="ind-body">
+          <div class="ind-name-new">Short Interest & Short Squeeze</div>
+          <div class="ind-sub-new">% flottante allo scoperto</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--red)"></div><div class="imp-d" style="background:var(--red)"></div><div class="imp-d" style="background:var(--red)"></div><div class="imp-d" style="background:var(--red)"></div><div class="imp-d" style="background:var(--red)"></div></div>
+          <span class="kpi-badge badge-red">Critico</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">Su micro-cap come RYDE, alto short interest + catalyst = short squeeze violentissimo. I short coprono comprando, amplificando il movimento. Attuale SI: 18.4% del flottante, ~3.1 giorni per coprire. Non ancora in zona squeeze estremo (>30%), ma sufficiente per spike del 25–40%.<br><br><span style="color:var(--red);">Tool:</span> Fintel.io, Ortex, iborrowdesk.com per dati in tempo reale</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(240,180,41,.15);">📅</div>
+        <div class="ind-body">
+          <div class="ind-name-new">Earnings Date + EPS Surprise</div>
+          <div class="ind-sub-new">Il catalyst fondamentale più potente</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div></div>
+          <span class="kpi-badge badge-amber">Event-driven</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">L'ultimo EPS RYDE ha mancato le stime del -51.5% → crollo immediato. Un beat anche del 15–20% su un titolo a così basse aspettative può generare +30–50% in apertura. Prossimo earnings atteso Q2 2026. Stima consenso: EPS -$0.09.<br><br><span style="color:var(--amber);">Strategia:</span> monitorare implied volatility delle opzioni nei 3 giorni pre-earnings</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(240,180,41,.12);">📄</div>
+        <div class="ind-body">
+          <div class="ind-name-new">SEC Filings — 8-K, Form 4, S-3</div>
+          <div class="ind-sub-new">Alert in tempo reale su EDGAR</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-amber">Alta</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">8-K = news material (catalyst +20%). Form 4 = insider buy/sell (molto bullish se CEO compra). S-3 = imminente share offering (bearish, diluzione). Su RYDE ogni filing SEC può muovere il titolo significativamente nelle ore successive.<br><br><span style="color:var(--amber);">Tool:</span> sec.gov/cgi-bin/browse-edgar — imposta alert email per RYDE (CIK 0001988748)</div>
+    </div>
+    <div class="ind-card-new" onclick="this.classList.toggle('open')">
+      <div class="ind-top-new">
+        <div class="ind-icon-new" style="background:rgba(240,180,41,.12);">💬</div>
+        <div class="ind-body">
+          <div class="ind-name-new">Social Sentiment — X / StockTwits</div>
+          <div class="ind-sub-new">Retail buzz e mention volume</div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px;">
+          <div class="imp-dots"><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d" style="background:var(--amber)"></div><div class="imp-d"></div></div>
+          <span class="kpi-badge badge-amber">Alta su RYDE</span>
+        </div>
+      </div>
+      <div class="ind-detail-new">Su RYDE il retail sentiment è un driver primario, non secondario. Un post virale su X con migliaia di engagement può muovere il prezzo del 20–30% in ore. Il crypto treasury announcement di marzo ne è l'esempio perfetto — amplificato da community retail.<br><br><span style="color:var(--amber);">Tool:</span> StockTwits ($RYDE), Unusual Whales, alert X per "$RYDE" + "squeeze" / "catalyst"</div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ RISK MANAGER ═══════════════════ -->
+<div id="page-risk" class="page">
+
+  <div class="grid2" style="margin-bottom:20px;">
+    <div class="card">
+      <div class="card-title">Calcolatore position sizing & stop loss</div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Capitale totale ($)</label>
+        <input class="calc-input" id="capital" type="number" value="10000" min="100">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Rischio max per trade (%)</label>
+        <input class="calc-input" id="risk_pct" type="number" value="2" min="0.1" max="10" step="0.1">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Prezzo entrata ($)</label>
+        <input class="calc-input" id="entry_price" type="number" value="1.2484" step="0.001">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Prezzo stop loss ($)</label>
+        <input class="calc-input" id="stop_price" type="number" value="1.00" step="0.001">
+      </div>
+      <div style="margin-bottom:10px;">
+        <label style="font-size:11px;color:var(--muted);display:block;margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Target price ($)</label>
+        <input class="calc-input" id="target_price" type="number" value="1.80" step="0.001">
+      </div>
+      <button class="calc-btn" onclick="calcRisk()">Calcola position size</button>
+      <div class="calc-result" id="calc-result" style="display:none;">
+        <div class="calc-result-row"><span style="color:var(--muted);">Rischio massimo ($)</span><span id="r_max_dollar" class="mono" style="color:var(--red);"></span></div>
+        <div class="calc-result-row"><span style="color:var(--muted);">Azioni da acquistare</span><span id="r_shares" class="mono" style="color:var(--text);"></span></div>
+        <div class="calc-result-row"><span style="color:var(--muted);">Valore posizione ($)</span><span id="r_position" class="mono" style="color:var(--text);"></span></div>
+        <div class="calc-result-row"><span style="color:var(--muted);">% del portafoglio</span><span id="r_pct_port" class="mono" style="color:var(--amber);"></span></div>
+        <div class="calc-result-row"><span style="color:var(--muted);">Stop loss ($)</span><span id="r_stop" class="mono" style="color:var(--red);"></span></div>
+        <div class="calc-result-row"><span style="color:var(--muted);">Target profit ($)</span><span id="r_profit" class="mono" style="color:var(--green);"></span></div>
+        <div class="calc-result-row"><span style="color:var(--muted);">Risk/Reward ratio</span><span id="r_rr" class="mono" style="color:var(--green);font-weight:700;"></span></div>
+      </div>
+    </div>
+
+    <div>
+      <div class="card" style="margin-bottom:16px;">
+        <div class="card-title">Profilo rischio RYDE (aggiornato apr 2026)</div>
+        <div class="risk-row">
+          <div class="risk-label">Volatilità (beta)</div>
+          <div class="risk-bar-wrap"><div class="risk-fill" style="width:95%;background:var(--red);"></div></div>
+          <div class="risk-val" style="color:var(--red);">Estrema</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-label">Liquidità azioni</div>
+          <div class="risk-bar-wrap"><div class="risk-fill" style="width:40%;background:var(--amber);"></div></div>
+          <div class="risk-val" style="color:var(--amber);">Migliorata</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-label">Short Interest</div>
+          <div class="risk-bar-wrap"><div class="risk-fill" style="width:25%;background:var(--amber);"></div></div>
+          <div class="risk-val" style="color:var(--amber);">~25%</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-label">Rischio diluizione</div>
+          <div class="risk-bar-wrap"><div class="risk-fill" style="width:80%;background:var(--red);"></div></div>
+          <div class="risk-val" style="color:var(--red);">Alto</div>
+        </div>
+        <div class="risk-row">
+          <div class="risk-label">Rischio delisting</div>
+          <div class="risk-bar-wrap"><div class="risk-fill" style="width:15%;background:var(--green);"></div></div>
+          <div class="risk-val" style="color:var(--green);">Basso</div>
+        </div>
+        <div class="risk-row" style="border:none;">
+          <div class="risk-label">Solidità fondamentale</div>
+          <div class="risk-bar-wrap"><div class="risk-fill" style="width:12%;background:var(--red);"></div></div>
+          <div class="risk-val" style="color:var(--red);">Molto bassa</div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-title">Regole operative day trading RYDE</div>
+        <div style="font-size:13px;color:var(--muted);line-height:1.8;">
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--green);font-weight:700;min-width:18px;">1</span>Non rischiare mai più del 2% del capitale per trade</div>
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--green);font-weight:700;min-width:18px;">2</span>RVOL > 2x obbligatorio prima di entrare</div>
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--green);font-weight:700;min-width:18px;">3</span>Stop loss sempre impostato prima dell'entrata</div>
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--amber);font-weight:700;min-width:18px;">4</span>Non operare con Fear & Greed < 30</div>
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--amber);font-weight:700;min-width:18px;">5</span>Preferire R/R minimo 1:2 — ideale 1:3</div>
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--amber);font-weight:700;min-width:18px;">6</span>Monitorare EDGAR per 8-K prima della sessione</div>
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--red);font-weight:700;min-width:18px;">7</span>Non mediare mai al ribasso su micro-cap</div>
+          <div style="display:flex;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04);"><span style="color:var(--red);font-weight:700;min-width:18px;">8</span>Max 3 trade/giorno su RYDE — evitare overtrading</div>
+          <div style="display:flex;gap:8px;padding:6px 0;"><span style="color:var(--red);font-weight:700;min-width:18px;">9</span>Uscire sempre prima della chiusura se intraday</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Simulazione scenari P&L</div>
+    <div class="chart-wrap" style="height:240px;"><canvas id="pnlChart"></canvas></div>
+    <div style="display:flex;gap:20px;margin-top:12px;flex-wrap:wrap;">
+      <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#00e5a0;display:inline-block;"></span>Scenario Bull — target $1.80</span>
+      <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#4d9fff;display:inline-block;"></span>Scenario Base — target $1.10</span>
+      <span style="font-size:12px;display:flex;align-items:center;gap:6px;"><span style="width:10px;height:10px;border-radius:2px;background:#ff4d6d;display:inline-block;"></span>Scenario Bear — stop $0.70</span>
+    </div>
+  </div>
+
+</div>
+
+<!-- ═══════════════════ CHART & DECISIONE ═══════════════════ -->
+<div id="page-decision" class="page">
+
+  <!-- HEADER VERDICT BAR -->
+  <div style="background:linear-gradient(135deg,rgba(0,229,160,.08),rgba(77,159,255,.06));border:1px solid rgba(0,229,160,.2);border-radius:14px;padding:20px 28px;margin-bottom:20px;display:flex;align-items:center;gap:24px;flex-wrap:wrap;">
+    <div>
+      <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:4px;">Verdetto AI — 25 apr 2026</div>
+      <div style="font-size:30px;font-weight:800;color:var(--amber);">HOLD / WATCH</div>
+      <div style="font-size:12px;color:var(--muted);margin-top:2px;">Pullback correttivo sano · Attendere conferma su supporto</div>
+    </div>
+    <div style="margin-left:auto;display:flex;gap:16px;align-items:center;flex-wrap:wrap;">
+      <div style="text-align:center;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Score Tecnico</div>
+        <div class="score-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#f0b429" stroke-width="10"
+              stroke-dasharray="220 314" stroke-dashoffset="78" stroke-linecap="round"
+              transform="rotate(-90 60 60)"/>
+          </svg>
+          <div style="text-align:center;">
+            <div class="score-val" style="color:var(--amber);">62</div>
+            <div style="font-size:10px;color:var(--muted);">/100</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Conf. Segnale</div>
+        <div class="score-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#4d9fff" stroke-width="10"
+              stroke-dasharray="175 314" stroke-dashoffset="78" stroke-linecap="round"
+              transform="rotate(-90 60 60)"/>
+          </svg>
+          <div style="text-align:center;">
+            <div class="score-val" style="color:var(--blue);">56</div>
+            <div style="font-size:10px;color:var(--muted);">/100</div>
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;">
+        <div style="font-size:11px;color:var(--muted);margin-bottom:4px;text-transform:uppercase;letter-spacing:.06em;">Risk/Reward</div>
+        <div class="score-ring">
+          <svg width="120" height="120" viewBox="0 0 120 120">
+            <circle cx="60" cy="60" r="50" fill="none" stroke="rgba(255,255,255,0.06)" stroke-width="10"/>
+            <circle cx="60" cy="60" r="50" fill="none" stroke="#00e5a0" stroke-width="10"
+              stroke-dasharray="188 314" stroke-dashoffset="78" stroke-linecap="round"
+              transform="rotate(-90 60 60)"/>
+          </svg>
+          <div style="text-align:center;">
+            <div class="score-val" style="color:var(--green);">1:2.2</div>
+            <div style="font-size:10px;color:var(--muted);">ratio</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="grid2" style="margin-bottom:20px;">
+
+    <!-- ANALISI CHART VISIVA -->
+    <div class="card">
+      <div class="card-title">Lettura Chart D1 — Pattern Visivi (25 apr 2026)</div>
+
+      <!-- Chart schematico SVG -->
+      <div style="position:relative;background:var(--surface2);border-radius:10px;padding:16px;margin-bottom:16px;overflow:hidden;">
+        <svg viewBox="0 0 560 260" xmlns="http://www.w3.org/2000/svg" style="width:100%;height:auto;">
+          <!-- Grid lines -->
+          <line x1="0" y1="50"  x2="560" y2="50"  stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="100" x2="560" y2="100" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="150" x2="560" y2="150" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+          <line x1="0" y1="200" x2="560" y2="200" stroke="rgba(255,255,255,0.05)" stroke-width="1"/>
+
+          <!-- Resistance $1.49 - blue line -->
+          <line x1="0" y1="30" x2="560" y2="30" stroke="#4d9fff" stroke-width="1.5" stroke-dasharray="0"/>
+          <text x="4" y="26" fill="#4d9fff" font-size="9" font-family="monospace">$1.49 — 52W High / ATH</text>
+
+          <!-- Resistance red dashed -->
+          <line x1="0" y1="68" x2="560" y2="68" stroke="#ff4d6d" stroke-width="1" stroke-dasharray="5,4"/>
+          <text x="4" y="64" fill="#ff4d6d" font-size="9" font-family="monospace">$1.30 — Distribuzione</text>
+
+          <!-- Current price amber -->
+          <line x1="0" y1="105" x2="560" y2="105" stroke="#f0b429" stroke-width="1.5" stroke-dasharray="4,3"/>
+          <text x="4" y="101" fill="#f0b429" font-size="9" font-family="monospace">$1.2484 — Prezzo attuale</text>
+
+          <!-- Demand zone box (blue) -->
+          <rect x="340" y="108" width="220" height="72" fill="rgba(77,159,255,0.12)" rx="3"/>
+          <text x="346" y="122" fill="#4d9fff" font-size="9" font-family="monospace" font-weight="bold">DEMAND ZONE</text>
+
+          <!-- Midpoint red line in demand zone -->
+          <line x1="340" y1="144" x2="560" y2="144" stroke="#ff4d6d" stroke-width="1.5"/>
+          <text x="344" y="140" fill="#ff4d6d" font-size="8" font-family="monospace">Midpoint $1.08</text>
+
+          <!-- Support green -->
+          <line x1="0" y1="180" x2="560" y2="180" stroke="#00e5a0" stroke-width="1.5"/>
+          <text x="4" y="176" fill="#00e5a0" font-size="9" font-family="monospace">$1.00 — Supporto psicologico</text>
+
+          <!-- MA fan lines -->
+          <path d="M 0,230 Q 120,220 200,200 T 340,170 T 420,150" stroke="#ff6b35" stroke-width="1.5" fill="none" opacity="0.7"/>
+          <path d="M 0,240 Q 120,228 200,208 T 340,180 T 420,162" stroke="#ff4d6d" stroke-width="1.2" fill="none" opacity="0.6"/>
+          <path d="M 0,245 Q 120,232 200,215 T 340,188 T 420,172" stroke="#4d9fff" stroke-width="2" fill="none" opacity="0.8"/>
+          <path d="M 0,248 Q 120,236 200,220 T 340,194 T 420,178" stroke="#f0b429" stroke-width="1.5" fill="none" opacity="0.6"/>
+          <text x="422" y="157" fill="#4d9fff" font-size="9" font-family="monospace">EMA fan ~$0.95–1.10</text>
+
+          <!-- Candles — fase accumulazione bassa -->
+          <g opacity="0.7">
+            <rect x="22" y="200" width="5" height="25" fill="#00e5a0" rx="1"/>
+            <rect x="30" y="210" width="5" height="18" fill="#ff4d6d" rx="1"/>
+            <rect x="38" y="205" width="5" height="22" fill="#00e5a0" rx="1"/>
+            <rect x="46" y="208" width="5" height="20" fill="#ff4d6d" rx="1"/>
+            <rect x="54" y="202" width="5" height="26" fill="#00e5a0" rx="1"/>
+            <rect x="62" y="206" width="5" height="24" fill="#ff4d6d" rx="1"/>
+            <rect x="70" y="198" width="5" height="30" fill="#00e5a0" rx="1"/>
+            <rect x="78" y="204" width="5" height="25" fill="#ff4d6d" rx="1"/>
+            <rect x="86" y="200" width="5" height="28" fill="#00e5a0" rx="1"/>
+          </g>
+
+          <!-- Candles — spike impulsivo -->
+          <rect x="110" y="165" width="6" height="50" fill="#00e5a0" rx="1"/>
+          <rect x="119" y="130" width="6" height="70" fill="#00e5a0" rx="1"/>
+          <rect x="128" y="75" width="6" height="90" fill="#00e5a0" rx="1"/>
+          <rect x="137" y="35" width="6" height="80" fill="#00e5a0" rx="1"/>
+          <!-- Shooting star / top -->
+          <rect x="146" y="25" width="6" height="12" fill="#00e5a0" rx="1"/>
+          <line x1="149" y1="12" x2="149" y2="25" stroke="#00e5a0" stroke-width="1.5"/>
+          <line x1="149" y1="37" x2="149" y2="55" stroke="#ff4d6d" stroke-width="1.5"/>
+          <!-- Engulfing bearish -->
+          <rect x="155" y="32" width="7" height="65" fill="#ff4d6d" rx="1"/>
+          <line x1="158.5" y1="22" x2="158.5" y2="32" stroke="#ff4d6d" stroke-width="1.5"/>
+          <line x1="158.5" y1="97" x2="158.5" y2="110" stroke="#ff4d6d" stroke-width="1.5"/>
+
+          <!-- Candles — pullback / distribuzione -->
+          <rect x="170" y="90" width="5" height="40" fill="#ff4d6d" rx="1"/>
+          <rect x="178" y="95" width="5" height="35" fill="#00e5a0" rx="1"/>
+          <rect x="186" y="100" width="5" height="30" fill="#ff4d6d" rx="1"/>
+          <rect x="194" y="98" width="5" height="32" fill="#00e5a0" rx="1"/>
+          <rect x="202" y="102" width="5" height="28" fill="#ff4d6d" rx="1"/>
+          <rect x="210" y="100" width="5" height="30" fill="#00e5a0" rx="1"/>
+
+          <!-- Target arrow right - yellow box -->
+          <rect x="470" y="15" width="80" height="50" fill="rgba(240,180,41,0.2)" rx="4" stroke="#f0b429" stroke-width="1.5"/>
+          <text x="478" y="32" fill="#f0b429" font-size="9" font-family="monospace" font-weight="bold">TARGET BULL</text>
+          <text x="478" y="47" fill="#f0b429" font-size="10" font-family="monospace" font-weight="bold">$1.80+</text>
+          <line x1="220" y1="40" x2="468" y2="40" stroke="#f0b429" stroke-width="1" stroke-dasharray="6,3" opacity="0.5"/>
+          <polygon points="468,36 476,40 468,44" fill="#f0b429" opacity="0.7"/>
+
+          <!-- Pattern labels -->
+          <rect x="112" y="2" width="48" height="14" rx="3" fill="rgba(0,229,160,0.2)"/>
+          <text x="115" y="12" fill="#00e5a0" font-size="8" font-family="monospace" font-weight="bold">IMPULSO</text>
+          <rect x="147" y="2" width="62" height="14" rx="3" fill="rgba(255,77,109,0.2)"/>
+          <text x="150" y="12" fill="#ff4d6d" font-size="8" font-family="monospace" font-weight="bold">SHOOTING★</text>
+          <rect x="168" y="60" width="74" height="14" rx="3" fill="rgba(240,180,41,0.2)"/>
+          <text x="171" y="70" fill="#f0b429" font-size="8" font-family="monospace" font-weight="bold">DISTRIBUZIONE</text>
+
+          <!-- Volume bars (base) -->
+          <g opacity="0.4">
+            <rect x="22" y="248" width="5" height="6" fill="#4d9fff" rx="1"/>
+            <rect x="30" y="246" width="5" height="8" fill="#4d9fff" rx="1"/>
+            <rect x="38" y="247" width="5" height="7" fill="#4d9fff" rx="1"/>
+            <rect x="110" y="240" width="6" height="14" fill="#00e5a0" rx="1"/>
+            <rect x="119" y="235" width="6" height="19" fill="#00e5a0" rx="1"/>
+            <rect x="128" y="228" width="6" height="26" fill="#00e5a0" rx="1"/>
+            <rect x="137" y="222" width="6" height="32" fill="#00e5a0" rx="1"/>
+            <rect x="146" y="232" width="6" height="22" fill="#ff4d6d" rx="1"/>
+            <rect x="155" y="230" width="7" height="24" fill="#ff4d6d" rx="1"/>
+            <rect x="170" y="240" width="5" height="14" fill="#4d9fff" rx="1"/>
+            <rect x="178" y="244" width="5" height="10" fill="#4d9fff" rx="1"/>
+            <rect x="186" y="246" width="5" height="8" fill="#4d9fff" rx="1"/>
+          </g>
+
+          <!-- Labels X -->
+          <text x="30"  y="260" fill="#6b6b7a" font-size="8" font-family="monospace">Feb</text>
+          <text x="120" y="260" fill="#6b6b7a" font-size="8" font-family="monospace">Mar→Apr</text>
+          <text x="195" y="260" fill="#6b6b7a" font-size="8" font-family="monospace">Ora</text>
+          <text x="440" y="260" fill="#6b6b7a" font-size="8" font-family="monospace">Proiezione</text>
+        </svg>
+      </div>
+
+      <!-- Pattern cards -->
+      <div style="display:flex;flex-direction:column;gap:10px;">
+        <div style="background:rgba(0,229,160,.06);border-left:3px solid var(--green);border-radius:8px;padding:12px 14px;">
+          <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:4px;">✦ IMPULSO RIALZISTA (feb→apr)</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Candle impulsive verdi con volume crescente da $0.31 → $1.49. Golden Cross multiplo su tutte le MA. Pattern da manuale di breakout da consolidamento lungo.</div>
+        </div>
+        <div style="background:rgba(255,77,109,.06);border-left:3px solid var(--red);border-radius:8px;padding:12px 14px;">
+          <div style="font-size:12px;font-weight:800;color:var(--red);margin-bottom:4px;">✦ SHOOTING STAR + ENGULFING (top)</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Long upper wick in zona ATH $1.49 → rifiuto netto. Seguita da candela bearish engulfing. Classico segnale di esaurimento compratori al top. Sell-the-news HK catalyst (-13.5%) ne è la conferma fondamentale.</div>
+        </div>
+        <div style="background:rgba(240,180,41,.06);border-left:3px solid var(--amber);border-radius:8px;padding:12px 14px;">
+          <div style="font-size:12px;font-weight:800;color:var(--amber);margin-bottom:4px;">✦ DEMAND ZONE + CONSOLIDAMENTO</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Prezzo attuale dentro la demand zone $1.08–1.30 (box azzurro chart). Range stretto → compressione → possibile rimbalzo. Il midpoint $1.08 (linea rossa) è il livello di tenuta critico. Se regge → rimbalzo verso $1.49. Se cede → retest EMA fan $0.95–1.10.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- PANNELLO DECISIONE -->
+    <div style="display:flex;flex-direction:column;gap:16px;">
+
+      <!-- BOTTONI BUY/SELL/HOLD -->
+      <div class="card">
+        <div class="card-title">Decisione operativa — seleziona il tuo scenario</div>
+        <div style="display:flex;gap:12px;margin-bottom:16px;">
+          <button class="decision-btn buy" id="btn-buy" onclick="selectDecision('buy')">
+            <div style="font-size:22px;margin-bottom:4px;">▲</div>
+            BUY
+            <div style="font-size:10px;font-weight:400;margin-top:4px;opacity:0.8;">Rimbalzo demand zone</div>
+          </button>
+          <button class="decision-btn hold" id="btn-hold" onclick="selectDecision('hold')">
+            <div style="font-size:22px;margin-bottom:4px;">◆</div>
+            HOLD
+            <div style="font-size:10px;font-weight:400;margin-top:4px;opacity:0.8;">Attendi conferma</div>
+          </button>
+          <button class="decision-btn sell" id="btn-sell" onclick="selectDecision('sell')">
+            <div style="font-size:22px;margin-bottom:4px;">▼</div>
+            SELL
+            <div style="font-size:10px;font-weight:400;margin-top:4px;opacity:0.8;">Breakout bearish</div>
+          </button>
+        </div>
+
+        <!-- Verdetto dinamico -->
+        <div id="verdict-panel" class="verdict-box hold-v">
+          <div id="verdict-title" style="font-size:18px;font-weight:800;color:var(--amber);margin-bottom:10px;">◆ HOLD — Attendi la conferma</div>
+          <div id="verdict-body" style="font-size:13px;color:var(--muted);line-height:1.8;">
+            Il prezzo è dentro la demand zone $1.08–1.30. <strong style="color:var(--text);">Non entrare né uscire adesso.</strong> Aspetta una di queste conferme:<br><br>
+            <span style="color:var(--green);">► BUY se:</span> rimbalzo da $1.08–1.15 con candela bullish + volume >2x media<br>
+            <span style="color:var(--red);">► SELL/EXIT se:</span> chiusura H4 sotto $1.08 con volume in espansione<br><br>
+            <span style="color:var(--amber);">La struttura di fondo rimane rialzista finché il prezzo è sopra EMA fan ($0.95+).</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHECKLIST SEGNALI -->
+      <div class="card">
+        <div class="card-title">Checklist segnali — status attuale</div>
+        <div id="checklist-panel">
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+            <span style="font-size:16px;">✅</span>
+            <div style="flex:1;font-size:12px;">Prezzo sopra tutte le EMA (8/20/50)</div>
+            <span class="kpi-badge badge-green">Bullish</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+            <span style="font-size:16px;">✅</span>
+            <div style="flex:1;font-size:12px;">MACD positivo (momentum rialzista)</div>
+            <span class="kpi-badge badge-green">Bullish</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+            <span style="font-size:16px;">⚠️</span>
+            <div style="flex:1;font-size:12px;">RSI ~68 — zona ipercomprato in avvicinamento</div>
+            <span class="kpi-badge badge-amber">Neutro</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+            <span style="font-size:16px;">⚠️</span>
+            <div style="flex:1;font-size:12px;">StochRSI >90 — ipercomprato estremo</div>
+            <span class="kpi-badge badge-amber">Cautela</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+            <span style="font-size:16px;">❌</span>
+            <div style="flex:1;font-size:12px;">Volume conferma rimbalzo da demand zone</div>
+            <span class="kpi-badge badge-red">Da confermare</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.04);">
+            <span style="font-size:16px;">❌</span>
+            <div style="flex:1;font-size:12px;">Candela bullish daily sopra $1.25</div>
+            <span class="kpi-badge badge-red">Da confermare</span>
+          </div>
+          <div style="display:flex;align-items:center;gap:10px;padding:8px 0;">
+            <span style="font-size:16px;">✅</span>
+            <div style="flex:1;font-size:12px;">Struttura trend rialzista (HH + HL)</div>
+            <span class="kpi-badge badge-green">Bullish</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- LIVELLI OPERATIVI -->
+      <div class="card">
+        <div class="card-title">Livelli operativi chiave</div>
+        <div style="display:flex;flex-direction:column;gap:8px;">
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(0,229,160,.08);border-radius:8px;border-left:3px solid var(--green);">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--green);">TARGET 1</div>
+              <div style="font-size:11px;color:var(--muted);">Resistenza precedente</div>
+            </div>
+            <div class="mono" style="font-size:18px;font-weight:800;color:var(--green);">$1.49</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(0,229,160,.05);border-radius:8px;border-left:3px solid var(--green);">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--green);">TARGET 2</div>
+              <div style="font-size:11px;color:var(--muted);">Scenario bull esteso</div>
+            </div>
+            <div class="mono" style="font-size:18px;font-weight:800;color:var(--green);">$1.80</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(240,180,41,.08);border-radius:8px;border-left:3px solid var(--amber);">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--amber);">ENTRY IDEALE</div>
+              <div style="font-size:11px;color:var(--muted);">Rimbalzo demand zone</div>
+            </div>
+            <div class="mono" style="font-size:18px;font-weight:800;color:var(--amber);">$1.08–1.20</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,77,109,.08);border-radius:8px;border-left:3px solid var(--red);">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--red);">STOP LOSS</div>
+              <div style="font-size:11px;color:var(--muted);">Sotto midpoint demand zone</div>
+            </div>
+            <div class="mono" style="font-size:18px;font-weight:800;color:var(--red);">$1.00</div>
+          </div>
+          <div style="display:flex;justify-content:space-between;align-items:center;padding:10px 14px;background:rgba(255,77,109,.05);border-radius:8px;border-left:3px solid var(--red);">
+            <div>
+              <div style="font-size:12px;font-weight:700;color:var(--red);">INVALIDAZIONE</div>
+              <div style="font-size:11px;color:var(--muted);">Chiusura daily sotto EMA fan</div>
+            </div>
+            <div class="mono" style="font-size:18px;font-weight:800;color:var(--red);">$0.95</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RIGA INFERIORE — ANALISI INDICATORI + ROADMAP -->
+  <div class="grid2" style="margin-bottom:20px;">
+
+    <div class="card">
+      <div class="card-title">Lettura sub-chart indicatori (da screenshot)</div>
+      <div style="display:flex;flex-direction:column;gap:12px;margin-top:4px;">
+
+        <div style="padding:12px;background:var(--surface2);border-radius:8px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:700;">Pannello 1 — RSI / Momentum</span>
+            <span class="kpi-badge badge-amber">In discesa</span>
+          </div>
+          <div class="signal-bar"><div class="signal-fill" style="width:68%;background:linear-gradient(90deg,var(--green),var(--amber));"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">RSI ~68, pendenza discendente. Non ancora in ipercomprato ma attenzione alla divergenza ribassista se il prezzo tenta nuovo ATH senza conferma RSI.</div>
+        </div>
+
+        <div style="padding:12px;background:var(--surface2);border-radius:8px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:700;">Pannello 2 — MACD</span>
+            <span class="kpi-badge badge-amber">Contrazione</span>
+          </div>
+          <div class="signal-bar"><div class="signal-fill" style="width:55%;background:var(--blue);"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Istogramma in contrazione dopo il picco. Linee convergenti: momentum si indebolisce ma ancora positivo. Nessun crossover bearish confermato. Finché MACD > 0 la struttura di fondo è bullish.</div>
+        </div>
+
+        <div style="padding:12px;background:var(--surface2);border-radius:8px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:700;">Pannello 3 — Williams %R / Oscillatore</span>
+            <span class="kpi-badge badge-red">Bearish breve</span>
+          </div>
+          <div class="signal-bar"><div class="signal-fill" style="width:25%;background:var(--red);"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Già uscito dalla zona ipercomprato, in discesa verso area neutra. È il segnale più ribassista dei tre pannelli. Suggerisce ulteriore pressione nel breve prima di un potenziale rimbalzo.</div>
+        </div>
+
+        <div style="padding:12px;background:var(--surface2);border-radius:8px;">
+          <div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+            <span style="font-size:12px;font-weight:700;">MA Fan (curva multipla)</span>
+            <span class="kpi-badge badge-green">Golden Cross</span>
+          </div>
+          <div class="signal-bar"><div class="signal-fill" style="width:82%;background:var(--green);"></div></div>
+          <div style="font-size:11px;color:var(--muted);margin-top:6px;">Tutte le MA inclinate al rialzo e ventilate verso l'alto. Il prezzo si sta avvicinando al fascio MA come supporto dinamico — zona $0.95–1.10. Questo è il supporto naturale del trend primario.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Roadmap operativa — i prossimi scenari</div>
+
+      <div style="position:relative;padding-left:28px;margin-top:8px;">
+
+        <!-- Timeline line -->
+        <div style="position:absolute;left:10px;top:0;bottom:0;width:2px;background:linear-gradient(180deg,var(--green),var(--amber),var(--red));border-radius:2px;"></div>
+
+        <div style="position:relative;margin-bottom:20px;">
+          <div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--green);border:2px solid var(--bg);"></div>
+          <div style="font-size:12px;font-weight:800;color:var(--green);margin-bottom:4px;">STEP 1 — Ora (zona $1.08–1.30)</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Prezzo in demand zone. Attendere candela giornaliera di conferma. Volume deve aumentare rispetto alle ultime sedute di distribuzione (RVOL > 1.5x).</div>
+        </div>
+
+        <div style="position:relative;margin-bottom:20px;">
+          <div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--amber);border:2px solid var(--bg);"></div>
+          <div style="font-size:12px;font-weight:800;color:var(--amber);margin-bottom:4px;">STEP 2 — Prossimi 3–5 giorni</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">
+            <span style="color:var(--green);">Scenario A (60%):</span> rimbalzo da demand zone → tentativo retest $1.30–1.49<br>
+            <span style="color:var(--red);">Scenario B (40%):</span> breakdown sotto $1.08 → ritracciamento verso EMA fan $0.95–1.00
+          </div>
+        </div>
+
+        <div style="position:relative;margin-bottom:20px;">
+          <div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--blue);border:2px solid var(--bg);"></div>
+          <div style="font-size:12px;font-weight:800;color:var(--blue);margin-bottom:4px;">STEP 3 — Settimana 2–3</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Se Scenario A: rottura confermata di $1.49 apre target $1.80+. Necessario volume istituzionale (dollar volume >$3M/giorno). Primo catalizzatore atteso: news operative HK o earnings update.</div>
+        </div>
+
+        <div style="position:relative;">
+          <div style="position:absolute;left:-22px;top:2px;width:12px;height:12px;border-radius:50%;background:var(--red);border:2px solid var(--bg);"></div>
+          <div style="font-size:12px;font-weight:800;color:var(--red);margin-bottom:4px;">INVALIDAZIONE TOTALE</div>
+          <div style="font-size:12px;color:var(--muted);line-height:1.6;">Chiusura settimanale sotto $0.95 (EMA fan). Questo scenario annulla la struttura rialzista e riporta il titolo in range laterale $0.60–1.00. Probabilità: 20%.</div>
+        </div>
+
+      </div>
+
+      <div style="margin-top:20px;padding:14px;background:rgba(240,180,41,.06);border:1px solid rgba(240,180,41,.2);border-radius:10px;">
+        <div style="font-size:12px;font-weight:800;color:var(--amber);margin-bottom:8px;">⚡ REGOLA OPERATIVA CHIAVE</div>
+        <div style="font-size:12px;color:var(--muted);line-height:1.7;">
+          Non inseguire il prezzo. Su RYDE il sell-the-news è confermato su ogni catalyst (HK -13.5%, GO-GENIE -23%). <strong style="color:var(--text);">L'entry migliore è sempre nel pullback post-annuncio, non nel giorno del comunicato.</strong> Demand zone $1.08–1.20 + volume + candela bullish = setup ideale.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONSENSUS BAR -->
+  <div class="card">
+    <div class="card-title">Consensus multi-timeframe — sintesi operativa</div>
+    <div style="display:grid;grid-template-columns:repeat(5,1fr);gap:12px;margin-top:8px;">
+      <div style="text-align:center;padding:14px;background:var(--surface2);border-radius:10px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">1H</div>
+        <div style="font-size:16px;font-weight:800;color:var(--red);">SELL</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">Momentum corto negativo</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--surface2);border-radius:10px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">4H</div>
+        <div style="font-size:16px;font-weight:800;color:var(--amber);">NEUTRO</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">Demand zone attiva</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--surface2);border-radius:10px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">D1</div>
+        <div style="font-size:16px;font-weight:800;color:var(--amber);">HOLD</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">Pullback sano in trend</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--surface2);border-radius:10px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">W1</div>
+        <div style="font-size:16px;font-weight:800;color:var(--green);">BUY</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">Struttura rialzista intatta</div>
+      </div>
+      <div style="text-align:center;padding:14px;background:var(--surface2);border-radius:10px;">
+        <div style="font-size:10px;color:var(--muted);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">MN</div>
+        <div style="font-size:16px;font-weight:800;color:var(--green);">STRONG BUY</div>
+        <div style="font-size:10px;color:var(--muted);margin-top:4px;">+490% trend primario</div>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:12px 16px;background:rgba(240,180,41,.06);border-radius:8px;border-left:3px solid var(--amber);font-size:12px;color:var(--muted);">
+      <strong style="color:var(--amber);">Conclusione:</strong> il bias di medio-lungo periodo è <strong style="color:var(--green);">rialzista</strong>, ma il breve (1H/4H) è in fase correttiva. Il D1 in attesa di conferma è il frame decisivo. Non agire su 1H durante pullback di un trend mensile bullish.
+    </div>
+  </div>
+
+</div>
+
+</body>
+</html>
