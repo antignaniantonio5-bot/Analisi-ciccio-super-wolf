@@ -174,9 +174,9 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
     </div>
   </div>
   <div class="hd-right">
-    <div class="hd-price">$5.37</div>
-    <div class="hd-chg">▲ +$0.89 (+20.67%)</div>
-    <div class="hd-meta"><span class="live"></span>Real-time · 24 Apr 2026 &nbsp;|&nbsp; H: $5.53 &nbsp; L: $4.44 &nbsp; Vol: 3.94M</div>
+    <div class="hd-price">$5.32</div>
+    <div class="hd-chg">▲ +$0.71 (+15.4%) YTD · +97.1% ultimi 30gg</div>
+    <div class="hd-meta"><span class="live"></span>Aggiornato · 27 Apr 2026 &nbsp;|&nbsp; 52W H: $5.53 &nbsp; L: $2.18 &nbsp; ⚠️ Earnings AMC 28 Apr</div>
   </div>
 </header>
 
@@ -188,6 +188,8 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
   <button class="tab-btn"         onclick="T('report',this)">📋 Report</button>
   <button class="tab-btn"         onclick="T('volsent',this)">🔬 Vol &amp; Sentiment</button>
   <button class="tab-btn"         onclick="T('riskmgr',this)">💰 Risk Manager</button>
+  <button class="tab-btn"         onclick="T('backtest',this)">⚙️ Backtest</button>
+  <button class="tab-btn"         onclick="T('chartanalysis',this)">📷 Analisi Chart</button>
 </div>
 
 <!-- ====================================================
@@ -197,17 +199,17 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 
   <!-- KPI ROW -->
   <div class="g6">
-    <div class="card"><div class="ctitle">Prezzo</div><div class="cval green">$5.37</div><div class="csub">Live close</div></div>
-    <div class="card"><div class="ctitle">Variazione</div><div class="cval green">+20.67%</div><div class="csub">+$0.89 da $4.45</div></div>
-    <div class="card"><div class="ctitle">Market Cap</div><div class="cval">$125M</div><div class="csub">~23.3M azioni</div></div>
-    <div class="card"><div class="ctitle">Volume</div><div class="cval">3.94M</div><div class="csub"><span class="badge bg-g">+550% media</span></div></div>
-    <div class="card"><div class="ctitle">52W H / L</div><div class="cval" style="font-size:1rem">$5.53 <span style="color:#8b949e">/</span> $1.82</div><div class="csub">Range 204%</div></div>
-    <div class="card"><div class="ctitle">RSI (14)</div><div class="cval red">88.8</div><div class="csub"><span class="badge bg-r">Ipercomprato</span></div></div>
+    <div class="card"><div class="ctitle">Prezzo</div><div class="cval green">$5.32</div><div class="csub">Close 27 Apr</div></div>
+    <div class="card"><div class="ctitle">Ultimi 30gg</div><div class="cval green">+97.1%</div><div class="csub">da ~$2.70</div></div>
+    <div class="card"><div class="ctitle">Market Cap</div><div class="cval">~$194M</div><div class="csub">~36.5M azioni</div></div>
+    <div class="card"><div class="ctitle">Volume medio</div><div class="cval">~2.1M</div><div class="csub"><span class="badge bg-g">+250% media</span></div></div>
+    <div class="card"><div class="ctitle">52W H / L</div><div class="cval" style="font-size:1rem">$5.53 <span style="color:#8b949e">/</span> $2.18</div><div class="csub">Range 154%</div></div>
+    <div class="card"><div class="ctitle">Earnings</div><div class="cval yellow" style="font-size:1rem">28 Apr</div><div class="csub"><span class="badge bg-y">⚠️ AMC Stasera</span></div></div>
   </div>
 
   <!-- PRICE CHART -->
   <div class="card mb">
-    <div class="stitle">Andamento Prezzo &amp; Volume — Gen 2025 / Apr 2026</div>
+    <div class="stitle">Andamento Prezzo &amp; Volume — Gen 2025 / Apr 2026 · ⚠️ Earnings AMC 28 Apr</div>
     <div style="height:280px;position:relative"><canvas id="cPrice"></canvas></div>
   </div>
 
@@ -266,8 +268,8 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
      TAB 2 – ANALISI TECNICA
 ===================================================== -->
 <div id="tech" class="pane">
-  <div class="alert al-g">✅ STRONG UPTREND — Golden Cross attivo · ADX 30.4 · +DI 64 vs -DI 5 · Prezzo sopra tutte le medie mobili</div>
-  <div class="alert al-y">⚠️ ATTENZIONE — RSI 88.8 · Stochastic 95 · Prezzo sopra Banda Superiore Bollinger → zona ipercomprato estremo</div>
+  <div class="alert al-g">✅ STRONG UPTREND — MX +97.1% ultimi 30gg · +56.8% YTD 2026 · Golden Cross attivo · Prezzo vicino ai massimi 52W ($5.53)</div>
+  <div class="alert al-y">⚠️ ATTENZIONE — RSI ancora elevato · Stochastic %K in calo · Prezzo $5.32 vicino resistenza · Earnings AMC 28 Apr (oscillazione attesa ±5.4%)</div>
 
   <div class="g2">
     <!-- OSCILLATORI -->
@@ -302,7 +304,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 
     <!-- MEDIE MOBILI -->
     <div class="card">
-      <div class="stitle">Medie Mobili vs Prezzo $5.37</div>
+      <div class="stitle">Medie Mobili vs Prezzo $5.32</div>
       <table class="tbl">
         <thead><tr><th>Media</th><th>Valore</th><th>Distanza</th><th>Segnale</th></tr></thead>
         <tbody>
@@ -324,7 +326,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 
   <!-- S/R CHART -->
   <div class="card mb">
-    <div class="stitle">Supporti &amp; Resistenze — Livelli chiave con prezzo corrente $5.37</div>
+    <div class="stitle">Supporti &amp; Resistenze — Livelli chiave con prezzo corrente $5.32</div>
     <div style="height:210px;position:relative"><canvas id="cSR"></canvas></div>
   </div>
 
@@ -417,7 +419,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
         <tr><th>Ticker</th><th>Azienda</th><th>Prezzo</th><th>Var%</th><th>RSI</th><th>MACD</th><th>ADX</th><th>EMA Cross</th><th>Trend</th><th>P/S</th><th>Rating</th></tr>
       </thead>
       <tbody>
-        <tr data-r="WATCH"><td><strong class="blue">MX</strong></td><td>MagnaChip Semi.</td><td><strong>$5.37</strong></td><td class="green">+20.67%</td><td><span class="badge bg-r">88.8</span></td><td><span class="badge bg-g">Bull</span></td><td>30.4</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-g">Strong Up</span></td><td>0.48x</td><td><span class="badge bg-y">WATCH</span></td></tr>
+        <tr data-r="WATCH"><td><strong class="blue">MX</strong></td><td>MagnaChip Semi.</td><td><strong>$5.32</strong></td><td class="green">+97.1% (30gg)</td><td><span class="badge bg-y">~52</span></td><td><span class="badge bg-g">Bull</span></td><td>~28</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-g">Strong Up</span></td><td>0.54x</td><td><span class="badge bg-y">WATCH</span></td></tr>
         <tr data-r="BUY"><td><strong>ON</strong></td><td>ON Semiconductor</td><td>$44.50</td><td class="green">+0.8%</td><td><span class="badge bg-x">52.1</span></td><td><span class="badge bg-g">Bull</span></td><td>22.5</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-b">Uptrend</span></td><td>2.1x</td><td><span class="badge bg-g">BUY</span></td></tr>
         <tr data-r="BUY"><td><strong>MPWR</strong></td><td>Monolithic Power Sys.</td><td>$398.20</td><td class="green">+1.5%</td><td><span class="badge bg-x">61.4</span></td><td><span class="badge bg-g">Bull</span></td><td>28.3</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-b">Uptrend</span></td><td>8.7x</td><td><span class="badge bg-g">BUY</span></td></tr>
         <tr data-r="HOLD"><td><strong>DIOD</strong></td><td>Diodes Incorporated</td><td>$24.80</td><td class="red">-1.2%</td><td><span class="badge bg-x">48.3</span></td><td><span class="badge bg-r">Bear</span></td><td>18.2</td><td><span class="badge bg-r">Death X</span></td><td><span class="badge bg-x">Sideways</span></td><td>1.1x</td><td><span class="badge bg-y">HOLD</span></td></tr>
@@ -454,15 +456,16 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 ===================================================== -->
 <div id="report" class="pane">
 
-  <div class="alert al-b">📋 Report generato il 24 Aprile 2026 — Dati real-time TradingView · Solo scopi informativi, non costituisce consulenza finanziaria</div>
+  <div class="alert al-b">📋 Report aggiornato al 27 Aprile 2026 — Earnings MX attesi AMC 28 Apr · Solo scopi informativi, non costituisce consulenza finanziaria</div>
 
   <!-- EXECUTIVE SUMMARY -->
   <div class="mb">
     <div style="font-size:1rem;font-weight:700;margin-bottom:9px">📊 Executive Summary</div>
     <div style="font-size:.86rem;color:#8b949e;line-height:1.75">
       <p style="margin-bottom:7px">MagnaChip Semiconductor (NYSE: MX) è un produttore sudcoreano di circuiti integrati analogici e misti, specializzato in soluzioni di potenza (MOSFET, IGBT) e display (driver IC). Quotato al NYSE, opera principalmente nel segmento consumer electronics e automotive.</p>
-      <p style="margin-bottom:7px">Il 24 aprile 2026 il titolo ha registrato un rialzo eccezionale del <strong style="color:#3fb950">+20.67%</strong> a <strong style="color:#3fb950">$5.37</strong>, livello non visto da oltre 12 mesi. Il catalizzatore principale è stato il lancio della linea MOSFET 8ª generazione per smartphone (-48% on-resistance, +185% densità di corrente). Il movimento si inserisce in un uptrend strutturale già avviato a inizio 2026, con un +47% nelle ultime 2 settimane.</p>
-      <p>Da un punto di vista tecnico il quadro è fortemente polarizzato: il trend di medio-lungo periodo è inequivocabilmente bullish (Golden Cross, ADX 30.4, prezzo sopra tutte le EMA/SMA), ma gli oscillatori di breve (RSI 88.8, Stochastic 95, prezzo sopra Bollinger superiore) indicano una zona di ipercomprato estremo che storicamente precede fasi di consolidamento o pullback.</p>
+      <p style="margin-bottom:7px">Al 27 aprile 2026 il titolo quota <strong style="color:#3fb950">$5.32</strong>, con un rialzo di <strong style="color:#3fb950">+97.1%</strong> negli ultimi 30 giorni e <strong style="color:#3fb950">+56.8% YTD</strong>. Il principale catalizzatore è stato il lancio della linea MOSFET 8ª generazione per smartphone (Apr 22: +13.4%) — tecnologia con -48% on-resistance e +185% densità di corrente. Il titolo si avvicina ai massimi a 52 settimane ($5.53) con il prezzo target medio degli analisti a <strong style="color:#d29922">$7.00</strong> (range $6–$8, +31.6% upside).</p>
+      <p style="margin-bottom:7px"><strong style="color:#d29922">⚠️ EVENTO CHIAVE:</strong> MX riporta i risultati Q1 2026 <strong>stasera dopo la chiusura (AMC, 28 Apr 2026)</strong>. Il consensus attende EPS -$0.22 e revenue di $44–48M (+2.9% YoY). Il Q4 2025 aveva battuto le stime EPS di +$0.24 ($-0.08 vs -$0.32 atteso). L'oscillazione post-earnings attesa è ±5.4%, ma la storia recente mostra movimenti ben superiori.</p>
+      <p>Da un punto di vista tecnico il quadro è complesso: il trend di medio-lungo periodo è bullish (Golden Cross attivo, prezzo sopra tutte le EMA/SMA principali), ma il prezzo è reduce da un forte spike con ritracciamento. Lo screenshot del 27 Apr mostra il prezzo a $3.17 — sotto le SMA 3.53 e 3.71 — suggerendo una fase di distribuzione post-picco. La divergenza tra OBV positivo e Accum/Dist negativo è un segnale critico da monitorare.</p>
     </div>
   </div>
 
@@ -471,18 +474,18 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
   <div class="sgrid">
     <div class="scard sc-bull">
       <div class="stit">🚀 Scenario Rialzista</div>
-      <div class="sbody">Earnings 28 apr superano il consensus (-$0.22 EPS). La guidance Q2 sorprende positivamente. Adozione MOSFET 8ª gen da OEM tier-1 (Samsung supply chain) confermata. Momentum tecnico mantiene il prezzo sopra EMA20.<br><br><strong>Probabilità stimata: 25%</strong></div>
-      <div class="starget">Target: $7.50–$9.00</div>
+      <div class="sbody">Earnings 28 apr superano il consensus (-$0.22 EPS). Revenue Q1 sopra $48M con guidance Q2 positiva. Adozione MOSFET 8ª gen da OEM tier-1 confermata. MX tiene sopra $5.00 post-earnings e attacca i massimi $5.53. Analisti alzano target verso $8.00.<br><br><strong>Probabilità stimata: 30%</strong></div>
+      <div class="starget">Target: $7.00–$8.00</div>
     </div>
     <div class="scard sc-base">
       <div class="stit">📊 Scenario Base</div>
-      <div class="sbody">Pullback fisiologico verso EMA20 ($3.48–$4.00) dopo il forte rialzo. Earnings in linea con attese. I MOSFET trovano conferma graduale nei trimestri successivi. Recupero entro Q3 2026.<br><br><strong>Probabilità stimata: 50%</strong></div>
-      <div class="starget">Target: $4.50–$6.00</div>
+      <div class="sbody">Earnings in linea col consensus. Revenue $44–48M, EPS ~-$0.22. Pullback fisiologico verso zona $4.00–$4.50 dopo il forte rialzo (+97% in 30gg). Consolidamento nella fascia $4–$5.53. Recupero graduale verso target analisti $7.00 entro Q3 2026.<br><br><strong>Probabilità stimata: 45%</strong></div>
+      <div class="starget">Target: $4.50–$5.53</div>
     </div>
     <div class="scard sc-bear">
       <div class="stit">📉 Scenario Ribassista</div>
-      <div class="sbody">Earnings del 28 apr deludono in modo significativo. Rischi supply chain gas (guerra Iran) si materializzano. Vendite "sell-the-news" dopo +47% in 2 settimane. Rottura sotto EMA50 ($3.13).<br><br><strong>Probabilità stimata: 25%</strong></div>
-      <div class="starget">Target: $2.50–$3.20</div>
+      <div class="sbody">Earnings del 28 apr deludono significativamente. Revenue sotto $44M con guidance debole Q2. Sell-the-news dopo +97% in 30 giorni. Rischi supply chain semiconduttori (gas critici). Accum/Dist già negativo accelera la distribuzione. Rottura $3.53 apre a $2.50–$3.00.<br><br><strong>Probabilità stimata: 25%</strong></div>
+      <div class="starget">Target: $2.50–$3.50</div>
     </div>
   </div>
 
@@ -491,26 +494,32 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
     <div class="card">
       <div class="stitle">Dati Fondamentali Chiave</div>
       <table class="tbl">
-        <tr><td style="color:#8b949e">Market Cap</td><td><strong>~$125M</strong></td></tr>
-        <tr><td style="color:#8b949e">P/S Ratio</td><td><strong>0.48x</strong> <span class="badge bg-g" style="font-size:.67rem">Economico</span></td></tr>
-        <tr><td style="color:#8b949e">Revenue (ann.)</td><td><strong>~$261M</strong></td></tr>
-        <tr><td style="color:#8b949e">EPS Q4 2025</td><td class="green"><strong>Beat +$0.24</strong></td></tr>
-        <tr><td style="color:#8b949e">EPS Q1 2026E</td><td class="red"><strong>-$0.22</strong></td></tr>
-        <tr><td style="color:#8b949e">Float</td><td><strong>~23.3M azioni</strong></td></tr>
-        <tr><td style="color:#8b949e">Beta stimato</td><td><strong>~1.8</strong> <span class="badge bg-r" style="font-size:.67rem">Alta vol.</span></td></tr>
+        <tr><td style="color:#8b949e">Market Cap</td><td><strong>~$194M</strong></td></tr>
+        <tr><td style="color:#8b949e">P/S Ratio</td><td><strong>0.54x</strong> <span class="badge bg-g" style="font-size:.67rem">Economico</span></td></tr>
+        <tr><td style="color:#8b949e">Revenue (ann.)</td><td><strong>~$178.9M</strong> <span class="badge bg-r" style="font-size:.67rem">CAGR -19%</span></td></tr>
+        <tr><td style="color:#8b949e">Gross Margin</td><td><strong>17.6%</strong> <span class="badge bg-y" style="font-size:.67rem">In miglioramento</span></td></tr>
+        <tr><td style="color:#8b949e">EPS Q4 2025</td><td class="green"><strong>Beat +$0.24</strong> (-$0.08 vs -$0.32E)</td></tr>
+        <tr><td style="color:#8b949e">EPS Q1 2026E</td><td class="red"><strong>-$0.22</strong> (consensus)</td></tr>
+        <tr><td style="color:#8b949e">Revenue Q1 2026E</td><td><strong>$44–48M</strong> (+2.9% YoY)</td></tr>
+        <tr><td style="color:#8b949e">Net Loss (ann.)</td><td class="red"><strong>-$29.72M</strong> (-45.3% YoY)</td></tr>
+        <tr><td style="color:#8b949e">Target analisti</td><td class="green"><strong>$7.00</strong> (range $6–$8)</td></tr>
+        <tr><td style="color:#8b949e">Rating analisti</td><td><span class="badge bg-g">Strong Buy</span> <span style="color:#8b949e;font-size:.77rem">(2 brokers)</span></td></tr>
+        <tr><td style="color:#8b949e">Prossimi earnings</td><td><strong style="color:#d29922">28 Apr 2026 AMC</strong></td></tr>
       </table>
     </div>
     <div class="card">
       <div class="stitle">Catalyst &amp; Risk Factors</div>
       <table class="tbl">
-        <tr><td><span class="badge bg-g">+</span></td><td>MOSFET 8ª gen: -48% R_on, +185% densità corrente</td></tr>
-        <tr><td><span class="badge bg-g">+</span></td><td>P/S 0.48x vs settore ~3x — forte sconto</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>MOSFET 8ª gen: -48% R_on, +185% densità corrente (Apr 22)</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>P/S 0.54x vs settore ~3x — forte sconto strutturale</td></tr>
         <tr><td><span class="badge bg-g">+</span></td><td>EPS Q4 25: beat di $0.24 vs consensus</td></tr>
-        <tr><td><span class="badge bg-g">+</span></td><td>Consorzio semiconductor USA $4T (Trump)</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>EPS Q1 2026 atteso negativo (-$0.22)</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>Rischi supply chain gas critici (He) — Iran</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>Small cap: rischio liquidità e volatilità</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>Dipendenza da pochi clienti chiave</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>Target analisti $7.00 (+31.6% upside da $5.32)</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>Revenue Q1E +2.9% YoY — prima crescita dopo anni di cali</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>EPS Q1 2026 atteso negativo (-$0.22), perdite annuali -$29.7M</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Rischi supply chain gas critici (He) — conflitti geopolitici</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Small cap: rischio liquidità e alta volatilità (Beta ~4)</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Accum/Dist negativo -14M → distribuzione professionale in corso</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Revenue CAGR 3-5 anni: -19% — declino strutturale da invertire</td></tr>
       </table>
     </div>
   </div>
@@ -521,13 +530,13 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
     <table class="tbl">
       <thead><tr><th>Scenario d'ingresso</th><th>Zona prezzo</th><th>Condizione</th><th>R/R stimato</th></tr></thead>
       <tbody>
-        <tr><td>🟡 Pullback moderato</td><td>$4.50–$4.80</td><td>RSI &lt; 75, candela di conferma</td><td>1:2.5</td></tr>
-        <tr><td>🟢 Pullback profondo</td><td>$3.50–$3.80 (EMA20)</td><td>RSI &lt; 60, volume in calo</td><td>1:3.5</td></tr>
-        <tr><td>⚠️ Pre-earnings</td><td>$5.00–$5.37</td><td>Solo con size &lt;1% portafoglio</td><td>Alto rischio</td></tr>
-        <tr><td>🔴 Short / Hedge</td><td>$5.40–$5.60</td><td>Solo su breakdown confermato sotto $4.90</td><td>1:2.0</td></tr>
+        <tr><td>⚠️ Pre-earnings (oggi)</td><td>$5.00–$5.32</td><td>Solo con size &lt;1% portafoglio · ±5.4% oscillazione attesa</td><td>Alto rischio</td></tr>
+        <tr><td>🟡 Pullback post-earnings</td><td>$4.20–$4.60</td><td>RSI &lt; 65, volume in calo, candela di conferma</td><td>1:2.5</td></tr>
+        <tr><td>🟢 Pullback profondo</td><td>$3.50–$3.80 (EMA20)</td><td>RSI &lt; 55, Accum/Dist che gira positivo</td><td>1:3.5</td></tr>
+        <tr><td>🔴 Short / Hedge</td><td>&gt;$5.53 (52W High)</td><td>Solo su mancato breakout + breakdown &lt;$5.00</td><td>1:2.0</td></tr>
       </tbody>
     </table>
-    <div class="alert al-y" style="margin-top:11px;font-size:.79rem">⚠️ <strong>Evento chiave:</strong> Earnings Q1 2026 — <strong>28 Aprile 2026</strong> dopo chiusura mercati. Consensus EPS: -$0.22. Ridurre l'esposizione prima dell'evento se già in posizione.</div>
+    <div class="alert al-y" style="margin-top:11px;font-size:.79rem">⚠️ <strong>EVENTO IMMINENTE:</strong> Earnings Q1 2026 — <strong>28 Aprile 2026 AMC (stasera)</strong>. Consensus EPS: -$0.22 · Revenue: $44–48M. Oscillazione attesa post-earnings: ±5.4%. Gestire il rischio di posizione prima della chiusura odierna.</div>
     <div style="margin-top:10px;font-size:.7rem;color:#6e7681;border-top:1px solid #21262d;padding-top:9px">
       Fonti: <a href="https://stockstory.org/us/stocks/nyse/mx/news/why-up-down/why-magnachip-mx-stock-is-up-today-3">StockStory</a> · <a href="https://markets.financialcontent.com/stocks/article/stockstory-2026-4-22-why-magnachip-mx-stock-is-up-today">FinancialContent</a> · <a href="https://www.marketbeat.com/instant-alerts/magnachip-semiconductor-mx-projected-to-post-earnings-on-tuesday-2026-04-21/">MarketBeat</a> · TradingView Real-time Data
     </div>
@@ -540,7 +549,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 ===================================================== -->
 <div id="volsent" class="pane">
 
-  <div class="alert al-b" style="margin-bottom:16px">🔬 <strong>Indicatori Avanzati</strong> — 12 card espandibili al click · Dati aggiornati al 24 Apr 2026 · Clicca su ogni card per dettagli e interpretazione</div>
+  <div class="alert al-b" style="margin-bottom:16px">🔬 <strong>Indicatori Avanzati</strong> — 12 card espandibili al click · Dati aggiornati al 27 Apr 2026 · ⚠️ Earnings AMC stasera 28 Apr · Clicca su ogni card per dettagli</div>
 
   <!-- GROUP 1: Volume & Volatilità -->
   <div class="exp-group">
@@ -1008,7 +1017,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 ===================================================== -->
 <div id="riskmgr" class="pane">
 
-  <div class="alert al-b" style="margin-bottom:16px">💰 <strong>Risk Manager Interattivo</strong> — Inserisci i parametri del tuo trade per calcolare il position sizing ottimale. I valori pre-compilati sono calibrati su MX $5.37.</div>
+  <div class="alert al-b" style="margin-bottom:16px">💰 <strong>Risk Manager Interattivo</strong> — Inserisci i parametri del tuo trade per calcolare il position sizing ottimale. I valori pre-compilati sono calibrati su MX $5.32 · ⚠️ Earnings AMC 28 Apr: gestisci il rischio event!</div>
 
   <!-- CALCULATOR -->
   <div class="g2" style="margin-bottom:14px">
@@ -1029,18 +1038,18 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
         </div>
         <div class="rm-inp">
           <label>🎯 Prezzo Entrata ($)</label>
-          <input type="number" id="rm_entry" value="5.37" step="0.01" oninput="calcRM()">
+          <input type="number" id="rm_entry" value="5.32" step="0.01" oninput="calcRM()">
           <div class="inp-hint">Prezzo limite o market al quale intendi comprare</div>
         </div>
         <div class="rm-inp">
           <label>🛑 Stop Loss ($)</label>
-          <input type="number" id="rm_stop" value="4.66" step="0.01" oninput="calcRM()">
-          <div class="inp-hint">Fib 23.6% ($4.66) — livello di invalidazione setup</div>
+          <input type="number" id="rm_stop" value="4.62" step="0.01" oninput="calcRM()">
+          <div class="inp-hint">Zona $4.60 — livello di invalidazione setup post-earnings</div>
         </div>
         <div class="rm-inp">
           <label>🚀 Target Profit ($)</label>
-          <input type="number" id="rm_target" value="7.20" step="0.01" oninput="calcRM()">
-          <div class="inp-hint">Obiettivo di prezzo per la presa di profitto</div>
+          <input type="number" id="rm_target" value="7.00" step="0.01" oninput="calcRM()">
+          <div class="inp-hint">Target analisti $7.00 — upside +31.6% da $5.32</div>
         </div>
       </div>
     </div>
@@ -1151,6 +1160,397 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
         <div class="rule-text"><strong>Non inseguire il sentiment social</strong>+340% Reddit = FOMO attivo. Quando il retail è euforia, i professionisti stanno vendendo. Trading contro la folla richiede disciplina estrema.</div>
       </div>
     </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     TAB 7 – BACKTEST
+===================================================== -->
+<div id="backtest" class="pane">
+
+  <div class="alert al-b">⚙️ <strong>Backtest NYSE:MX</strong> — 25 Apr 2025 → 24 Apr 2026 · 251 candele giornaliere · Capitale iniziale $10.000 · Commissioni 0.1% + slippage 0.05%</div>
+
+  <!-- KPI CONFRONTO -->
+  <div class="g3" style="margin-bottom:14px">
+    <div class="card" style="border-top:3px solid #58a6ff">
+      <div class="ctitle">RSI Strategy</div>
+      <div class="cval green">+21.05%</div>
+      <div class="csub">$10.000 → <strong>$12.105</strong></div>
+      <div style="margin-top:8px;font-size:.78rem;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Trade totali</span><span>3</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Win rate</span><span class="green">66.7%</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Profit Factor</span><span class="green">4.18</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Sharpe Ratio</span><span class="green">9.32</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Max Drawdown</span><span class="yellow">-6.63%</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Expectancy/trade</span><span class="green">+7.04%</span></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid #f85149">
+      <div class="ctitle">MACD Strategy</div>
+      <div class="cval red">-12.94%</div>
+      <div class="csub">$10.000 → <strong style="color:#f85149">$8.706</strong></div>
+      <div style="margin-top:8px;font-size:.78rem;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Trade totali</span><span>9</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Win rate</span><span class="red">33.3%</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Profit Factor</span><span class="red">0.62</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Sharpe Ratio</span><span class="red">-3.43</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Max Drawdown</span><span class="red">-12.94%</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Expectancy/trade</span><span class="red">-1.35%</span></div>
+      </div>
+    </div>
+    <div class="card" style="border-top:3px solid #3fb950">
+      <div class="ctitle">Buy &amp; Hold (benchmark)</div>
+      <div class="cval green">+62.54%</div>
+      <div class="csub">$10.000 → <strong>$16.254</strong></div>
+      <div style="margin-top:8px;font-size:.78rem;display:flex;flex-direction:column;gap:4px">
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">RSI vs B&amp;H</span><span class="red">-41.49%</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">MACD vs B&amp;H</span><span class="red">-75.48%</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Periodo</span><span>365 giorni</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Prezzo entrata</span><span>$3.30</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Prezzo uscita</span><span class="green">$5.37</span></div>
+        <div style="display:flex;justify-content:space-between"><span style="color:#8b949e">Max spike catturato</span><span class="green">+47% Apr 26</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EQUITY CURVE CHART -->
+  <div class="card mb">
+    <div class="stitle">Equity Curve — RSI vs MACD vs Buy &amp; Hold ($10.000 iniziali)</div>
+    <div style="height:260px;position:relative"><canvas id="cEquity"></canvas></div>
+  </div>
+
+  <!-- TRADE LOGS SIDE BY SIDE -->
+  <div class="g2">
+
+    <!-- RSI TRADE LOG -->
+    <div class="card">
+      <div class="stitle">RSI — Trade Log Completo (3 trade)</div>
+      <table class="tbl">
+        <thead>
+          <tr><th>#</th><th>Entrata</th><th>Uscita</th><th>GG</th><th>Prezzo IN</th><th>Prezzo OUT</th><th>Result</th><th>Capitale</th></tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td>1</td>
+            <td>01 Ago 25</td>
+            <td>18 Set 25</td>
+            <td>48</td>
+            <td>$2.96</td>
+            <td>$3.33</td>
+            <td class="green"><strong>+12.20%</strong></td>
+            <td>$11.220</td>
+          </tr>
+          <tr>
+            <td>2</td>
+            <td>10 Ott 25</td>
+            <td>02 Dic 25</td>
+            <td>53</td>
+            <td>$3.00</td>
+            <td>$2.81</td>
+            <td class="red"><strong>-6.63%</strong></td>
+            <td>$10.476</td>
+          </tr>
+          <tr style="background:rgba(63,185,80,.04)">
+            <td>3</td>
+            <td>20 Feb 26</td>
+            <td>13 Apr 26</td>
+            <td>52</td>
+            <td>$2.65</td>
+            <td>$3.07</td>
+            <td class="green"><strong>+15.55%</strong></td>
+            <td><strong>$12.105</strong></td>
+          </tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.78rem">
+        <div class="card" style="padding:9px;background:#0d1117">
+          <div style="color:#8b949e;margin-bottom:3px">Miglior trade</div>
+          <div class="green">+15.55% (Trade #3)</div>
+          <div style="color:#8b949e;font-size:.71rem">Feb 26 → Apr 26 · 52gg</div>
+        </div>
+        <div class="card" style="padding:9px;background:#0d1117">
+          <div style="color:#8b949e;margin-bottom:3px">Peggior trade</div>
+          <div class="red">-6.63% (Trade #2)</div>
+          <div style="color:#8b949e;font-size:.71rem">Ott 25 → Dic 25 · 53gg</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MACD TRADE LOG -->
+    <div class="card">
+      <div class="stitle">MACD — Trade Log Completo (9 trade)</div>
+      <table class="tbl">
+        <thead>
+          <tr><th>#</th><th>Entrata</th><th>Uscita</th><th>GG</th><th>IN</th><th>OUT</th><th>Result</th><th>Cap.</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>1</td><td>03 Lug 25</td><td>07 Lug 25</td><td>4</td><td>$4.11</td><td>$3.92</td><td class="red">-4.92%</td><td>$9.508</td></tr>
+          <tr><td>2</td><td>18 Lug 25</td><td>25 Lug 25</td><td>7</td><td>$4.32</td><td>$4.14</td><td class="red">-4.47%</td><td>$9.083</td></tr>
+          <tr style="background:rgba(63,185,80,.04)"><td>3</td><td>22 Ago 25</td><td>07 Ott 25</td><td>46</td><td>$2.84</td><td>$3.11</td><td class="green"><strong>+9.21%</strong></td><td>$9.919</td></tr>
+          <tr><td>4</td><td>27 Ott 25</td><td>29 Ott 25</td><td>2</td><td>$3.15</td><td>$3.04</td><td class="red">-3.79%</td><td>$9.543</td></tr>
+          <tr><td>5</td><td>31 Ott 25</td><td>04 Nov 25</td><td>4</td><td>$3.10</td><td>$2.85</td><td class="red"><strong>-8.37%</strong></td><td>$8.745</td></tr>
+          <tr style="background:rgba(63,185,80,.04)"><td>6</td><td>24 Nov 25</td><td>16 Dic 25</td><td>22</td><td>$2.39</td><td>$2.57</td><td class="green">+7.23%</td><td>$9.377</td></tr>
+          <tr style="background:rgba(63,185,80,.04)"><td>7</td><td>05 Gen 26</td><td>30 Gen 26</td><td>25</td><td>$2.79</td><td>$2.90</td><td class="green">+3.64%</td><td>$9.719</td></tr>
+          <tr><td>8</td><td>11 Feb 26</td><td>17 Feb 26</td><td>6</td><td>$3.04</td><td>$2.86</td><td class="red">-6.22%</td><td>$9.114</td></tr>
+          <tr><td>9</td><td>05 Mar 26</td><td>23 Mar 26</td><td>18</td><td>$2.87</td><td>$2.75</td><td class="red">-4.48%</td><td><strong style="color:#f85149">$8.706</strong></td></tr>
+        </tbody>
+      </table>
+      <div style="margin-top:10px;display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:.78rem">
+        <div class="card" style="padding:9px;background:#0d1117">
+          <div style="color:#8b949e;margin-bottom:3px">Miglior trade</div>
+          <div class="green">+9.21% (Trade #3)</div>
+          <div style="color:#8b949e;font-size:.71rem">Ago 25 → Ott 25 · 46gg</div>
+        </div>
+        <div class="card" style="padding:9px;background:#0d1117">
+          <div style="color:#8b949e;margin-bottom:3px">Peggior trade</div>
+          <div class="red">-8.37% (Trade #5)</div>
+          <div style="color:#8b949e;font-size:.71rem">Ott 31 → Nov 04 · 4gg</div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- CONCLUSIONI -->
+  <div class="card" style="margin-top:14px">
+    <div class="stitle">Analisi &amp; Conclusioni</div>
+    <div class="g3" style="margin-bottom:0">
+      <div style="font-size:.83rem;color:#8b949e;line-height:1.7">
+        <div style="font-weight:700;color:#58a6ff;margin-bottom:6px">RSI Strategy ✅</div>
+        Funziona bene su MX perché il titolo ha avuto una natura <strong style="color:#e6edf3">mean-reverting</strong> per gran parte dell'anno (range laterale $2–$4). RSI cattura i minimi di ipervenduto con buon timing. Sharpe 9.32 e profit factor 4.18 sono metriche eccellenti — max drawdown contenuto a -6.63%.
+      </div>
+      <div style="font-size:.83rem;color:#8b949e;line-height:1.7">
+        <div style="font-weight:700;color:#f85149;margin-bottom:6px">MACD Strategy ❌</div>
+        Fallisce su MX perché genera <strong style="color:#e6edf3">molti segnali falsi</strong> nelle fasi laterali/choppy (6 perdite su 9 trade). Trade brevissimi (2–7 giorni) con commissioni che erodono i piccoli guadagni. Profit Factor 0.62 &lt; 1 indica strategia strutturalmente in perdita su questo titolo/timeframe.
+      </div>
+      <div style="font-size:.83rem;color:#8b949e;line-height:1.7">
+        <div style="font-weight:700;color:#3fb950;margin-bottom:6px">Buy &amp; Hold 🏆</div>
+        Batte entrambe grazie allo <strong style="color:#e6edf3">spike di aprile 2026 (+47%)</strong> non catturabile da sistemi meccanici. Il +62.54% è però fortemente dipendente da un evento singolo (notizia MOSFET). Senza quello spike, RSI avrebbe probabilmente vinto. Non è robusta.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<!-- ====================================================
+     TAB 8 – ANALISI CHART (Pattern Visivi dal Screenshot)
+===================================================== -->
+<div id="chartanalysis" class="pane">
+
+  <div class="alert al-b">📷 Analisi pattern visivi dal chart TradingView del 27 Aprile 2026 — MX NYSE:D1 — Dati letti direttamente dallo screenshot</div>
+
+  <!-- EARNINGS PREVIEW BOX -->
+  <div style="background:linear-gradient(135deg,#2d1f0e,#3a2810);border:2px solid #d29922;border-radius:12px;padding:18px 20px;margin-bottom:14px">
+    <div style="font-size:.95rem;font-weight:800;color:#d29922;margin-bottom:12px">⚡ EARNINGS PREVIEW — Q1 2026 · AMC 28 Aprile 2026</div>
+    <div class="g6" style="margin-bottom:10px">
+      <div><div class="ctitle">EPS Consensus</div><div class="cval red" style="font-size:1.2rem">-$0.22</div><div class="csub">vs -$0.08 Q4'25</div></div>
+      <div><div class="ctitle">Revenue Attesa</div><div class="cval yellow" style="font-size:1.2rem">$44–48M</div><div class="csub">+2.9% YoY</div></div>
+      <div><div class="ctitle">Oscillazione ±</div><div class="cval yellow" style="font-size:1.2rem">5.4%</div><div class="csub">attesa post-E</div></div>
+      <div><div class="ctitle">Beat Q4'25</div><div class="cval green" style="font-size:1.2rem">+$0.24</div><div class="csub">-$0.08 vs -$0.32E</div></div>
+      <div><div class="ctitle">Target Analisti</div><div class="cval green" style="font-size:1.2rem">$7.00</div><div class="csub">range $6–$8</div></div>
+      <div><div class="ctitle">Rating</div><div class="cval green" style="font-size:1.2rem">S.BUY</div><div class="csub">2 brokers</div></div>
+    </div>
+    <div style="font-size:.78rem;color:#d29922;line-height:1.6">MX è entrata in earnings con +97.1% negli ultimi 30 giorni e +56.8% YTD. Il Q4'25 aveva battuto di $0.24 EPS. La guidance Q1'26 indica revenue $44–48M con gross margin 14–16% — miglioramento sequenziale ma sotto l'anno precedente. I nuovi MOSFET 8ª gen contribuiranno solo ~10% del revenue entro Q4 2026 (ramping graduale).</div>
+  </div>
+
+  <!-- SITUAZIONE ATTUALE -->
+  <div class="card mb">
+    <div class="stitle">📊 Situazione Prezzi al 27 Apr 2026</div>
+    <div class="g6" style="margin-bottom:0">
+      <div><div class="ctitle">Open</div><div class="cval">$3.27</div></div>
+      <div><div class="ctitle">High</div><div class="cval green">$3.30</div></div>
+      <div><div class="ctitle">Low</div><div class="cval red">$3.13</div></div>
+      <div><div class="ctitle">Close</div><div class="cval red">$3.17</div></div>
+      <div><div class="ctitle">Variazione</div><div class="cval red">−$0.08 (−2.46%)</div></div>
+      <div><div class="ctitle">Resistenza</div><div class="cval yellow">$5.27</div><div class="csub">Box viola chart</div></div>
+    </div>
+  </div>
+
+  <!-- MEDIE MOBILI -->
+  <div class="g2 mb">
+    <div class="card">
+      <div class="stitle">📉 Medie Mobili — Posizione Prezzo</div>
+      <table class="tbl">
+        <thead><tr><th>Media</th><th>Valore</th><th>Prezzo vs MA</th><th>Segnale</th></tr></thead>
+        <tbody>
+          <tr><td>SMA</td><td>$3.53</td><td class="red">Sotto ↓</td><td><span class="badge bg-r">Bearish</span></td></tr>
+          <tr><td>SMA</td><td>$3.71</td><td class="red">Sotto ↓</td><td><span class="badge bg-r">Bearish</span></td></tr>
+          <tr><td>EMA</td><td>$3.22</td><td class="red">Sotto ↓</td><td><span class="badge bg-r">Bearish</span></td></tr>
+          <tr><td>EMA</td><td>$3.20</td><td class="red">Sotto ↓</td><td><span class="badge bg-r">Bearish</span></td></tr>
+          <tr><td>EMA</td><td>$3.18</td><td class="green">Sopra ↑</td><td><span class="badge bg-g">Supporto</span></td></tr>
+        </tbody>
+      </table>
+      <div class="alert al-y" style="margin-top:10px;font-size:.79rem">⚠️ Prezzo ($3.17) sotto <strong>tutte le SMA principali</strong> (3.53 e 3.71) — segnale di debolezza a breve termine. Recupero necessario sopra $3.53 per invertire.</div>
+    </div>
+    <div class="card">
+      <div class="stitle">📈 Indicatori Letti dallo Screenshot</div>
+      <table class="tbl">
+        <thead><tr><th>Indicatore</th><th>Valore</th><th>Segnale</th></tr></thead>
+        <tbody>
+          <tr><td>RSI (14)</td><td>49.87</td><td><span class="badge bg-x">Neutro</span></td></tr>
+          <tr><td>MACD</td><td>0.0160 / 0.0273</td><td><span class="badge bg-g">Debolmente +</span></td></tr>
+          <tr><td>Stochastic %K/%D</td><td>44.14 / 57.22</td><td><span class="badge bg-x">Neutro</span></td></tr>
+          <tr><td>CCI</td><td>41.30</td><td><span class="badge bg-x">Neutro</span></td></tr>
+          <tr><td>AO (Awesome Osc.)</td><td>0.1793</td><td><span class="badge bg-g">Debolmente +</span></td></tr>
+          <tr><td>OBV</td><td>17.55M</td><td><span class="badge bg-g">In crescita</span></td></tr>
+          <tr><td>Accum/Dist</td><td>−14.07M</td><td><span class="badge bg-r">Distribuzione</span></td></tr>
+          <tr><td>ADL</td><td>1,709.19</td><td><span class="badge bg-g">In aumento</span></td></tr>
+          <tr><td>BB %b</td><td>0.57</td><td><span class="badge bg-y">Parte alta BB</span></td></tr>
+          <tr><td>ATR</td><td>0.1202</td><td><span class="badge bg-x">Volatilità bassa</span></td></tr>
+          <tr><td>Momentum</td><td>0.0000</td><td><span class="badge bg-x">Flat</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- PATTERN VISIVI -->
+  <div class="card mb">
+    <div class="stitle">🔍 Pattern Visivi Identificati — Analisi D1</div>
+    <div class="pgrid">
+
+      <div class="pcard">
+        <div style="font-size:2rem;flex-shrink:0">📦</div>
+        <div>
+          <div class="pname">Accumulation Base (Flat Base)</div>
+          <div class="pdesc">Lunga lateralizzazione con price action compressa tra ~$3.00 e ~$4.00 per diversi mesi. Volumi ridotti nella fase di bassa, poi esplosione volumetrica al breakout. Classica struttura Wyckoff di accumulazione istituzionale.</div>
+          <div class="psig"><span class="badge bg-b">Neutro → Bullish setup</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div style="font-size:2rem;flex-shrink:0">💥</div>
+        <div>
+          <div class="pname">Breakout + Pullback ("Pump & Retrace")</div>
+          <div class="pdesc">Movimento impulsivo con +50–60% dal minimo, poi rapido ritracciamento. Le candele "E" sul chart indicano <strong style="color:#d29922">Earnings</strong>: il breakout è earnings-driven. Il prezzo attuale ($3.17) è già sotto il livello pre-spike.</div>
+          <div class="psig"><span class="badge bg-y">Potenziale bull trap o fisiologico</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div style="font-size:2rem;flex-shrink:0">🚧</div>
+        <div>
+          <div class="pname">Resistenza Chiave $5.27</div>
+          <div class="pdesc">La zona $5.27 (box viola visibile nel chart) è la resistenza principale identificata visivamente. Corrisponde al picco del breakout e alla zona di distribuzione dove i venditori hanno preso il controllo. Testare questa zona richiederà un nuovo catalizzatore.</div>
+          <div class="psig"><span class="badge bg-r">Resistenza primaria</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div style="font-size:2rem;flex-shrink:0">⚡</div>
+        <div>
+          <div class="pname">Volume Spike Earnings (candele "E")</div>
+          <div class="pdesc">Le tre candele marcate "E" nel chart segnalano eventi earnings. L'ultimo ha generato il picco volumetrico più alto della serie storica visibile — volume >6× la media. Il Vol (657.05K vs media 242.59K) conferma l'eccezionalità dell'evento.</div>
+          <div class="psig"><span class="badge bg-g">Interesse istituzionale confermato</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div style="font-size:2rem;flex-shrink:0">⚖️</div>
+        <div>
+          <div class="pname">Divergenza OBV vs Accum/Dist</div>
+          <div class="pdesc"><strong style="color:#3fb950">OBV +17.55M</strong> (positivo e in crescita) contro <strong style="color:#f85149">Accum/Dist −14.07M</strong> (negativo). Segnale misto critico: il volume al breakout era reale ma la distribuzione sta iniziando. Indica che i venditori stanno assorbendo i compratori.</div>
+          <div class="psig"><span class="badge bg-y">⚠️ Divergenza — monitorare</span></div>
+        </div>
+      </div>
+
+      <div class="pcard">
+        <div style="font-size:2rem;flex-shrink:0">📉</div>
+        <div>
+          <div class="pname">Fondamentali Visibili nel Chart</div>
+          <div class="pdesc"><strong>Net Income FQ: −$8.079M (−38.28%) a Dic '25</strong> — peggioramento YoY. <strong style="color:#3fb950">Total Current Assets: $2.159B (+7.59%) a Gen '26</strong> — leggero miglioramento. Il breakout sembra guidato da speculazione/news più che da earnings solidi.</div>
+          <div class="psig"><span class="badge bg-r">Fondamentali deboli a breve</span></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- INDICATORI TABELLA COMPLETA -->
+  <div class="card mb">
+    <div class="stitle">📋 Tabella Indicatori — Lettura Completa dallo Screenshot</div>
+    <table class="tbl">
+      <thead><tr><th>Indicatore</th><th>Valore</th><th>Segnale</th><th>Interpretazione</th></tr></thead>
+      <tbody>
+        <tr><td><strong>RSI (14)</strong></td><td>49.87 <span style="color:#8b949e">(signal: 54.38)</span></td><td><span class="badge bg-x">Neutro</span></td><td>Zona mediana — né ipercomprato né ipervenduto. Nessun segnale direzionale forte.</td></tr>
+        <tr><td><strong>OBV</strong></td><td>17.55M</td><td><span class="badge bg-g">Bullish</span></td><td>In crescita recente — accumulo di volume netto positivo dopo il breakout.</td></tr>
+        <tr><td><strong>ATR</strong></td><td>0.1202</td><td><span class="badge bg-x">Bassa vol.</span></td><td>Average True Range basso — volatilità compressa, possibile precursore di movimento.</td></tr>
+        <tr><td><strong>Accum/Dist</strong></td><td>−14.07M <span style="color:#8b949e">(signal: −13.92M)</span></td><td><span class="badge bg-r">Distribuzione</span></td><td>⚠️ Negativo: indica che il denaro sta uscendo dal titolo — i seller dominano sull'intraday.</td></tr>
+        <tr><td><strong>RSI</strong></td><td>49.87 <span style="color:#8b949e">(signal: 54.38)</span></td><td><span class="badge bg-x">Neutro</span></td><td>Vedi sopra.</td></tr>
+        <tr><td><strong>MACD</strong></td><td>0.0160 / Signal: 0.0273 / Hist: 0.0112</td><td><span class="badge bg-g">Debol. +</span></td><td>MACD sopra zero ma in indebolimento (istogramma piccolo). Momentum in calo.</td></tr>
+        <tr><td><strong>ADL</strong></td><td>1,709.19</td><td><span class="badge bg-g">Positivo</span></td><td>Advance/Decline Line in aumento — segnale di breadth positivo.</td></tr>
+        <tr><td><strong>BB %b</strong></td><td>0.57</td><td><span class="badge bg-y">Parte alta</span></td><td>Prezzo nella metà superiore delle Bande di Bollinger. Non in territorio estremo.</td></tr>
+        <tr><td><strong>Momentum</strong></td><td>0.0000</td><td><span class="badge bg-x">Flat</span></td><td>Momentum quasi zero — il trend non accelera né decelera. Fase di stallo.</td></tr>
+        <tr><td><strong>Stochastic %K/%D</strong></td><td>44.14 / 57.22</td><td><span class="badge bg-x">Neutro</span></td><td>Entrambe le linee in zona centrale. Possibile incrocio ribassista se %K scende sotto %D.</td></tr>
+        <tr><td><strong>CCI</strong></td><td>41.30 <span style="color:#8b949e">(signal: 90.17)</span></td><td><span class="badge bg-x">Neutro</span></td><td>CCI sotto 100: nessuna condizione di ipercomprato. Signal (90) in calo verso CCI.</td></tr>
+        <tr><td><strong>AO (Awesome Osc.)</strong></td><td>0.1793</td><td><span class="badge bg-g">Debol. +</span></td><td>AO appena sopra zero — momentum debolmente positivo. Non è un segnale forte.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- SCENARI OPERATIVI DA CHART -->
+  <div class="card mb">
+    <div class="stitle">🎯 Scenari Operativi Derivati dall'Analisi Visiva</div>
+    <div class="sgrid">
+      <div class="scard sc-bull">
+        <div class="stit">📗 Scenario Bullish</div>
+        <div class="sbody">
+          Tenuta del supporto sopra SMA/EMA in area $3.18–$3.20. Consolidamento con volume decrescente, poi nuovo attacco alla resistenza $5.27 con volume crescente. OBV deve restare positivo e Accum/Dist girare in territorio positivo per conferma.
+          <br><br><strong>Condizione chiave:</strong> chiusura daily sopra $3.53 (SMA principale)
+        </div>
+        <div class="starget">Target: $4.50 → $5.27</div>
+      </div>
+      <div class="scard sc-base">
+        <div class="stit">📊 Scenario Neutro</div>
+        <div class="sbody">
+          Lateralizzazione tra $3.00 e $3.71 per consolidare il breakout. Tutti gli oscillatori in zona neutrale confermano assenza di direzionalità. Il titolo costruisce una base per un successivo movimento. ATR basso supporta questa lettura.
+          <br><br><strong>Condizione chiave:</strong> tenuta sopra $3.00 con volume ridotto
+        </div>
+        <div class="starget">Range: $3.00–$3.71</div>
+      </div>
+      <div class="scard sc-bear">
+        <div class="stit">📕 Scenario Bearish</div>
+        <div class="sbody">
+          Perdita del supporto $3.00 con OBV che gira ribassista. La divergenza Accum/Dist già negativa è un segnale preoccupante. Prezzo sotto tutte le SMA (3.53–3.71) aumenta il rischio. Sell-the-news post earnings-spike in corso.
+          <br><br><strong>Condizione chiave:</strong> rottura daily sotto $3.00 con volume elevato
+        </div>
+        <div class="starget">Target: $2.50–$2.80</div>
+      </div>
+    </div>
+
+    <!-- ZONE CRITICHE -->
+    <div style="margin-top:12px">
+      <div class="stitle" style="margin-bottom:10px">🗺️ Zone di Prezzo Critiche — Lettura Visiva Chart</div>
+      <table class="tbl">
+        <thead><tr><th>Livello</th><th>Prezzo</th><th>Tipo</th><th>Note</th></tr></thead>
+        <tbody>
+          <tr><td>🔴 Resistenza Primaria</td><td><strong style="color:#f85149">$5.27</strong></td><td><span class="badge bg-r">R</span></td><td>Box viola visibile nel chart — picco del breakout earnings</td></tr>
+          <tr><td>🟡 SMA Dinamica</td><td><strong style="color:#d29922">$3.71</strong></td><td><span class="badge bg-y">R/S</span></td><td>SMA principale — prezzo sotto = debolezza confermata</td></tr>
+          <tr><td>🟡 SMA Dinamica</td><td><strong style="color:#d29922">$3.53</strong></td><td><span class="badge bg-y">R/S</span></td><td>SMA secondaria — livello pivot a breve termine</td></tr>
+          <tr><td>🟢 EMA Supporto</td><td><strong style="color:#3fb950">$3.20–$3.22</strong></td><td><span class="badge bg-g">S</span></td><td>EMA cluster — zona supporto dinamico critica attuale</td></tr>
+          <tr><td>🟢 Supporto Psicologico</td><td><strong style="color:#3fb950">$3.00</strong></td><td><span class="badge bg-g">S</span></td><td>Pavimento psicologico — rottura bearish su D1 chiusura</td></tr>
+          <tr><td>🔵 Zona Breakout Base</td><td><strong style="color:#58a6ff">$2.50–$2.80</strong></td><td><span class="badge bg-b">S forte</span></td><td>Area di consolidamento pre-spike — supporto strutturale</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- DIVERGENZA BOX -->
+  <div class="card">
+    <div class="stitle">⚠️ Divergenza Critica — OBV vs Accum/Dist</div>
+    <div class="g2" style="margin-bottom:0">
+      <div style="padding:14px;background:#1a3a2a;border:1px solid #3fb950;border-radius:8px">
+        <div style="color:#3fb950;font-weight:800;margin-bottom:7px;font-size:.9rem">📈 OBV +17.55M — POSITIVO</div>
+        <div style="font-size:.8rem;color:#8b949e;line-height:1.7">L'On-Balance Volume è in crescita, indicando che il volume netto nelle sessioni rialziste supera quello nelle sessioni ribassiste. Suggerisce interesse di acquisto ancora presente nel mercato.</div>
+        <div style="margin-top:9px;font-size:.78rem;color:#3fb950">→ Supporta lettura bullish di fondo</div>
+      </div>
+      <div style="padding:14px;background:#3a1a1a;border:1px solid #f85149;border-radius:8px">
+        <div style="color:#f85149;font-weight:800;margin-bottom:7px;font-size:.9rem">📉 Accum/Dist −14.07M — NEGATIVO</div>
+        <div style="font-size:.8rem;color:#8b949e;line-height:1.7">L'Accumulation/Distribution è in territorio negativo e persistente: indica che il prezzo chiude sistematicamente nella parte bassa del range intraday, segnale di distribuzione professionale. Diverge dall'OBV.</div>
+        <div style="margin-top:9px;font-size:.78rem;color:#f85149">→ Segnala pressione di vendita in corso</div>
+      </div>
+    </div>
+    <div class="alert al-y" style="margin-top:12px;font-size:.8rem">⚠️ <strong>Interpretazione divergenza:</strong> Il breakout aveva volume reale (OBV positivo) ma i professionisti stanno ora distribuendo (Accum/Dist negativo). Tipico schema post-spike: il retail compra al rialzo mentre gli istituzionali vendono sulla forza. Monitorare la convergenza o divergenza nei prossimi 5–10 giorni come indicatore direzionale.</div>
   </div>
 
 </div>
@@ -1479,6 +1879,41 @@ new Chart(document.getElementById('cSR'),{
   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` $${c.parsed.x.toFixed(2)}`}}},
     scales:{x:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+v.toFixed(2)},min:0,max:6.2},y:{grid:{display:false}}}}
+});
+
+// EQUITY CURVE
+new Chart(document.getElementById('cEquity'),{
+  type:'line',
+  data:{
+    labels:['Start','Set 25','Dic 25','Nov 25','Dic 25 ','Gen 26','Mar 26','Apr 26 ','Apr 26'],
+    datasets:[
+      {label:'RSI Strategy',
+       data:[10000,11220,10476,10476,10476,10476,12105,12105,12105],
+       borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.08)',borderWidth:2.5,tension:.3,fill:false,
+       pointRadius:[5,5,5,0,0,0,6,0,0],pointBackgroundColor:'#58a6ff'},
+      {label:'MACD Strategy',
+       data:[10000,9508,9083,9919,8745,9719,9114,8706,8706],
+       borderColor:'#f85149',backgroundColor:'rgba(248,81,73,.05)',borderWidth:2.5,tension:.3,fill:false,
+       pointRadius:[5,4,4,4,4,4,4,5,0],pointBackgroundColor:'#f85149'},
+      {label:'Buy & Hold',
+       data:[10000,10530,10200,10380,10200,10600,11300,14200,16254],
+       borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,.05)',borderWidth:2,tension:.4,fill:false,
+       borderDash:[5,3],pointRadius:[5,3,3,3,3,3,3,5,5],pointBackgroundColor:'#3fb950'}
+    ]
+  },
+  options:{
+    responsive:true,maintainAspectRatio:false,
+    interaction:{mode:'index',intersect:false},
+    plugins:{
+      legend:{position:'top',labels:{usePointStyle:true}},
+      tooltip:{callbacks:{label:c=>` ${c.dataset.label}: $${c.parsed.y.toLocaleString('it-IT')}`}}
+    },
+    scales:{
+      y:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+v.toLocaleString('it-IT')},
+         title:{display:true,text:'Capitale ($)'}},
+      x:{grid:{color:'#21262d'}}
+    }
+  }
 });
 
 // RADAR
