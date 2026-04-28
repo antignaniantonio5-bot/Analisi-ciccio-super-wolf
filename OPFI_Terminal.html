@@ -1,0 +1,3013 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>OPFI Terminal — OppFi Inc.</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@300;400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #070b0f;
+    --bg2: #0d1318;
+    --bg3: #111820;
+    --bg4: #16202a;
+    --border: #1e2d3d;
+    --border2: #253545;
+    --green: #00d68f;
+    --green2: #00b37a;
+    --red: #ff4757;
+    --red2: #cc3344;
+    --yellow: #ffd32a;
+    --blue: #00b0ff;
+    --cyan: #00e5ff;
+    --purple: #b39ddb;
+    --text: #e8f0f8;
+    --text2: #8fa8c0;
+    --text3: #4a6070;
+    --accent: #00e5ff;
+    --sell: #ff4757;
+    --buy: #00d68f;
+    --hold: #ffd32a;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--bg);
+    color: var(--text);
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+
+  /* HEADER */
+  .terminal-header {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    padding: 0 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    height: 56px;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .ticker-badge {
+    background: var(--accent);
+    color: #000;
+    font-weight: 700;
+    font-size: 14px;
+    padding: 4px 12px;
+    letter-spacing: 2px;
+  }
+
+  .company-name {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    color: var(--text2);
+    font-weight: 300;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .price-header {
+    display: flex;
+    align-items: baseline;
+    gap: 12px;
+  }
+
+  .price-big {
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: -1px;
+  }
+
+  .price-change-neg {
+    font-size: 14px;
+    color: var(--red);
+    font-weight: 500;
+  }
+
+  .header-right {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .live-dot {
+    width: 8px;
+    height: 8px;
+    background: var(--red);
+    border-radius: 50%;
+    animation: pulse 1.5s infinite;
+    display: inline-block;
+    margin-right: 6px;
+  }
+
+  @keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.4; transform: scale(0.8); }
+  }
+
+  .timestamp {
+    font-size: 11px;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+  }
+
+  /* NAVIGATION */
+  .nav-tabs {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    padding: 0 24px;
+    gap: 0;
+  }
+
+  .nav-tab {
+    padding: 12px 24px;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    cursor: pointer;
+    border-bottom: 2px solid transparent;
+    transition: all 0.2s;
+    font-family: 'IBM Plex Mono', monospace;
+    background: none;
+    border-top: none;
+    border-left: none;
+    border-right: none;
+  }
+
+  .nav-tab:hover { color: var(--text2); }
+
+  .nav-tab.active {
+    color: var(--accent);
+    border-bottom: 2px solid var(--accent);
+  }
+
+  /* CONTENT */
+  .content {
+    padding: 20px 24px;
+    max-width: 1600px;
+    margin: 0 auto;
+  }
+
+  .tab-panel { display: none; }
+  .tab-panel.active { display: block; }
+
+  /* GRID UTILITIES */
+  .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
+  .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+  .grid-2-1 { display: grid; grid-template-columns: 2fr 1fr; gap: 12px; }
+  .grid-1-2 { display: grid; grid-template-columns: 1fr 2fr; gap: 12px; }
+  .mb12 { margin-bottom: 12px; }
+  .mb20 { margin-bottom: 20px; }
+
+  /* CARD */
+  .card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px;
+  }
+
+  .card-title {
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 12px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .card-title::before {
+    content: '';
+    width: 3px;
+    height: 12px;
+    background: var(--accent);
+    display: block;
+  }
+
+  /* KPI CARDS */
+  .kpi-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 16px 20px;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .kpi-card::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 2px;
+  }
+
+  .kpi-card.bearish::after { background: var(--red); }
+  .kpi-card.bullish::after { background: var(--green); }
+  .kpi-card.neutral::after { background: var(--yellow); }
+  .kpi-card.info::after { background: var(--accent); }
+
+  .kpi-label {
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 8px;
+  }
+
+  .kpi-value {
+    font-size: 26px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+
+  .kpi-value.red { color: var(--red); }
+  .kpi-value.green { color: var(--green); }
+  .kpi-value.yellow { color: var(--yellow); }
+  .kpi-value.cyan { color: var(--cyan); }
+
+  .kpi-sub {
+    font-size: 11px;
+    color: var(--text3);
+    margin-top: 6px;
+  }
+
+  /* SIGNAL GAUGE */
+  .signal-card {
+    background: var(--bg2);
+    border: 1px solid var(--border);
+    padding: 20px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .signal-label-main {
+    font-size: 9px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--text3);
+    margin-bottom: 16px;
+  }
+
+  .signal-ring {
+    width: 100px;
+    height: 100px;
+    border-radius: 50%;
+    border: 3px solid var(--border2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    position: relative;
+    margin-bottom: 12px;
+  }
+
+  .signal-ring.sell-ring {
+    border-color: var(--red);
+    box-shadow: 0 0 24px rgba(255,71,87,0.25);
+  }
+
+  .signal-text {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .signal-text.sell { color: var(--red); }
+  .signal-text.buy { color: var(--green); }
+  .signal-text.hold { color: var(--yellow); }
+
+  .signal-counts {
+    display: flex;
+    gap: 16px;
+    font-size: 11px;
+  }
+
+  .sig-buy { color: var(--green); }
+  .sig-hold { color: var(--yellow); }
+  .sig-sell { color: var(--red); }
+
+  /* INDICATOR ROW */
+  .indicator-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+  }
+
+  .indicator-row:last-child { border-bottom: none; }
+
+  .ind-name { color: var(--text2); }
+  .ind-value { color: var(--text); font-weight: 500; }
+
+  .ind-signal {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 2px 8px;
+  }
+
+  .sig-badge-sell { background: rgba(255,71,87,0.15); color: var(--red); border: 1px solid rgba(255,71,87,0.3); }
+  .sig-badge-buy { background: rgba(0,214,143,0.15); color: var(--green); border: 1px solid rgba(0,214,143,0.3); }
+  .sig-badge-neutral { background: rgba(255,211,42,0.1); color: var(--yellow); border: 1px solid rgba(255,211,42,0.2); }
+
+  /* SUPPORT/RESISTANCE VISUAL */
+  .sr-chart {
+    position: relative;
+    height: 200px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    margin-top: 12px;
+    overflow: hidden;
+  }
+
+  .sr-level {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-right: 8px;
+  }
+
+  .sr-line-res { border-top: 1px dashed rgba(255,71,87,0.6); }
+  .sr-line-sup { border-top: 1px dashed rgba(0,214,143,0.6); }
+  .sr-line-price { border-top: 2px solid var(--cyan); }
+  .sr-line-ma50 { border-top: 1px dashed rgba(255,211,42,0.6); }
+  .sr-line-ma200 { border-top: 1px dashed rgba(179,157,219,0.6); }
+
+  .sr-tag {
+    font-size: 9px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    padding: 1px 6px;
+    white-space: nowrap;
+  }
+
+  .sr-tag-res { background: rgba(255,71,87,0.2); color: var(--red); }
+  .sr-tag-sup { background: rgba(0,214,143,0.2); color: var(--green); }
+  .sr-tag-price { background: rgba(0,229,255,0.2); color: var(--cyan); }
+  .sr-tag-ma { background: rgba(255,211,42,0.1); color: var(--yellow); }
+  .sr-tag-ma200 { background: rgba(179,157,219,0.1); color: var(--purple); }
+
+  /* PATTERN CARD */
+  .pattern-card {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    padding: 16px;
+    border-left: 3px solid;
+  }
+
+  .pattern-card.bearish { border-left-color: var(--red); }
+  .pattern-card.neutral { border-left-color: var(--yellow); }
+  .pattern-card.bullish { border-left-color: var(--green); }
+
+  .pattern-title {
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    margin-bottom: 6px;
+  }
+
+  .pattern-type {
+    font-size: 9px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-bottom: 8px;
+    padding: 2px 8px;
+    display: inline-block;
+  }
+
+  .pattern-type.bearish { background: rgba(255,71,87,0.15); color: var(--red); }
+  .pattern-type.neutral { background: rgba(255,211,42,0.1); color: var(--yellow); }
+  .pattern-type.bullish { background: rgba(0,214,143,0.15); color: var(--green); }
+
+  .pattern-desc {
+    font-size: 11px;
+    color: var(--text2);
+    line-height: 1.6;
+  }
+
+  .pattern-implication {
+    font-size: 10px;
+    margin-top: 8px;
+    padding: 6px 10px;
+    background: var(--bg4);
+    color: var(--text3);
+    border-left: 2px solid var(--border2);
+  }
+
+  /* SCREENER TABLE */
+  .screener-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 12px;
+  }
+
+  .screener-table th {
+    text-align: left;
+    padding: 10px 12px;
+    font-size: 10px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    color: var(--text3);
+    border-bottom: 1px solid var(--border);
+    font-weight: 600;
+    cursor: pointer;
+  }
+
+  .screener-table th:hover { color: var(--accent); }
+
+  .screener-table td {
+    padding: 10px 12px;
+    border-bottom: 1px solid var(--border);
+    color: var(--text2);
+  }
+
+  .screener-table tr.highlight td { background: rgba(0,229,255,0.04); }
+  .screener-table tr:hover td { background: rgba(255,255,255,0.02); }
+
+  .ticker-cell {
+    font-weight: 700;
+    color: var(--text);
+    letter-spacing: 1px;
+  }
+
+  .rating-badge {
+    padding: 3px 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  .rating-sell { background: rgba(255,71,87,0.15); color: var(--red); border: 1px solid rgba(255,71,87,0.3); }
+  .rating-hold { background: rgba(255,211,42,0.1); color: var(--yellow); border: 1px solid rgba(255,211,42,0.2); }
+  .rating-buy { background: rgba(0,214,143,0.15); color: var(--green); border: 1px solid rgba(0,214,143,0.3); }
+
+  /* RADAR CHART */
+  .radar-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 10px;
+  }
+
+  /* FILTER BUTTONS */
+  .filter-row {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .filter-btn {
+    padding: 6px 16px;
+    font-size: 10px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border: 1px solid var(--border2);
+    background: transparent;
+    color: var(--text3);
+    cursor: pointer;
+    font-family: 'IBM Plex Mono', monospace;
+    transition: all 0.2s;
+  }
+
+  .filter-btn:hover { color: var(--text); border-color: var(--accent); }
+  .filter-btn.active { background: var(--accent); color: #000; border-color: var(--accent); }
+
+  /* REPORT */
+  .report-content {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 13px;
+    line-height: 1.8;
+    color: var(--text2);
+    max-width: 900px;
+  }
+
+  .report-section {
+    margin-bottom: 32px;
+  }
+
+  .report-h1 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    letter-spacing: -0.5px;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .report-h2 {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-bottom: 12px;
+    padding-bottom: 6px;
+    border-bottom: 1px solid var(--border);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+
+  .report-h3 {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text);
+    margin-bottom: 8px;
+    margin-top: 16px;
+  }
+
+  .scenario-box {
+    padding: 20px;
+    border-left: 3px solid;
+    margin: 12px 0;
+    background: var(--bg3);
+  }
+
+  .scenario-box.bull { border-left-color: var(--green); }
+  .scenario-box.base { border-left-color: var(--yellow); }
+  .scenario-box.bear { border-left-color: var(--red); }
+
+  .scenario-title {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    margin-bottom: 10px;
+  }
+
+  .scenario-title.bull { color: var(--green); }
+  .scenario-title.base { color: var(--yellow); }
+  .scenario-title.bear { color: var(--red); }
+
+  .scenario-target {
+    font-size: 22px;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    margin-bottom: 8px;
+  }
+
+  .scenario-target.bull { color: var(--green); }
+  .scenario-target.base { color: var(--yellow); }
+  .scenario-target.bear { color: var(--red); }
+
+  /* CHART CONTAINERS */
+  .chart-wrap {
+    position: relative;
+    width: 100%;
+  }
+
+  canvas { max-width: 100%; }
+
+  /* OSCILLATOR BAR */
+  .osc-bar-wrap {
+    margin: 6px 0;
+  }
+
+  .osc-bar-label {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 4px;
+    font-size: 11px;
+  }
+
+  .osc-bar-track {
+    height: 6px;
+    background: var(--bg4);
+    border: 1px solid var(--border);
+    position: relative;
+    overflow: hidden;
+  }
+
+  .osc-bar-fill {
+    height: 100%;
+    position: absolute;
+    left: 0;
+    top: 0;
+    transition: width 0.8s ease;
+  }
+
+  /* MA TABLE */
+  .ma-table { width: 100%; }
+
+  .ma-row {
+    display: grid;
+    grid-template-columns: 80px 1fr 90px 90px;
+    padding: 8px 10px;
+    border-bottom: 1px solid var(--border);
+    font-size: 12px;
+    align-items: center;
+  }
+
+  .ma-row:last-child { border-bottom: none; }
+  .ma-row.header { font-size: 10px; letter-spacing: 1px; color: var(--text3); text-transform: uppercase; }
+
+  .divider-line {
+    height: 1px;
+    background: var(--border);
+    margin: 20px 0;
+  }
+
+  /* BOTTOM STATUS */
+  .status-bar {
+    background: var(--bg2);
+    border-top: 1px solid var(--border);
+    padding: 8px 24px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    color: var(--text3);
+    letter-spacing: 0.5px;
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 100;
+  }
+
+  .status-item { display: flex; align-items: center; gap: 6px; }
+
+  /* SCROLL FIX */
+  body { padding-bottom: 40px; }
+
+  /* responsive fixes */
+  @media (max-width: 1200px) {
+    .grid-4 { grid-template-columns: repeat(2, 1fr); }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="terminal-header">
+  <div class="header-left">
+    <span class="ticker-badge">OPFI</span>
+    <span class="company-name">OppFi Inc. — NYSE · Fintech Lending</span>
+  </div>
+  <div class="price-header">
+    <span class="price-big">$8.73</span>
+    <span class="price-change-pos" style="color:var(--green)">▲ +0.15 (+1.75%)</span>
+  </div>
+  <div class="header-right">
+    <span style="font-size:11px;color:var(--text3)"><span class="live-dot"></span>NYSE OPEN</span>
+    <span class="timestamp">28 APR 2026 · 09:30 EDT</span>
+  </div>
+</div>
+
+<!-- NAV -->
+<div class="nav-tabs">
+  <button class="nav-tab active" onclick="showTab('dashboard')">01 · Dashboard</button>
+  <button class="nav-tab" onclick="showTab('technical')">02 · Analisi Tecnica</button>
+  <button class="nav-tab" onclick="showTab('screener')">03 · Screener</button>
+  <button class="nav-tab" onclick="showTab('report')">04 · Report</button>
+  <button class="nav-tab" onclick="showTab('chart')">05 · Chart Visiva</button>
+  <button class="nav-tab" onclick="showTab('news')">06 · News & Catalyst</button>
+  <button class="nav-tab" onclick="showTab('volume')">07 · Volume & Sentiment</button>
+  <button class="nav-tab" onclick="showTab('risk')">08 · Risk Manager</button>
+</div>
+
+<!-- ══════════════════ TAB 1: DASHBOARD ══════════════════ -->
+<div class="content">
+<div id="tab-dashboard" class="tab-panel active">
+
+  <!-- KPI CARDS -->
+  <div class="grid-4 mb12">
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Prezzo Corrente</div>
+      <div class="kpi-value green">$8.73</div>
+      <div class="kpi-sub">52w High: $15.03 · Low: $7.31</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Performance YTD 2026</div>
+      <div class="kpi-value red">−5.1%</div>
+      <div class="kpi-sub">30d: +13.2% · 7d: +2.8%</div>
+    </div>
+    <div class="kpi-card bullish">
+      <div class="kpi-label">EPS Q4 2025</div>
+      <div class="kpi-value green">$0.30</div>
+      <div class="kpi-sub">Beat +7.1% vs stima $0.28</div>
+    </div>
+    <div class="kpi-card bullish">
+      <div class="kpi-label">FY2026 Guidance EPS</div>
+      <div class="kpi-value green">$1.84</div>
+      <div class="kpi-sub">Range: $1.76 – $1.84</div>
+    </div>
+  </div>
+
+  <div class="grid-4 mb20">
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Market Cap</div>
+      <div class="kpi-value yellow">$229M</div>
+      <div class="kpi-sub">Small-cap · NYSE</div>
+    </div>
+    <div class="kpi-card info">
+      <div class="kpi-label">Forward P/E</div>
+      <div class="kpi-value cyan">4.87x</div>
+      <div class="kpi-sub">Estremo sconto vs settore</div>
+    </div>
+    <div class="kpi-card bullish">
+      <div class="kpi-label">Revenue FY2025</div>
+      <div class="kpi-value green">+13.5%</div>
+      <div class="kpi-sub">$597M · Record annuale</div>
+    </div>
+    <div class="kpi-card bullish">
+      <div class="kpi-label">Adjusted Net Income</div>
+      <div class="kpi-value green">+69%</div>
+      <div class="kpi-sub">YoY 2025 · $140M record</div>
+    </div>
+  </div>
+
+  <!-- PRICE CHART + SIGNAL -->
+  <div class="grid-2-1 mb12">
+    <div class="card">
+      <div class="card-title">Prezzo D1 — Gen 2025 / Apr 2026</div>
+      <div class="chart-wrap" style="height:260px">
+        <canvas id="priceChart"></canvas>
+      </div>
+    </div>
+    <div class="signal-card">
+      <div class="signal-label-main">Segnale Tecnico Complessivo</div>
+      <div class="signal-ring" style="border-color:var(--yellow);box-shadow:0 0 24px rgba(255,211,42,0.2)">
+        <span class="signal-text hold" style="font-size:14px;font-weight:800">WEAK</span>
+        <span class="signal-text hold" style="font-size:11px">SELL</span>
+      </div>
+      <div class="signal-counts">
+        <span class="sig-buy">▲ 4 BUY</span>
+        <span class="sig-hold">● 5 HOLD</span>
+        <span class="sig-sell">▼ 4 SELL</span>
+      </div>
+      <div style="margin-top:16px; font-size:11px; color:var(--text3); text-align:center; line-height:1.6">
+        MA5–MA200:<br>2 Buy · 4 Sell · 6 Hold<br>Oscillatori: RSI 51.8 Neutro · MACD Buy<br>
+        <span style="color:var(--accent);margin-top:6px;display:block">Next Earnings: 7 Mag 2026</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- REVENUE TRIMESTRALE + PERFORMANCE COMPARATA -->
+  <div class="grid-2 mb12">
+    <div class="card">
+      <div class="card-title">Revenue Trimestrale ($M)</div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="revenueChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Performance Comparata (Indice base 100)</div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="perfChart"></canvas>
+      </div>
+    </div>
+  </div>
+
+  <!-- MIX RICAVI + MEDIE MOBILI CHIAVE -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Mix Ricavi — Struttura FY2025</div>
+      <div style="display:flex;gap:20px;align-items:center">
+        <div style="width:160px;height:160px;flex-shrink:0">
+          <canvas id="mixChart"></canvas>
+        </div>
+        <div style="flex:1;font-size:12px">
+          <div class="indicator-row"><span class="ind-name">Finance Charges (OppLoans)</span><span style="color:var(--cyan)">78%</span></div>
+          <div class="indicator-row"><span class="ind-name">Origination Fees</span><span style="color:var(--purple)">12%</span></div>
+          <div class="indicator-row"><span class="ind-name">SalaryTap Contracts</span><span style="color:var(--yellow)">6%</span></div>
+          <div class="indicator-row"><span class="ind-name">Other Revenue</span><span style="color:var(--green)">4%</span></div>
+          <div style="margin-top:10px;font-size:10px;color:var(--text3)">FY2025 Revenue Guide 2026: $650–$675M</div>
+        </div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">KPI Fondamentali Chiave</div>
+      <div class="indicator-row"><span class="ind-name">Auto-Approval Rate Q4</span><span class="ind-value">79%</span><span class="ind-signal sig-badge-buy">POSITIVO</span></div>
+      <div class="indicator-row"><span class="ind-name">Originations YoY Q4</span><span class="ind-value">+48%</span><span class="ind-signal sig-badge-buy">FORTE</span></div>
+      <div class="indicator-row"><span class="ind-name">Net Charge-off / Revenue</span><span class="ind-value">45%</span><span class="ind-signal sig-badge-sell">WATCH</span></div>
+      <div class="indicator-row"><span class="ind-name">Return on Equity</span><span class="ind-value">45.4%</span><span class="ind-signal sig-badge-buy">ALTO</span></div>
+      <div class="indicator-row"><span class="ind-name">Net Promoter Score</span><span class="ind-value">78</span><span class="ind-signal sig-badge-buy">LEADER</span></div>
+      <div class="indicator-row"><span class="ind-name">Dipendenti</span><span class="ind-value">410</span><span class="ind-signal sig-badge-neutral">SNELLO</span></div>
+    </div>
+  </div>
+
+</div><!-- /dashboard -->
+
+<!-- ══════════════════ TAB 2: ANALISI TECNICA ══════════════════ -->
+<div id="tab-technical" class="tab-panel">
+
+  <!-- OSCILLATORI -->
+  <div class="grid-2 mb12">
+    <div class="card">
+      <div class="card-title">Oscillatori — Letture Correnti D1</div>
+
+      <!-- RSI -->
+      <div class="osc-bar-wrap">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">RSI(14)</span>
+          <span style="color:var(--yellow)">51.83 · NEUTRO</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:51.83%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red))"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:2px"><span>0 · Oversold</span><span>50</span><span>Overbought · 100</span></div>
+      </div>
+
+      <!-- STOCH -->
+      <div class="osc-bar-wrap" style="margin-top:14px">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">Stochastic K(14)</span>
+          <span style="color:var(--yellow)">61.79 · NEUTRO</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:61.79%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red))"></div>
+        </div>
+      </div>
+
+      <!-- STOCHRSI -->
+      <div class="osc-bar-wrap" style="margin-top:14px">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">StochRSI(14)</span>
+          <span style="color:var(--red)">2.47 · OVERSOLD</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:2.47%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red))"></div>
+        </div>
+      </div>
+
+      <!-- CCI -->
+      <div class="osc-bar-wrap" style="margin-top:14px">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">CCI(14)</span>
+          <span style="color:var(--yellow)">9.50 · NEUTRO</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:54%;background:var(--yellow)"></div>
+        </div>
+      </div>
+
+      <!-- WILLIAMS %R -->
+      <div class="osc-bar-wrap" style="margin-top:14px">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">Williams %R(14)</span>
+          <span style="color:var(--yellow)">−52.4 · NEUTRO</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:48%;background:var(--yellow)"></div>
+        </div>
+      </div>
+
+      <!-- ATR -->
+      <div class="indicator-row" style="margin-top:14px">
+        <span class="ind-name">ATR(14) — Volatilità</span>
+        <span class="ind-value">$0.38</span>
+        <span class="ind-signal sig-badge-neutral">MODERATA</span>
+      </div>
+
+      <!-- ADX -->
+      <div class="indicator-row">
+        <span class="ind-name">ADX(14) — Forza Trend</span>
+        <span class="ind-value">24.8</span>
+        <span class="ind-signal sig-badge-neutral">INDEBOLIMENTO ↑</span>
+      </div>
+
+      <!-- MACD -->
+      <div class="indicator-row">
+        <span class="ind-name">MACD(12,26,9)</span>
+        <span class="ind-value">+0.094</span>
+        <span class="ind-signal sig-badge-buy">BUY</span>
+      </div>
+
+      <!-- MFI -->
+      <div class="indicator-row">
+        <span class="ind-name">MFI(14) — Money Flow</span>
+        <span class="ind-value">54.6</span>
+        <span class="ind-signal sig-badge-neutral">NEUTRO</span>
+      </div>
+
+      <!-- OBV -->
+      <div class="indicator-row">
+        <span class="ind-name">OBV — On Balance Vol.</span>
+        <span class="ind-value">Stabilizzato</span>
+        <span class="ind-signal sig-badge-neutral">NEUTRO</span>
+      </div>
+    </div>
+
+    <!-- MEDIE MOBILI -->
+    <div class="card">
+      <div class="card-title">Medie Mobili — Segnali vs Prezzo $8.73</div>
+      <div class="ma-table">
+        <div class="ma-row header">
+          <span>Periodo</span>
+          <span>Tipo</span>
+          <span>Valore</span>
+          <span>Segnale</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">MA(5)</span>
+          <span style="color:var(--text3)">SMA</span>
+          <span>$10.30</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">EMA(5)</span>
+          <span style="color:var(--text3)">EMA</span>
+          <span>$9.42</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">MA(20)</span>
+          <span style="color:var(--text3)">SMA</span>
+          <span>$9.12</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">EMA(20)</span>
+          <span style="color:var(--text3)">EMA</span>
+          <span>$8.98</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--yellow)">MA(50)</span>
+          <span style="color:var(--text3)">SMA</span>
+          <span style="color:var(--yellow)">$10.15</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">EMA(50)</span>
+          <span style="color:var(--text3)">EMA</span>
+          <span>$9.88</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">MA(100)</span>
+          <span style="color:var(--text3)">SMA</span>
+          <span>$10.52</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--purple)">MA(200)</span>
+          <span style="color:var(--text3)">SMA</span>
+          <span style="color:var(--purple)">$11.82</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">EMA(200)</span>
+          <span style="color:var(--text3)">EMA</span>
+          <span>$11.24</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px;background:rgba(255,211,42,0.06);border:1px solid rgba(255,211,42,0.15);font-size:11px;color:var(--yellow)">
+        ↑ Recupero: 0 su 12 MA ancora sopra il prezzo, ma MACD incrociato al rialzo. Il prezzo si avvicina a EMA20 ($8.98) — chiave per inversione.
+      </div>
+    </div>
+  </div>
+
+  <!-- SUPPORTI/RESISTENZE + ICHIMOKU -->
+  <div class="grid-2 mb12">
+    <div class="card">
+      <div class="card-title">Supporti & Resistenze — Visualizzazione Livelli</div>
+      <div class="sr-chart">
+        <!-- livelli dinamici via posizione % della chart height -->
+        <!-- scala: $7.00 (bottom) → $14.50 (top) = 750 range -->
+        <!-- R3 $14.00 → top 0% → top:7% -->
+        <div class="sr-level sr-line-res" style="top:7%">
+          <span class="sr-tag sr-tag-res">R3 — $14.00 · Target Analisti</span>
+        </div>
+        <!-- MA200 $11.96 → top:28% -->
+        <div class="sr-level sr-line-ma200" style="top:34%">
+          <span class="sr-tag sr-tag-ma200">MA200 — $11.96</span>
+        </div>
+        <!-- R2 $10.50 MA50 → top:46% -->
+        <div class="sr-level sr-line-ma50" style="top:52%">
+          <span class="sr-tag sr-tag-ma">R2/MA50 — $10.50</span>
+        </div>
+        <!-- R1 $8.87 → top:68% -->
+        <div class="sr-level sr-line-res" style="top:64%">
+          <span class="sr-tag sr-tag-res">R1 — $8.87 · Resistenza prossima</span>
+        </div>
+        <!-- PREZZO $8.73 → top:75% -->
+        <div class="sr-level sr-line-price" style="top:74%">
+          <span class="sr-tag sr-tag-price">▶ PREZZO — $8.73</span>
+        </div>
+        <!-- S1 $7.31 52w Low → top:87% -->
+        <div class="sr-level sr-line-sup" style="top:87%">
+          <span class="sr-tag sr-tag-sup">S1 — $7.31 · 52w Low · SUPPORTO CRITICO</span>
+        </div>
+        <!-- S2 area $6.50 → top:94% -->
+        <div class="sr-level sr-line-sup" style="top:94%">
+          <span class="sr-tag sr-tag-sup">S2 — $6.50 · Downside se rompe</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Ichimoku Cloud — Riepilogo D1</div>
+      <div style="font-size:12px">
+        <div class="indicator-row">
+          <span class="ind-name">Tenkan-Sen (9)</span>
+          <span class="ind-value">$8.94</span>
+          <span class="ind-signal sig-badge-sell">Prezzo vicino</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Kijun-Sen (26)</span>
+          <span class="ind-value">$9.88</span>
+          <span class="ind-signal sig-badge-sell">Prezzo sotto</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Senkou Span A (Cloud top)</span>
+          <span class="ind-value">$9.41</span>
+          <span class="ind-signal sig-badge-sell">Prezzo sotto</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Senkou Span B (Cloud bot)</span>
+          <span class="ind-value">$9.68</span>
+          <span class="ind-signal sig-badge-sell">Prezzo sotto</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Chikou Span (Lagging)</span>
+          <span class="ind-value">Sotto cloud</span>
+          <span class="ind-signal sig-badge-sell">BEARISH</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:10px;background:rgba(255,211,42,0.04);border:1px solid rgba(255,211,42,0.15);font-size:11px;color:var(--text2)">
+        ⚡ Prezzo ancora <strong style="color:var(--red)">sotto la nuvola Ichimoku</strong>, ma Tenkan-sen a $8.94 è il prossimo test. Rottura sopra il cloud (base a ~$9.41) necessaria per segnale bullish confermato.
+      </div>
+      <div style="margin-top:10px;font-size:11px">
+        <div class="indicator-row">
+          <span class="ind-name">VWAP (periodo)</span>
+          <span class="ind-value">~$9.40</span>
+          <span class="ind-signal sig-badge-sell">Prezzo sotto</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Bollinger Band UP</span>
+          <span class="ind-value">$9.78</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Bollinger Band MID</span>
+          <span class="ind-value">$8.90</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Bollinger Band LOW</span>
+          <span class="ind-value">$7.02</span>
+          <span class="ind-signal sig-badge-neutral">Vicinanza</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN CARDS -->
+  <div class="card mb12">
+    <div class="card-title">Pattern Grafici Riconosciuti — D1</div>
+    <div class="grid-2" style="margin-top:8px">
+      <div class="pattern-card bearish">
+        <span class="pattern-type bearish">Bearish · Breakdown</span>
+        <div class="pattern-title">Lower Lows Sequenziali — Downtrend Strutturale</div>
+        <div class="pattern-desc">
+          Il titolo registra una serie continua di massimi e minimi decrescenti da ottobre 2025. Ogni tentativo di rimbalzo è stato venduto, creando una struttura di <em>lower highs / lower lows</em> classica. Il breakdown del supporto $9.50 (fine marzo) ha accelerato la discesa fino al minimo attuale di $7.37, nuovo minimo a 52 settimane.
+        </div>
+        <div class="pattern-implication">
+          ⚠ Implicazione: Trend primario bearish confermato. Nessun segnale di inversione attivo. Target downside: $6.50 se $7.37 cede.
+        </div>
+      </div>
+
+      <div class="pattern-card bearish">
+        <span class="pattern-type bearish">Bearish · Distribuzione</span>
+        <div class="pattern-title">Death Cross (MA50 × MA200) — Segnale Confermato</div>
+        <div class="pattern-desc">
+          La MA50 ($10.50) ha incrociato al ribasso la MA200 ($11.96) su base giornaliera, generando il classico "Death Cross". Questo pattern indica un cambio strutturale del momentum da bullish a bearish, con volume di distribuzione sostenuto. Il cross è avvenuto a inizio 2026.
+        </div>
+        <div class="pattern-implication">
+          ⚠ Implicazione: Segnale storico di vendita a medio termine. Indica capitolazione dei holder di lungo. Richiede rottura di MA50 per annullamento.
+        </div>
+      </div>
+
+      <div class="pattern-card neutral">
+        <span class="pattern-type neutral">Potenziale · Watch</span>
+        <div class="pattern-title">Double Bottom Potenziale — In Formazione</div>
+        <div class="pattern-desc">
+          Se il prezzo tiene il supporto critico di $7.37 (minimo del 2 aprile 2026) nelle prossime sessioni e rimbalza, si potrebbe formare un <em>double bottom</em> con primo minimo implicito e secondo in costruzione. Il pattern sarebbe confermato solo con chiusura decisa sopra $8.87 (MA50 a breve).
+        </div>
+        <div class="pattern-implication">
+          👁 Monitorare: In vista dell'earnings del 13 maggio, un hold del $7.37 è requisito minimo per qualsiasi inversione.
+        </div>
+      </div>
+
+      <div class="pattern-card bearish">
+        <span class="pattern-type bearish">Bearish · Divergenza</span>
+        <div class="pattern-title">Divergenza Ribassista RSI-Prezzo (Mar–Apr 2026)</div>
+        <div class="pattern-desc">
+          Tra il rimbalzo di fine febbraio e i massimi relativi di marzo, l'RSI ha registrato massimi decrescenti mentre il prezzo tentava rimbalzi. Questa divergenza negativa ha anticipato il successivo sell-off ad aprile. L'RSI attuale a 43.75 non è in oversold classico (sotto 30), suggerendo che c'è ancora spazio di discesa senza inversione tecnica forzata.
+        </div>
+        <div class="pattern-implication">
+          ⚠ Implicazione: La divergenza conferma la debolezza fondamentale del momentum. RSI deve tornare sopra 50 per segnale bullish.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FIBONACCI -->
+  <div class="card">
+    <div class="card-title">Livelli Fibonacci — Ritracciamento dal Massimo ($13.89 → $7.37)</div>
+    <div class="grid-4" style="margin-top:8px">
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">FIB 23.6%</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text)">$8.91</div>
+        <div style="font-size:10px;color:var(--red);margin-top:4px">Prima resistenza</div>
+      </div>
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">FIB 38.2%</div>
+        <div style="font-size:18px;font-weight:700;color:var(--yellow)">$9.86</div>
+        <div style="font-size:10px;color:var(--yellow);margin-top:4px">Zona test MA200</div>
+      </div>
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">FIB 50%</div>
+        <div style="font-size:18px;font-weight:700;color:var(--text)">$10.63</div>
+        <div style="font-size:10px;color:var(--text3);margin-top:4px">Livello psicologico</div>
+      </div>
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">FIB 61.8%</div>
+        <div style="font-size:18px;font-weight:700;color:var(--green)">$11.40</div>
+        <div style="font-size:10px;color:var(--green);margin-top:4px">Golden ratio — target bull</div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /technical -->
+
+<!-- ══════════════════ TAB 3: SCREENER ══════════════════ -->
+<div id="tab-screener" class="tab-panel">
+
+  <div class="filter-row mb12">
+    <button class="filter-btn active" onclick="filterTable('all',this)">Tutti</button>
+    <button class="filter-btn" onclick="filterTable('buy',this)">Buy</button>
+    <button class="filter-btn" onclick="filterTable('hold',this)">Hold</button>
+    <button class="filter-btn" onclick="filterTable('sell',this)">Sell / Underperform</button>
+  </div>
+
+  <div class="card mb20">
+    <div class="card-title">Comparativa Peer — Fintech Consumer Lending</div>
+    <table class="screener-table" id="screenerTable">
+      <thead>
+        <tr>
+          <th>Ticker</th>
+          <th>Società</th>
+          <th>Prezzo</th>
+          <th>Var 30d</th>
+          <th>P/E Fwd</th>
+          <th>Revenue YoY</th>
+          <th>Market Cap</th>
+          <th>ROE</th>
+          <th>Rating</th>
+          <th>P.Target</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr class="highlight" data-rating="sell">
+          <td class="ticker-cell">OPFI</td>
+          <td>OppFi Inc.</td>
+          <td style="color:var(--red)">$7.48</td>
+          <td style="color:var(--red)">−18.2%</td>
+          <td style="color:var(--green)">6.3x</td>
+          <td style="color:var(--green)">+13.5%</td>
+          <td>$198M</td>
+          <td style="color:var(--green)">45.4%</td>
+          <td><span class="rating-badge rating-sell">SELL</span></td>
+          <td style="color:var(--yellow)">$14.00</td>
+        </tr>
+        <tr data-rating="buy">
+          <td class="ticker-cell">ENVA</td>
+          <td>Enova International</td>
+          <td>$48.20</td>
+          <td style="color:var(--green)">+2.1%</td>
+          <td>9.8x</td>
+          <td style="color:var(--green)">+18.2%</td>
+          <td>$1.8B</td>
+          <td>22.1%</td>
+          <td><span class="rating-badge rating-buy">BUY</span></td>
+          <td style="color:var(--green)">$58.00</td>
+        </tr>
+        <tr data-rating="buy">
+          <td class="ticker-cell">SZL</td>
+          <td>Sezzle Inc.</td>
+          <td>$102.50</td>
+          <td style="color:var(--green)">+5.4%</td>
+          <td>18.4x</td>
+          <td style="color:var(--green)">+42.0%</td>
+          <td>$890M</td>
+          <td>38.7%</td>
+          <td><span class="rating-badge rating-buy">BUY</span></td>
+          <td style="color:var(--green)">$125.00</td>
+        </tr>
+        <tr data-rating="hold">
+          <td class="ticker-cell">BFH</td>
+          <td>Bread Financial</td>
+          <td>$38.70</td>
+          <td style="color:var(--red)">−4.2%</td>
+          <td>5.1x</td>
+          <td style="color:var(--red)">−3.1%</td>
+          <td>$1.5B</td>
+          <td>18.4%</td>
+          <td><span class="rating-badge rating-hold">HOLD</span></td>
+          <td style="color:var(--yellow)">$42.00</td>
+        </tr>
+        <tr data-rating="hold">
+          <td class="ticker-cell">ECPG</td>
+          <td>Encore Capital</td>
+          <td>$44.10</td>
+          <td style="color:var(--red)">−1.8%</td>
+          <td>7.2x</td>
+          <td style="color:var(--green)">+8.4%</td>
+          <td>$1.2B</td>
+          <td>14.2%</td>
+          <td><span class="rating-badge rating-hold">HOLD</span></td>
+          <td style="color:var(--yellow)">$50.00</td>
+        </tr>
+        <tr data-rating="sell">
+          <td class="ticker-cell">KPLT</td>
+          <td>Katapult Holdings</td>
+          <td>$3.84</td>
+          <td style="color:var(--red)">−12.1%</td>
+          <td>N/A</td>
+          <td style="color:var(--red)">−8.6%</td>
+          <td>$94M</td>
+          <td>−22.0%</td>
+          <td><span class="rating-badge rating-sell">SELL</span></td>
+          <td style="color:var(--red)">$3.50</td>
+        </tr>
+        <tr data-rating="hold">
+          <td class="ticker-cell">EZPW</td>
+          <td>EZCORP</td>
+          <td>$11.20</td>
+          <td style="color:var(--red)">−2.9%</td>
+          <td>8.4x</td>
+          <td style="color:var(--green)">+6.2%</td>
+          <td>$620M</td>
+          <td>11.8%</td>
+          <td><span class="rating-badge rating-hold">HOLD</span></td>
+          <td style="color:var(--yellow)">$13.00</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- RADAR FONDAMENTALE -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Radar Fondamentale — OPFI vs Competitor Mediano</div>
+      <div class="radar-container">
+        <canvas id="radarChart" width="340" height="300"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Posizionamento Competitivo</div>
+      <div style="font-size:12px">
+        <div class="indicator-row">
+          <span class="ind-name">Valutazione (P/E Fwd)</span>
+          <span style="color:var(--green)">OPFI migliore · 6.3x</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Crescita Revenue</span>
+          <span style="color:var(--yellow)">Nella media · +13.5%</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Return on Equity</span>
+          <span style="color:var(--green)">Leader gruppo · 45.4%</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Market Cap / Dimensione</span>
+          <span style="color:var(--red)">Più piccolo del peer</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Performance Prezzo 30d</span>
+          <span style="color:var(--red)">Peggiore · −18.2%</span>
+        </div>
+        <div class="indicator-row">
+          <span class="ind-name">Credit Quality</span>
+          <span style="color:var(--red)">Charge-off 45% rev.</span>
+        </div>
+      </div>
+      <div style="margin-top:14px;padding:12px;background:var(--bg3);border:1px solid var(--border);font-size:11px;color:var(--text2);line-height:1.7">
+        <strong style="color:var(--accent)">Tesi contrarian:</strong> OPFI tratta a sconto significativo rispetto ai peer con fondamentali operativi superiori (ROE 45%, crescita guidance +10%). Il gap di valutazione suggerisce che il mercato prezza un rischio di credito elevato. Il forward P/E di 6.3x è il più basso del gruppo.
+      </div>
+    </div>
+  </div>
+
+</div><!-- /screener -->
+
+<!-- ══════════════════ TAB 4: REPORT ══════════════════ -->
+<div id="tab-report" class="tab-panel">
+<div class="report-content">
+
+  <div class="report-section">
+    <div class="report-h1">OPFI — OppFi Inc. · Report Analitico Completo</div>
+    <div style="font-size:11px;color:var(--text3);margin-bottom:24px;letter-spacing:1px">NYSE:OPFI · Timeframe D1 · Aggiornato 28 Aprile 2026 · 09:30 EDT</div>
+  </div>
+
+  <div class="report-section">
+    <div class="report-h2">1 · Profilo Società</div>
+    <p>OppFi Inc. (NYSE: OPFI) è una piattaforma fintech mission-driven che facilita l'accesso al credito per consumatori near-prime negli Stati Uniti attraverso partnership con banche comunitarie. Il prodotto principale è OppLoans, un prestito installment non garantito. La società utilizza modelli di AI e machine learning proprietari per la valutazione del rischio di credito, con un tasso di approvazione automatica del 79% nel Q4 2025. Fondata nel 2012 a Chicago da Todd G. Schwartz e Theodore Schwartz, conta 410 dipendenti e ha un Net Promoter Score di 78.</p>
+  </div>
+
+  <div class="report-section">
+    <div class="report-h2">2 · Situazione Tecnica — Analisi D1</div>
+    <p>Il quadro tecnico al 28 aprile 2026 mostra un <strong style="color:var(--yellow)">recupero parziale</strong> rispetto ai minimi di inizio aprile. Il prezzo di $8.73 si trova ancora al di sotto di tutte le medie mobili principali (MA5-MA200), ma ha guadagnato circa il 19% dal minimo a 52 settimane di $7.31. Il MACD ha incrociato al rialzo (+0.094) per la prima volta dal Q4 2025, segnalando un potenziale cambio di momentum.</p>
+    <p>Il RSI(14) è risalito a 51.83, in zona neutra dopo mesi di territorio oversold. Lo Stochastic è a 61.79, anch'esso neutro. ADX in indebolimento a 24.8 (da 32.4) indica riduzione della forza del trend ribassista — non ancora inversione, ma calo della pressione di vendita strutturale.</p>
+    <p>Il prezzo si avvicina all'EMA(20) a $8.98 — primo test critico. Sopra $9.00 si aprirebbe spazio verso la base del cloud Ichimoku a $9.41. La struttura di lower highs / lower lows resta attiva, ma il MACD buy cross e RSI neutro suggeriscono che il rimbalzo potrebbe avere sostanza.</p>
+
+    <div class="report-h3">Livelli Critici</div>
+    <p>Supporto chiave a $7.31 (52-week low) — ha tenuto. Resistenze immediate: $8.98 (EMA20), $9.41 (base cloud Ichimoku), $10.15 (MA50). Target analisti medio $14.25 (+63% upside). Fibonacci 38.2% dal massimo a $10.29 è il livello pivot per conferma inversione di breve.</p>
+  </div>
+
+  <div class="report-section">
+    <div class="report-h2">3 · Analisi Fondamentale</div>
+    <p>I fondamentali operativi di FY2025 sono stati record: revenue $597M (+13.5% YoY), adjusted net income +69% YoY a $140M. Nel Q4 2025, le originations sono cresciute del 48% YoY grazie al tasso di approvazione automatica all'79% abilitato dal Modello AI 6.</p>
+    <p>Il principale rischio emerso è l'aumento dei net charge-off: 45% del revenue nel Q4 2025 vs 42% nel Q4 2024, e 59% dei receivables vs 54%. I prestiti estivi 2025 hanno mostrato tassi di default superiori alle attese, sebbene il management abbia sottolineato che grazie alla breve durata dei prestiti, il rischio sarà completamente assorbito entro il Q1 2026 — test confermato con l'earnings del 7 maggio 2026.</p>
+    <p>La guidance FY2026 è di EPS $1.76-$1.84 e revenue $650-675M (+10% YoY). Il forward P/E di 4.87x (al prezzo corrente di $8.73) è uno dei livelli più compressi del settore peer, suggerendo che il mercato sconta un rischio di credito premium. Il target analisti medio è $14.25 (+63% upside).</p>
+    <p>Un catalizzatore chiave è la piattaforma LOLA (nuovo sistema di origination e servicing AI-driven) la cui migrazione è prevista nel Q3 2026, e il lancio di un nuovo prodotto "line of credit" in estate 2026 che espanderà la presenza geografica. Il Model 6.1 è atteso nel H1 2026.</p>
+  </div>
+
+  <div class="report-section">
+    <div class="report-h2">4 · Scenari di Prezzo</div>
+
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+      <div class="scenario-box bull">
+        <div class="scenario-title bull">🟢 Scenario Bullish</div>
+        <div class="scenario-target bull">$13.50 – $16.00</div>
+        <div class="report-h3" style="color:var(--text2);font-size:12px">Probabilità stimata: 30%</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.7">Il supporto $7.31 ha tenuto, il MACD ha incrociato al rialzo. L'earnings Q1 del 7 maggio sorprende positivamente con charge-off normalizzati. La migrazione LOLA e il nuovo line of credit catalizzano interesse istituzionale. Breakout sopra MA20 ($9.12) con volume, recupero verso target analisti $14.25. Target range $13.50–$16.00.</p>
+      </div>
+
+      <div class="scenario-box base">
+        <div class="scenario-title base">🟡 Scenario Base</div>
+        <div class="scenario-target base">$9.00 – $11.00</div>
+        <div class="report-h3" style="color:var(--text2);font-size:12px">Probabilità stimata: 45%</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.7">Rimbalzo tecnico sostenuto dal 52w low con MACD buy cross, ma senza rottura delle MA principali. Il titolo consolida in range $8.50-$10.50 in attesa dell'earnings di maggio. Execution della guidance 2026 nella parte bassa del range. Valutazione compressa (P/E 4.87x) attrae compratori value progressivamente.</p>
+      </div>
+
+      <div class="scenario-box bear">
+        <div class="scenario-title bear">🔴 Scenario Bearish</div>
+        <div class="scenario-target bear">$6.00 – $7.50</div>
+        <div class="report-h3" style="color:var(--text2);font-size:12px">Probabilità stimata: 25%</div>
+        <p style="font-size:12px;color:var(--text2);line-height:1.7">Il rimbalzo attuale è un dead cat bounce. L'earnings Q1 del 7 maggio delude con charge-off ancora elevati nel Q1, mancando le stime. Un contesto macro deteriorato (recessione USA, tariffe doganali, inflazione) pesa sui consumatori near-prime. Rottura del supporto $7.31 apre downside verso $6.00. Il rischio di partnership bancaria si materializza.</p>
+      </div>
+    </div>
+  </div>
+
+  <div class="report-section">
+    <div class="report-h2">5 · Rischi Principali</div>
+    <p><strong style="color:var(--red)">Rischio credito:</strong> L'aumento dei charge-off sui prestiti estivi 2025 (45% del revenue) è il rischio principale. Se il deterioramento del credito prosegue nel 2026, la guidance EPS potrebbe essere rivista al ribasso.</p>
+    <p><strong style="color:var(--red)">Rischio partnership bancaria:</strong> OppFi opera attraverso banche partner (FinWise e altri). La perdita di una partnership significativa potrebbe ridurre materialmente i volumi di origination.</p>
+    <p><strong style="color:var(--yellow)">Rischio esecuzione LOLA:</strong> La migrazione al nuovo sistema LOLA nel Q3 2026 è un rischio operativo. Ritardi o problemi tecnici potrebbero impattare l'efficienza operativa.</p>
+    <p><strong style="color:var(--yellow)">Rischio macro:</strong> In quanto lender a consumatori near-prime, OPFI è particolarmente sensibile a shock macroeconomici. Un aumento della disoccupazione USA accelererebbe i default.</p>
+  </div>
+
+  <div class="report-section">
+    <div class="report-h2">6 · Rating Analisti & Consenso</div>
+    <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-bottom:16px">
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px">RATING MEDIO</div>
+        <div style="font-size:20px;font-weight:700;color:var(--green)">BUY</div>
+        <div style="font-size:10px;color:var(--text3)">Consensus 2 analisti</div>
+      </div>
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px">P.TARGET MEDIO</div>
+        <div style="font-size:20px;font-weight:700;color:var(--green)">$14.25</div>
+        <div style="font-size:10px;color:var(--green)">Upside +63.2%</div>
+      </div>
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px">NEXT EARNINGS</div>
+        <div style="font-size:16px;font-weight:700;color:var(--cyan)">7 MAG</div>
+        <div style="font-size:10px;color:var(--text3)">2026 · Q1 2026</div>
+      </div>
+      <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+        <div style="font-size:10px;color:var(--text3);margin-bottom:6px">EPS ATTESO Q1</div>
+        <div style="font-size:20px;font-weight:700;color:var(--text)">$0.41</div>
+        <div style="font-size:10px;color:var(--text3)">Stima consensus</div>
+      </div>
+    </div>
+    <p>JMP Securities mantiene Buy con price target $13.50. Stonegate Capital Partners ha aggiornato la copertura il 12 marzo 2026 con outlook positivo. Stephens ha declassato a Hold il 20 marzo 2026. Il consensus di 2 analisti è Buy con target medio $14.25 (+63% upside). La nota più attesa è l'earnings Q1 del 7 maggio 2026: la normalizzazione dei charge-off sarà il discriminante principale per una revisione al rialzo dei target.</p>
+  </div>
+
+  <div class="report-section">
+    <div class="report-h2">7 · Conclusione Operativa</div>
+    <div style="padding:20px;background:var(--bg3);border:1px solid var(--border);border-left:3px solid var(--accent)">
+      <p style="margin-bottom:12px">OPFI presenta un <strong style="color:var(--text)">paradosso in evoluzione</strong>: fondamentali operativi solidi (ROE 45%, crescita guidance double-digit +10%, P/E record compresso a 4.87x) con azione tecnica in fase di recupero dal 52w low. Il MACD ha incrociato al rialzo il 20 aprile 2026 — primo segnale bullish confermato da mesi.</p>
+      <p style="margin-bottom:12px">Sul piano tecnico il trend primario resta bearish (sotto tutte le MA), ma la struttura lower lows / lower highs è stata interrotta: il rimbalzo da $7.31 a $8.73 (+19.4%) con RSI risalito a 51.83 suggerisce che la capitolazione potrebbe essere avvenuta. Il test di EMA20 a $8.98 è imminente.</p>
+      <p>Il <strong style="color:var(--cyan)">7 maggio 2026 (earnings Q1)</strong> sarà il catalizzatore decisivo. Dati positivi sui charge-off del Q1 2026 e conferma della guidance $650-675M potrebbero innescare un breakout sopra $9.41 (cloud Ichimoku base) e un potenziale short squeeze su un titolo con 18.4% short float e DTC 7.7. <strong style="color:var(--yellow)">Setup speculativo favorevole con stop loss a $7.10 e target $12.00-$14.25.</strong></p>
+    </div>
+  </div>
+
+  <div style="margin-top:24px;padding:12px;background:var(--bg3);border:1px solid var(--border);font-size:10px;color:var(--text3);line-height:1.8">
+    ⚠ DISCLAIMER: Questo report è puramente informativo e non costituisce consulenza finanziaria. I dati tecnici sono basati su informazioni disponibili al 28 aprile 2026. Investire in titoli azionari comporta rischi, inclusa la perdita del capitale investito. Consultare un consulente finanziario qualificato prima di prendere qualsiasi decisione di investimento.
+  </div>
+
+</div>
+</div><!-- /report -->
+
+<!-- ══════════════════ TAB 5: CHART VISIVA ══════════════════ -->
+<div id="tab-chart" class="tab-panel">
+
+  <!-- HEADER ROW: prezzo aggiornato + segnale SVP -->
+  <div class="grid-4 mb12">
+    <div class="kpi-card bullish">
+      <div class="kpi-label">Prezzo Rilevato (Chart)</div>
+      <div class="kpi-value green">$8.73</div>
+      <div class="kpi-sub">+0.15 (+1.75%) · Rimbalzo confermato</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">SVP Signal</div>
+      <div class="kpi-value yellow" style="font-size:18px">8.72 SELL · 8.76 BUY</div>
+      <div class="kpi-sub">Zona di indecisione stretta</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Volume Attuale</div>
+      <div class="kpi-value cyan" style="font-size:20px">0.84M</div>
+      <div class="kpi-sub">Media: 4.31M · Sotto media</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Resistenza Chiave</div>
+      <div class="kpi-value yellow" style="font-size:20px">$8.98</div>
+      <div class="kpi-sub">EMA20 — test imminente</div>
+    </div>
+  </div>
+
+  <!-- GRAFICO PRICE ACTION AGGIORNATO + FIBONACCI -->
+  <div class="grid-2-1 mb12">
+    <div class="card">
+      <div class="card-title">Price Action con MA — Visuale Aggiornata ($8.73 · Rimbalzo +19.4% da 52wLow)</div>
+      <div class="chart-wrap" style="height:280px">
+        <canvas id="chartVisCanvas"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Fibonacci — Dal Massimo al Minimo</div>
+      <div style="font-size:11px;color:var(--text3);margin-bottom:12px">Swing: $15.03 → $7.31</div>
+      <!-- Fib visual bar -->
+      <div style="position:relative;height:260px;background:var(--bg3);border:1px solid var(--border);overflow:hidden">
+        <!-- 0% top = $15.03 -->
+        <div style="position:absolute;top:4%;left:0;right:0;border-top:1px dashed rgba(255,71,87,0.5);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(255,71,87,0.2);color:var(--red);padding:1px 6px">0% · $15.03 · Top (52w High)</span>
+        </div>
+        <!-- 23.6% = $9.21 -->
+        <div style="position:absolute;top:26%;left:0;right:0;border-top:1px dashed rgba(255,211,42,0.5);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(255,211,42,0.1);color:var(--yellow);padding:1px 6px">23.6% · $9.21</span>
+        </div>
+        <!-- PREZZO $8.73 -->
+        <div style="position:absolute;top:33%;left:0;right:0;border-top:2px solid var(--cyan);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(0,229,255,0.2);color:var(--cyan);padding:1px 6px;font-weight:700">▶ PREZZO $8.73</span>
+        </div>
+        <!-- 38.2% = $10.29 -->
+        <div style="position:absolute;top:51%;left:0;right:0;border-top:1px dashed rgba(0,214,143,0.5);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(0,214,143,0.1);color:var(--green);padding:1px 6px">38.2% · $10.29 · EMA20 $8.98</span>
+        </div>
+        <!-- 50% = $11.69 -->
+        <div style="position:absolute;top:64%;left:0;right:0;border-top:1px dashed rgba(143,168,192,0.4);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(143,168,192,0.08);color:var(--text2);padding:1px 6px">50% · $11.69</span>
+        </div>
+        <!-- 61.8% = $12.70 -->
+        <div style="position:absolute;top:74%;left:0;right:0;border-top:1px dashed rgba(179,157,219,0.5);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(179,157,219,0.1);color:var(--purple);padding:1px 6px">61.8% · $12.70 · Golden Ratio</span>
+        </div>
+        <!-- 78.6% = $14.15 -->
+        <div style="position:absolute;top:86%;left:0;right:0;border-top:1px dashed rgba(0,176,255,0.4);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(0,176,255,0.08);color:var(--blue);padding:1px 6px">78.6% · $14.15</span>
+        </div>
+        <!-- 100% bottom -->
+        <div style="position:absolute;top:96%;left:0;right:0;border-top:1px dashed rgba(0,214,143,0.5);display:flex;justify-content:flex-end;align-items:center;padding-right:8px">
+          <span style="font-size:9px;background:rgba(0,214,143,0.1);color:var(--green);padding:1px 6px">100% · $7.31 · 52w Low</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- OSCILLATORI AGGIORNATI DAL CHART -->
+  <div class="grid-2 mb12">
+    <div class="card">
+      <div class="card-title">Oscillatori — Letture Dirette dal Chart TradingView</div>
+
+      <div class="osc-bar-wrap">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">RSI(14)</span>
+          <span style="color:var(--yellow)">51.83 · Neutro — in recupero sopra 50</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:51.83%;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red))"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:2px"><span>0</span><span>30 OS</span><span>50</span><span>70 OB</span><span>100</span></div>
+      </div>
+
+      <div class="osc-bar-wrap" style="margin-top:14px">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">Stochastic K/D</span>
+          <span style="color:var(--yellow)">61.79 / 58.43 · Neutro</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:62%;background:var(--yellow)"></div>
+        </div>
+      </div>
+
+      <div class="osc-bar-wrap" style="margin-top:14px">
+        <div class="osc-bar-label">
+          <span style="color:var(--text2)">CCI(14)</span>
+          <span style="color:var(--yellow)">9.50 · Neutro</span>
+        </div>
+        <div class="osc-bar-track">
+          <div class="osc-bar-fill" style="width:54%;background:linear-gradient(90deg,var(--green),var(--yellow))"></div>
+        </div>
+      </div>
+
+      <div class="indicator-row" style="margin-top:12px">
+        <span class="ind-name">MACD (12/26/9)</span>
+        <span class="ind-value">+0.094 / +0.042 / +0.052</span>
+        <span class="ind-signal sig-badge-buy">CROSS ↑ BUY</span>
+      </div>
+      <div class="indicator-row">
+        <span class="ind-name">BB %b</span>
+        <span class="ind-value">0.52</span>
+        <span class="ind-signal sig-badge-neutral">Zona centrale</span>
+      </div>
+      <div class="indicator-row">
+        <span class="ind-name">OBV</span>
+        <span class="ind-value">271.40M</span>
+        <span class="ind-signal sig-badge-neutral">Stabilizzato ↑</span>
+      </div>
+      <div class="indicator-row">
+        <span class="ind-name">Accum/Dist</span>
+        <span class="ind-value">−29.80M / −30.10M</span>
+        <span class="ind-signal sig-badge-neutral">In recupero lento</span>
+      </div>
+      <div class="indicator-row">
+        <span class="ind-name">ATR(14)</span>
+        <span class="ind-value">0.3820</span>
+        <span class="ind-signal sig-badge-neutral">Moderata ↓</span>
+      </div>
+      <div class="indicator-row">
+        <span class="ind-name">AO (Awesome Osc.)</span>
+        <span class="ind-value">+0.0842</span>
+        <span class="ind-signal sig-badge-buy">Cross zero ↑ BUY</span>
+      </div>
+      <div class="indicator-row">
+        <span class="ind-name">Mamma (DEMA)</span>
+        <span class="ind-value">0.6120</span>
+        <span class="ind-signal sig-badge-buy">POSITIVO ↑</span>
+      </div>
+      <div class="indicator-row">
+        <span class="ind-name">ADL</span>
+        <span class="ind-value">1,842.30</span>
+        <span class="ind-signal sig-badge-neutral">In crescita</span>
+      </div>
+    </div>
+
+    <!-- MEDIE MOBILI DAL CHART -->
+    <div class="card">
+      <div class="card-title">Medie Mobili — Letture Dirette Chart · Prezzo $8.73</div>
+      <div class="ma-table">
+        <div class="ma-row header">
+          <span>MA</span><span>Tipo</span><span>Valore</span><span>Segnale</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--purple)">MA200</span>
+          <span style="color:var(--text3)">Simple</span>
+          <span style="color:var(--red)">$11.82</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--text)">MA50</span>
+          <span style="color:var(--text3)">Simple</span>
+          <span style="color:var(--red)">$10.15</span>
+          <span class="ind-signal sig-badge-sell">SELL</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--yellow)">EMA20</span>
+          <span style="color:var(--text3)">Exp.</span>
+          <span style="color:var(--yellow)">$8.98</span>
+          <span class="ind-signal sig-badge-sell">SELL · Test imminente</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--cyan)">EMA9</span>
+          <span style="color:var(--text3)">Exp.</span>
+          <span style="color:var(--cyan)">$8.81</span>
+          <span class="ind-signal sig-badge-neutral">⚠ Quasi superato</span>
+        </div>
+        <div class="ma-row">
+          <span style="color:var(--cyan)">EMA5</span>
+          <span style="color:var(--text3)">Exp.</span>
+          <span style="color:var(--cyan)">$8.71</span>
+          <span class="ind-signal sig-badge-buy">✓ Sopra EMA5</span>
+        </div>
+      </div>
+
+      <div style="margin-top:14px;padding:12px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.15);font-size:11px;color:var(--text2);line-height:1.7">
+        Il prezzo a <strong style="color:var(--cyan)">$8.73</strong> ha superato EMA5 ($8.71) — primo incrocio rialzista. EMA20 a $8.98 è la prossima resistenza critica. Una chiusura sopra $8.98 con volume confermato sarebbe il primo segnale bullish strutturale.
+      </div>
+
+      <!-- SETUP OPERATIVO -->
+      <div style="margin-top:14px">
+        <div class="card-title">Setup Operativo Aggiornato · 28 Apr 2026</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:11px">
+          <div style="padding:10px;background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2)">
+            <div style="color:var(--text3);font-size:9px;letter-spacing:1px;margin-bottom:4px">RESISTENZE</div>
+            <div style="color:var(--red)">R1 · EMA20 $8.98</div>
+            <div style="color:var(--red)">R2 · Fib 23.6% $9.21</div>
+            <div style="color:var(--red)">R3 · MA50 $10.15</div>
+            <div style="color:var(--red)">R4 · MA200 $11.82</div>
+          </div>
+          <div style="padding:10px;background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.15)">
+            <div style="color:var(--text3);font-size:9px;letter-spacing:1px;margin-bottom:4px">SUPPORTI</div>
+            <div style="color:var(--green)">S1 · $8.20 (supporto recente)</div>
+            <div style="color:var(--green)">S2 · $7.31 (52w Low)</div>
+            <div style="color:var(--green)">S3 · $7.10 (stop loss)</div>
+            <div style="color:var(--green)">S4 · $6.50 (Fib estensione)</div>
+          </div>
+        </div>
+        <div style="margin-top:10px;padding:10px;background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15);font-size:11px;color:var(--green);line-height:1.6">
+          ✓ MACD BUY cross + AO cross zero + RSI 51.83 neutro-rialzista. Setup long valido sopra $8.98 con volume >4.3M. <strong>Earnings 7 Mag = catalizzatore decisivo.</strong>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERN VISIVI + ACCUM/DIST -->
+  <div class="grid-2 mb12">
+    <div class="card">
+      <div class="card-title">Pattern Grafici — Analisi Visiva Chart TradingView</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+
+        <div class="pattern-card neutral">
+          <span class="pattern-type neutral">In Evoluzione · Da Monitorare</span>
+          <div class="pattern-title">Potenziale Double Bottom — $7.31 / $7.48 (Feb–Apr 2026)</div>
+          <div class="pattern-desc">Il pattern mostra due minimi ravvicinati ($7.48 a febbraio e $7.31 a inizio aprile) con il neckline intorno a $9.00–$9.21. Un double bottom classico si conferma solo con chiusura sopra il neckline ($9.21 / Fib 23.6%) con volume espanso. Il pattern è ancora in formazione e non confermato.</div>
+          <div class="pattern-implication">⚡ Potenziale bullish: se confermato target misurato $11.00–$11.50. Conferma il 7 maggio con earnings.</div>
+        </div>
+
+        <div class="pattern-card bullish">
+          <span class="pattern-type bullish">Bullish · Momentum</span>
+          <div class="pattern-title">MACD Bullish Cross + AO Cross Zero — 20 Aprile 2026</div>
+          <div class="pattern-desc">Il 20 aprile MACD ha effettuato un bullish crossover (+0.094) per la prima volta dal Q4 2025. Contestualmente l'Awesome Oscillator ha superato la linea dello zero (+0.084), confermando il cambio di momentum. RSI risalito a 51.83 in zona neutra-rialzista — non overbought. Segnali multipli allineati al rialzo su D1.</div>
+          <div class="pattern-implication">✅ Momentum bullish confermato. Needs volume >4.3M per upgrade a segnale strutturale.</div>
+        </div>
+
+        <div class="pattern-card bearish">
+          <span class="pattern-type bearish">Bearish · Strutturale</span>
+          <div class="pattern-title">Lower Highs / Lower Lows — Trend Ribassista Primario</div>
+          <div class="pattern-desc">La struttura di lower highs / lower lows è attiva da ottobre 2025 ($13.89 → $10.20 → $9.60 → $8.12 → il rimbalzo attuale). Il trend ribassista primario è intatto fino a una chiusura sopra il precedente lower high (~$8.90–$9.00). Il rimbalzo a $8.73 è ancora all'interno di questa struttura.</div>
+          <div class="pattern-implication">⚠ Il trend bearish strutturale non è ancora invertito. Rottura definitiva sopra $9.00–$9.21 necessaria.</div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- FUNDAMENTAL OVERLAY DAL CHART -->
+    <div class="card">
+      <div class="card-title">Utile Netto Trimestrale — Dati PATH dal Chart</div>
+      <div class="chart-wrap" style="height:200px">
+        <canvas id="netIncomeChart"></canvas>
+      </div>
+      <div style="margin-top:14px">
+        <div class="card-title">Attività Correnti Totali — PATH FQ</div>
+        <div class="chart-wrap" style="height:160px">
+          <canvas id="currentAssetsChart"></canvas>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CONCLUSIONE AGGIORNATA -->
+  <div class="card">
+    <div class="card-title">Conclusione Aggiornata — Analisi Chart Visiva · 28 Apr 2026</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px;font-family:'IBM Plex Sans',sans-serif;font-size:12px">
+      <div style="padding:16px;background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.15);border-left:3px solid var(--red)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--red);margin-bottom:8px">BEARISH STRUTTURALE</div>
+        <ul style="color:var(--text2);line-height:1.8;padding-left:14px">
+          <li>Prezzo sotto tutte le MA</li>
+          <li>Accum/Dist ancora negativo</li>
+          <li>Volume rimbalzo sotto media</li>
+          <li>Lower highs/lows attivi</li>
+          <li>Short interest 18.4%</li>
+        </ul>
+      </div>
+      <div style="padding:16px;background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.15);border-left:3px solid var(--green)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--green);margin-bottom:8px">BULLISH EMERGENTI</div>
+        <ul style="color:var(--text2);line-height:1.8;padding-left:14px">
+          <li>MACD BUY cross ✓</li>
+          <li>AO sopra zero ✓</li>
+          <li>RSI 51.83 neutro-rialz.</li>
+          <li>+19.4% da 52w Low</li>
+          <li>Pot. double bottom</li>
+        </ul>
+      </div>
+      <div style="padding:16px;background:rgba(255,211,42,0.05);border:1px solid rgba(255,211,42,0.15);border-left:3px solid var(--yellow)">
+        <div style="font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--yellow);margin-bottom:8px">LIVELLI CHIAVE</div>
+        <ul style="color:var(--text2);line-height:1.8;padding-left:14px">
+          <li>EMA5: $8.71 ✓ superato</li>
+          <li>EMA20: $8.98 test imm.</li>
+          <li>Fib 23.6%: $9.21</li>
+          <li>Stop: $7.10</li>
+          <li>Target 1: $9.21 (+5.5%)</li>
+        </ul>
+      </div>
+    </div>
+    <div style="margin-top:14px;padding:14px;background:var(--bg3);border:1px solid var(--border);font-size:12px;color:var(--text2);font-family:'IBM Plex Sans',sans-serif;line-height:1.8">
+      <strong style="color:var(--accent)">Sintesi operativa 28 Apr 2026:</strong> Il rimbalzo da $7.31 a $8.73 (+19.4%) ha caratteristiche più solide del precedente rimbalzo di marzo: MACD BUY cross confermato, AO sopra zero, RSI in zona neutra (non overbought). Il pattern double bottom è in formazione — necessita conferma sopra $9.21. Test immediato EMA20 a <strong style="color:var(--cyan)">$8.98</strong>. <strong style="color:var(--yellow)">Earnings Q1 del 7 Maggio 2026 = catalizzatore decisivo per inversione strutturale o ripresa del downtrend.</strong>
+    </div>
+  </div>
+
+</div><!-- /chart -->
+
+<!-- ══════════════════ TAB 6: NEWS & CATALYST ══════════════════ -->
+<div id="tab-news" class="tab-panel">
+
+  <!-- KPI SOMMARIO CATALYST -->
+  <div class="grid-4 mb12">
+    <div class="kpi-card bullish">
+      <div class="kpi-label">Catalyst Rialzisti</div>
+      <div class="kpi-value green">7</div>
+      <div class="kpi-sub">Earnings beat, upgrade, buyback, guidance raise</div>
+    </div>
+    <div class="kpi-card bearish">
+      <div class="kpi-label">Catalyst Ribassisti</div>
+      <div class="kpi-value red">6</div>
+      <div class="kpi-sub">Insider selling, charge-off, downgrade, dilution risk</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Pattern Ricorrente</div>
+      <div class="kpi-value yellow" style="font-size:16px">Sell the News</div>
+      <div class="kpi-sub">Beat fondamentali → venduti dal mercato</div>
+    </div>
+    <div class="kpi-card info">
+      <div class="kpi-label">Prossimo Catalyst</div>
+      <div class="kpi-value cyan" style="font-size:18px">7 Mag 2026</div>
+      <div class="kpi-sub">Earnings Q1 2026 · EPS stima $0.41</div>
+    </div>
+  </div>
+
+  <!-- TIMELINE CATALYST -->
+  <div class="card mb12">
+    <div class="card-title">Timeline Catalyst — Cronologia News con Impatto sul Prezzo</div>
+    <div style="margin-top:8px">
+
+      <!-- Catalyst item template -->
+      <div style="display:flex;gap:0;position:relative">
+        <!-- Linea verticale -->
+        <div style="width:2px;background:var(--border2);position:absolute;left:119px;top:0;bottom:0;z-index:0"></div>
+
+        <div style="display:flex;flex-direction:column;gap:0;width:100%">
+
+          <!-- ITEM 1 - SPECIALE DIVIDEND -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">MAR 2025</div>
+              <div style="font-size:10px;color:var(--green);font-weight:600">+RIALZISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--green);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.2);border-left:3px solid var(--green);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📢 Dividendo Speciale Dichiarato</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">OppFi annuncia un dividendo speciale, segnalando forte generazione di cassa e fiducia del management. Primo segnale concreto di maturità finanziaria dell'azienda. Impatto positivo sul sentiment degli investitori value.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--green)">💹 Impatto: Rialzista · Sentiment positivo sulle capital returns</div>
+            </div>
+          </div>
+
+          <!-- ITEM 2 - INSIDER SELLING MASSIVO -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">MAR–MAG 2025</div>
+              <div style="font-size:10px;color:var(--red);font-weight:600">−RIBASSISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--red);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-left:3px solid var(--red);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">⚠ Insider Selling Massiccio — CEO vende $34M</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">Tra marzo e maggio 2025, il CEO Todd Schwartz scarica 3.4 milioni di azioni incassando oltre $34M. Il CRO Christopher McKay vende 176.000 azioni in aprile–maggio; il direttore David Vennettilli cede 688.000 azioni a marzo. Il CFO effettua vendite volontarie sul mercato aperto — segnale considerato ribassista dato che l'84% delle azioni è detenuto da insider.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--red)">📉 Impatto: Fortemente ribassista · Dubbi sulla fiducia interna al picco</div>
+            </div>
+          </div>
+
+          <!-- ITEM 3 - JMP UPGRADE -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">8 MAG 2025</div>
+              <div style="font-size:10px;color:var(--green);font-weight:600">+RIALZISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--green);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.2);border-left:3px solid var(--green);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📈 JMP Securities — Upgrade a "Buy" · P.T. $16.00</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">JMP Securities aggiorna il rating a Buy con price target di $16.00, citando la solidità del modello AI di underwriting (Model 6), il miglioramento dei margini e la crescita dell'auto-approval rate. È uno dei principali catalyst istituzionali del rally verso i massimi estivi.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--green)">💹 Impatto: Fortemente rialzista · Innesca rally verso $13–16</div>
+            </div>
+          </div>
+
+          <!-- ITEM 4 - Q1 2025 EARNINGS + GUIDANCE RAISE -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">MAG 2025</div>
+              <div style="font-size:10px;color:var(--green);font-weight:600">+RIALZISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--green);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.2);border-left:3px solid var(--green);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📊 Q1 2025 Beat + Prima Guidance Raise — EPS $1.18–1.26</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">OppFi supera le stime Q1 e alza la guidance per il FY2025 con adjusted EPS $1.18–$1.26 (da stime precedenti inferiori). Crescita originations +strong, miglioramento del credito con charge-off in calo YoY di 700bps. Gli analisti alzano le stime EPS 2025 del 10.6% e quelle 2026 del 15.5%.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--green)">💹 Impatto: Rialzista · Conferma del ciclo di revision al rialzo</div>
+            </div>
+          </div>
+
+          <!-- ITEM 5 - Q2 2025 RECORD -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">AGO 2025</div>
+              <div style="font-size:10px;color:var(--green);font-weight:600">+RIALZISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--green);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.2);border-left:3px solid var(--green);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📊 Q2 2025 — Revenue Record + Guidance Raise 2° volta · EPS $1.39–1.44</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">Secondo raise consecutivo della guidance: adjusted EPS alzato a $1.39–$1.44. Revenue +12.8% YoY con qualità del credito in miglioramento. Originations record trimestrali. Auto-approval rate al 79.1% in Q3, con spese totali calate di 500bps. Net income Q3 +136.9% YoY — massimo storico trimestrale per qualsiasi quarter.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--green)">💹 Impatto: Rialzista · Contribuisce al rally fino al doppio top ~$16</div>
+            </div>
+          </div>
+
+          <!-- ITEM 6 - DELINQUENZE ESTIVE -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">SET–OTT 2025</div>
+              <div style="font-size:10px;color:var(--red);font-weight:600">−RIBASSISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--red);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-left:3px solid var(--red);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">🔴 Delinquenze Prestiti Estivi — Charge-off salgono</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">I default sui prestiti originati nell'estate 2025 iniziano a emergere: net charge-off salgono di 80bps YoY nel Q3. Nel Q4 raggiungono il 45% dei ricavi (da 42%) e 59% dei receivables (da 54%). Il management riconosce esplicitamente il problema ma rassicura sulla brevità dei prestiti. Il mercato tuttavia inizia a prezzare un deterioramento strutturale del credito.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--red)">📉 Impatto: Ribassista · Innesca distribuzione dal doppio top ~$16</div>
+            </div>
+          </div>
+
+          <!-- ITEM 7 - Q3 RECORD + BUYBACK COMPLETATO -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">29 OTT 2025</div>
+              <div style="font-size:10px;color:var(--green);font-weight:600">+/− MISTO</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--yellow);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(255,211,42,0.04);border:1px solid rgba(255,211,42,0.2);border-left:3px solid var(--yellow);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📊 Q3 Record + Buyback Completato + Guidance Raise 3° volta</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">OppFi annuncia guidance FY2025 alzata a $590–605M di revenue, conferma completamento riacquisto di 1.751.070 azioni per $10.93M. Net income Q3 record assoluto +136.9% YoY. Nonostante i dati eccellenti, il titolo mostra un pattern "sell the news" con rimbalzo limitato, già penalizzato dalle preoccupazioni sui charge-off estivi.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--yellow)">⚡ Impatto: Misto · Rimbalzo temporaneo, poi ripresa del downtrend</div>
+            </div>
+          </div>
+
+          <!-- ITEM 8 - DILUTION RISK REPORT -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">12 FEB 2026</div>
+              <div style="font-size:10px;color:var(--red);font-weight:600">−RIBASSISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--red);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-left:3px solid var(--red);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">⚠ Report Dilution Risk #1 — Probabilità calo 73.2% in 20 giorni</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">Shortfinder classifica OPFI come il titolo con il più alto rischio di diluzione su 184 stocks analizzati: debt/equity 9x, 100% insider sell ratio in 90 giorni, CFO con vendite volontarie open-market, un major holder che ha ceduto il 94% delle sue quote dirette. Short interest a 7.7 giorni per coprire. Il modello assegna 73.2% di probabilità di calo del 21.6% entro 20 giorni.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--red)">📉 Impatto: Fortemente ribassista · Accelera il sell-off invernale</div>
+            </div>
+          </div>
+
+          <!-- ITEM 9 - FY2025 RECORD + SELL ON NEWS -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">11 MAR 2026</div>
+              <div style="font-size:10px;color:var(--red);font-weight:600">−SELL NEWS</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--red);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-left:3px solid var(--red);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📊 FY2025 Record + Guidance 2026 Double-Digit → Titolo −5.3%</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">Risultati FY25 eccellenti: revenue record $597.1M, adjusted net income +69.1% a $139.8M, EPS $1.59 (+$0.64 YoY), $15.5M buyback totali. Guidance FY2026: revenue $650–675M, EPS $1.76–1.84 (+10% YoY). Nonostante tutto, il titolo chiude a −5.3% il giorno del rilascio. Pattern "sell the news" confermato in downtrend strutturale.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--red)">📉 Impatto: Paradossalmente ribassista · Massima conferma del trend bear</div>
+            </div>
+          </div>
+
+          <!-- ITEM 10 - STEPHENS HOLD + TIPRANKS -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">20 MAR 2026</div>
+              <div style="font-size:10px;color:var(--red);font-weight:600">−RIBASSISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--red);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-left:3px solid var(--red);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📉 Stephens → Hold · TipRanks: Rischi di Sostenibilità Margini</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">Stephens abbassa il rating da Buy a Hold il 20 marzo 2026. TipRanks pubblica analisi segnalando un plateau nei miglioramenti del modello AI e nelle condizioni di credito — suggerendo che i futuri guadagni di efficienza saranno più difficili da ottenere. Zacks aveva già abbassato da Strong Buy a Hold a dicembre 2025.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--red)">📉 Impatto: Ribassista · Riduce la copertura positiva degli analisti</div>
+            </div>
+          </div>
+
+          <!-- ITEM 11 - INSIDER SELLING MARZO -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">12 MAR 2026</div>
+              <div style="font-size:10px;color:var(--red);font-weight:600">−RIBASSISTA</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--red);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);border-left:3px solid var(--red);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">⚠ Direttore Jocelyn Moore vende 8.190 azioni a $8.53</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">Il 12 marzo 2026, la direttrice Jocelyn Moore cede 8.190 azioni a $8.53 per un totale di $69.860. Insider selling continuativo a prezzi decrescenti — il management scarica anche a valutazioni già compresse, segnale che il mercato interpreta negativamente.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--red)">📉 Impatto: Ribassista · Conferma pressione di vendita interna</div>
+            </div>
+          </div>
+
+          <!-- ITEM 12 - 52W LOW + RIMBALZO -->
+          <div style="display:grid;grid-template-columns:120px 12px 1fr;gap:0 16px;align-items:start;padding:10px 0">
+            <div style="text-align:right;padding-right:12px">
+              <div style="font-size:10px;color:var(--text3);letter-spacing:1px">2 APR – 28 APR</div>
+              <div style="font-size:10px;color:var(--green);font-weight:600">↑ RIMBALZO</div>
+            </div>
+            <div style="width:12px;height:12px;border-radius:50%;background:var(--green);margin-top:3px;flex-shrink:0;position:relative;z-index:1;border:2px solid var(--bg2)"></div>
+            <div style="background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.2);border-left:3px solid var(--green);padding:12px 16px">
+              <div style="font-size:12px;font-weight:700;color:var(--text);margin-bottom:4px">📍 Rimbalzo dal 52w Low $7.31 → $8.73 (+19.4%) · MACD BUY Cross</div>
+              <div style="font-size:11px;color:var(--text2);line-height:1.7">Il 2 aprile OPFI tocca il minimo a 52 settimane di $7.31. Nelle settimane successive rimbalzo sostenuto fino a $8.73 (+19.4%), con MACD che incrocia al rialzo il 20 aprile — primo segnale bullish dal Q4 2025. Volume ancora sotto media (0.84M vs 4.31M), ma RSI risalito a zona neutra 51.83. Il 23 aprile OppFi pubblica il Social Impact Report 2025 con NPS 78 e 77% same-day loan decisions. Il 7 maggio: Earnings Q1 2026.</div>
+              <div style="margin-top:6px;font-size:10px;color:var(--green)">💹 Impatto: Potenzialmente rialzista · Test EMA20 $8.98 imminente</div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCHEMA PATTERN + PROSSIMI CATALYST -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">Schema Ricorrente — "Sell the News" in Downtrend</div>
+      <div style="font-family:'IBM Plex Sans',sans-serif;font-size:12px;color:var(--text2);line-height:1.8">
+        <p style="margin-bottom:12px">Il pattern che emerge dall'analisi delle news è chiaro e consistente: <strong style="color:var(--text)">OPFI ha fondamentali operativi in costante miglioramento ma il mercato prezza sistematicamente il rischio</strong> piuttosto che la performance.</p>
+        <p style="margin-bottom:12px">Ogni trimestre dal Q1 al Q3 2025 ha visto beat sulle stime e raise della guidance — eppure il titolo ha costruito un doppio top e poi distribuito. La causa principale è il conflitto tra:</p>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:12px 0">
+          <div style="padding:10px;background:rgba(0,214,143,0.06);border:1px solid rgba(0,214,143,0.15)">
+            <div style="font-size:10px;color:var(--green);letter-spacing:1px;margin-bottom:6px">FORZE RIALZISTE</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.8">
+              ✓ EPS beat continui<br>
+              ✓ Guidance alzata 3 volte nel 2025<br>
+              ✓ Auto-approval AI al 79%<br>
+              ✓ Buyback $15.5M completato<br>
+              ✓ P/E a 4.87x — sconto record<br>
+              ✓ MACD BUY cross Apr 2026
+            </div>
+          </div>
+          <div style="padding:10px;background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.15)">
+            <div style="font-size:10px;color:var(--red);letter-spacing:1px;margin-bottom:6px">FORZE RIBASSISTE</div>
+            <div style="font-size:11px;color:var(--text2);line-height:1.8">
+              ✗ Insider selling sistematico<br>
+              ✗ Charge-off 45% revenue (Q4)<br>
+              ✗ D/E ratio 9x elevato<br>
+              ✗ Prezzo sotto tutte le MA<br>
+              ✗ Downgrade Stephens (Hold)<br>
+              ✗ Volume rimbalzo sotto media
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Prossimi Catalyst da Monitorare</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-top:4px">
+
+        <div style="padding:12px;background:rgba(0,229,255,0.05);border:1px solid rgba(0,229,255,0.2);border-left:3px solid var(--cyan)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:700;color:var(--text)">Earnings Q1 2026</span>
+            <span style="font-size:10px;color:var(--cyan);font-weight:600">7 MAG 2026</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">EPS atteso: $0.41. Dati chiave: charge-off Q1 (attesa normalizzazione post-estate 2025), originations YoY, conferma guidance $650–675M. Un beat con charge-off in calo potrebbe innescare un short squeeze su 18.4% short float.</div>
+        </div>
+
+        <div style="padding:12px;background:rgba(179,157,219,0.05);border:1px solid rgba(179,157,219,0.15);border-left:3px solid var(--purple)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:700;color:var(--text)">Migrazione LOLA Platform</span>
+            <span style="font-size:10px;color:var(--purple);font-weight:600">Q3 2026</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">Nuovo sistema AI di origination e servicing. Se la migrazione è fluida potrebbe migliorare materialmente i costi operativi e l'auto-approval rate oltre l'80%. Catalyst positivo se eseguito senza interruzioni.</div>
+        </div>
+
+        <div style="padding:12px;background:rgba(0,214,143,0.05);border:1px solid rgba(0,214,143,0.15);border-left:3px solid var(--green)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:700;color:var(--text)">Lancio Prodotto "Line of Credit"</span>
+            <span style="font-size:10px;color:var(--green);font-weight:600">2026 (TBD)</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">Nuovo prodotto via partnership bancarie per espansione geografica. Potenziale di crescita TAM significativa. Da monitorare l'annuncio ufficiale degli stati target e dei partner bancari.</div>
+        </div>
+
+        <div style="padding:12px;background:rgba(255,71,87,0.05);border:1px solid rgba(255,71,87,0.15);border-left:3px solid var(--red)">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+            <span style="font-size:12px;font-weight:700;color:var(--text)">Rischio: Perdita Partnership Bancaria</span>
+            <span style="font-size:10px;color:var(--red);font-weight:600">ONGOING</span>
+          </div>
+          <div style="font-size:11px;color:var(--text2);line-height:1.6">FinWise e altri partner bancari sono critici per il modello di business. Notizie di rinegoziazione o perdita di partnership sarebbero catalyst fortemente negativi. Da monitorare qualsiasi filing SEC correlato.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /news -->
+
+<!-- ══════════════════ TAB 7: VOLUME & SENTIMENT ══════════════════ -->
+<div id="tab-volume" class="tab-panel">
+
+  <!-- KPI CARDS -->
+  <div class="grid-4 mb12">
+    <div class="kpi-card bearish">
+      <div class="kpi-label">RVOL — Relative Volume</div>
+      <div class="kpi-value red">3.2x</div>
+      <div class="kpi-sub">1.38M oggi vs media 20gg 431K · Spike anomalo</div>
+    </div>
+    <div class="kpi-card bearish">
+      <div class="kpi-label">Short Interest</div>
+      <div class="kpi-value red">18.4%</div>
+      <div class="kpi-sub">7.7 giorni per coprire · Elevato</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Fear & Greed Index</div>
+      <div class="kpi-value yellow">39</div>
+      <div class="kpi-sub">Fear · Zona di possibile rimbalzo contrarian</div>
+    </div>
+    <div class="kpi-card neutral">
+      <div class="kpi-label">Social Buzz Score</div>
+      <div class="kpi-value cyan">62/100</div>
+      <div class="kpi-sub">Reddit ↑ · StockTwits ↑ · Twitter neutro</div>
+    </div>
+  </div>
+
+  <!-- VOLUME 10GG + OBV -->
+  <div class="grid-2 mb12">
+    <div class="card">
+      <div class="card-title">Volume Giornaliero — Ultimi 10 Giorni con Media 20gg</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="volChart"></canvas>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">OBV — On Balance Volume · Divergenza Evidenziata</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="obvChart"></canvas>
+      </div>
+      <div style="margin-top:8px;padding:8px 10px;background:rgba(255,71,87,0.06);border:1px solid rgba(255,71,87,0.2);font-size:11px;color:var(--red)">
+        ⚠ Divergenza: Prezzo in rimbalzo (+19%) ma OBV ancora in trend discendente → rimbalzo non confermato dal volume smart money
+      </div>
+    </div>
+  </div>
+
+  <!-- SENTIMENT PANNELLO + SQUEEZE PROB -->
+  <div class="grid-2 mb12">
+    <div class="card">
+      <div class="card-title">Pannello Sentiment — Letture Multi-Dimensione</div>
+
+      <!-- Retail Bullish -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+          <span style="color:var(--text2)">Retail Sentiment (Social)</span>
+          <span style="color:var(--green);font-weight:600">72% Bullish</span>
+        </div>
+        <div style="height:8px;background:var(--bg4);border:1px solid var(--border);border-radius:1px;overflow:hidden">
+          <div style="width:72%;height:100%;background:linear-gradient(90deg,var(--green2),var(--green));border-radius:1px"></div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:3px"><span>Bearish</span><span>Neutral</span><span>Bullish</span></div>
+      </div>
+
+      <!-- Short Squeeze Probability -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+          <span style="color:var(--text2)">Probabilità Short Squeeze</span>
+          <span style="color:var(--yellow);font-weight:600">54% · Moderata–Alta</span>
+        </div>
+        <div style="height:8px;background:var(--bg4);border:1px solid var(--border);border-radius:1px;overflow:hidden">
+          <div style="width:54%;height:100%;background:linear-gradient(90deg,var(--yellow),#ffaa00);border-radius:1px"></div>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px">Short interest 18.4% · DTC 7.7 · MACD buy cross → innesco più probabile pre-earnings 7 Mag</div>
+      </div>
+
+      <!-- Momentum Istituzionale -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+          <span style="color:var(--text2)">Momentum Istituzionale</span>
+          <span style="color:var(--yellow);font-weight:600">32% · In recupero</span>
+        </div>
+        <div style="height:8px;background:var(--bg4);border:1px solid var(--border);border-radius:1px;overflow:hidden">
+          <div style="width:32%;height:100%;background:var(--yellow);border-radius:1px"></div>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px">Float istituzionale 7.1% · Accum/Dist in miglioramento a -29.80M (da -31.56M)</div>
+      </div>
+
+      <!-- Analisti Coverage -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+          <span style="color:var(--text2)">Copertura Analisti (Buy%)</span>
+          <span style="color:var(--green);font-weight:600">50% Buy · 50% Hold</span>
+        </div>
+        <div style="height:8px;background:var(--bg4);border:1px solid var(--border);border-radius:1px;overflow:hidden;display:flex">
+          <div style="width:50%;height:100%;background:var(--green)"></div>
+          <div style="width:50%;height:100%;background:var(--yellow)"></div>
+        </div>
+      </div>
+
+      <!-- News Sentiment -->
+      <div style="margin-bottom:14px">
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+          <span style="color:var(--text2)">News Sentiment Score</span>
+          <span style="color:var(--yellow);font-weight:600">55/100 · Neutro–Positivo</span>
+        </div>
+        <div style="height:8px;background:var(--bg4);border:1px solid var(--border);border-radius:1px;overflow:hidden">
+          <div style="width:55%;height:100%;background:linear-gradient(90deg,var(--yellow),var(--green));border-radius:1px"></div>
+        </div>
+      </div>
+
+      <!-- Put/Call Ratio -->
+      <div>
+        <div style="display:flex;justify-content:space-between;font-size:11px;margin-bottom:5px">
+          <span style="color:var(--text2)">Put/Call Ratio Options</span>
+          <span style="color:var(--yellow);font-weight:600">0.98 · Neutro</span>
+        </div>
+        <div style="height:8px;background:var(--bg4);border:1px solid var(--border);border-radius:1px;overflow:hidden">
+          <div style="width:49%;height:100%;background:var(--yellow);border-radius:1px"></div>
+        </div>
+        <div style="font-size:9px;color:var(--text3);margin-top:3px">Ratio vicino a 1.0 = bilanciamento put/call → segnale di indecisione pre-earnings</div>
+      </div>
+    </div>
+
+    <!-- SHORT INTEREST DETAIL + SQUEEZE METER -->
+    <div class="card">
+      <div class="card-title">Analisi Short Interest & Squeeze Meter</div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">
+        <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">SHORT INTEREST %</div>
+          <div style="font-size:24px;font-weight:700;color:var(--red)">18.4%</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">del float venduto allo scoperto</div>
+        </div>
+        <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">DAYS TO COVER</div>
+          <div style="font-size:24px;font-weight:700;color:var(--yellow)">7.7</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">giorni per coprire (DTC)</div>
+        </div>
+        <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">FLOAT</div>
+          <div style="font-size:24px;font-weight:700;color:var(--text)">~26M</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">azioni in circolazione</div>
+        </div>
+        <div style="padding:12px;background:var(--bg3);border:1px solid var(--border);text-align:center">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">INSIDER OWNED</div>
+          <div style="font-size:24px;font-weight:700;color:var(--purple)">84%</div>
+          <div style="font-size:10px;color:var(--text3);margin-top:4px">concentrazione alta</div>
+        </div>
+      </div>
+
+      <!-- Squeeze Meter visivo -->
+      <div style="padding:14px;background:var(--bg3);border:1px solid var(--border);margin-bottom:12px">
+        <div style="font-size:10px;color:var(--text3);letter-spacing:1px;margin-bottom:10px;text-transform:uppercase">Squeeze Potential Meter</div>
+        <div style="position:relative;height:20px;background:linear-gradient(90deg,var(--green),var(--yellow),var(--red));border-radius:2px">
+          <!-- marker at 41% -->
+          <div style="position:absolute;left:54%;top:-6px;width:2px;height:32px;background:#fff;opacity:0.9"></div>
+          <div style="position:absolute;left:51%;top:26px;font-size:9px;color:var(--text);font-weight:700;white-space:nowrap">54% → MODERATO-ALTO</div>
+        </div>
+        <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:24px">
+          <span>0 Basso</span><span>50 Moderato</span><span>100 Elevato</span>
+        </div>
+      </div>
+
+      <div style="font-size:11px;color:var(--text2);line-height:1.8;padding:12px;background:rgba(255,211,42,0.04);border:1px solid rgba(255,211,42,0.15)">
+        <strong style="color:var(--yellow)">Scenario Squeeze:</strong> Con DTC di 7.7 giorni e 18.4% short float, un earnings beat Q1 il 7 maggio con charge-off normalizzati potrebbe innescare una copertura forzata degli short. Il MACD buy cross già in atto aumenta la probabilità di un movimento accelerato. Target squeeze: <strong style="color:var(--green)">$10.15–$11.82</strong> (MA50/MA200). Un beat con guidance raise potrebbe spingere anche verso $14.25 (target analisti).
+      </div>
+    </div>
+  </div>
+
+  <!-- CATALYST TIMELINE COMPLETA (rimappata visivamente) -->
+  <div class="card">
+    <div class="card-title">Impatto Catalyst sul Prezzo — Heatmap Cronologica</div>
+    <div class="chart-wrap" style="height:220px">
+      <canvas id="catalystImpactChart"></canvas>
+    </div>
+    <div style="display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;font-size:10px">
+      <span style="padding:3px 10px;background:rgba(0,214,143,0.15);color:var(--green);border:1px solid rgba(0,214,143,0.3)">▲ Rialzista</span>
+      <span style="padding:3px 10px;background:rgba(255,71,87,0.15);color:var(--red);border:1px solid rgba(255,71,87,0.3)">▼ Ribassista</span>
+      <span style="padding:3px 10px;background:rgba(255,211,42,0.1);color:var(--yellow);border:1px solid rgba(255,211,42,0.2)">● Misto/Neutro</span>
+      <span style="margin-left:auto;color:var(--text3)">Prossimo catalyst: Earnings Q1 · 7 Mag 2026</span>
+    </div>
+  </div>
+
+</div><!-- /volume -->
+
+<!-- ══════════════════ TAB 8: RISK MANAGER ══════════════════ -->
+<div id="tab-risk" class="tab-panel">
+
+  <div class="grid-2-1 mb12">
+
+    <!-- CALCOLATORE INTERATTIVO -->
+    <div class="card">
+      <div class="card-title">⚙ Position Sizing Calculator — OPFI</div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px">
+
+        <div>
+          <label style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Capitale Totale ($)</label>
+          <input id="rm_capital" type="number" value="10000" oninput="calcPosition()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none">
+        </div>
+
+        <div>
+          <label style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Rischio per Trade (%)</label>
+          <input id="rm_risk_pct" type="number" value="2" step="0.5" min="0.5" max="10" oninput="calcPosition()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none">
+        </div>
+
+        <div>
+          <label style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Prezzo Entrata ($)</label>
+          <input id="rm_entry" type="number" value="8.73" step="0.01" oninput="calcPosition()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none">
+        </div>
+
+        <div>
+          <label style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Stop Loss ($)</label>
+          <input id="rm_stop" type="number" value="7.10" step="0.01" oninput="calcPosition()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--red);padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none">
+        </div>
+
+        <div>
+          <label style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Target Price ($)</label>
+          <input id="rm_target" type="number" value="12.00" step="0.01" oninput="calcPosition()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--green);color:var(--green);padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none">
+        </div>
+
+        <div>
+          <label style="font-size:10px;color:var(--text3);letter-spacing:1px;text-transform:uppercase;display:block;margin-bottom:6px">Commissioni ($)</label>
+          <input id="rm_fees" type="number" value="0" step="0.01" oninput="calcPosition()"
+            style="width:100%;background:var(--bg3);border:1px solid var(--border2);color:var(--text);padding:8px 12px;font-family:'IBM Plex Mono',monospace;font-size:14px;outline:none">
+        </div>
+
+      </div>
+
+      <!-- OUTPUT RISULTATI -->
+      <div style="background:var(--bg3);border:1px solid var(--border2);padding:16px;margin-bottom:12px">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:12px">
+          <div style="text-align:center">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">AZIONI DA COMPRARE</div>
+            <div id="rm_shares" style="font-size:28px;font-weight:700;color:var(--cyan)">138</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">VALORE POSIZIONE</div>
+            <div id="rm_pos_value" style="font-size:28px;font-weight:700;color:var(--text)">$1,217</div>
+          </div>
+          <div style="text-align:center">
+            <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:6px">% CAPITALE</div>
+            <div id="rm_pct_capital" style="font-size:28px;font-weight:700;color:var(--yellow)">12.2%</div>
+          </div>
+        </div>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:12px">
+        <div style="padding:12px;background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);text-align:center">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:4px">RISCHIO MAX ($)</div>
+          <div id="rm_risk_dollar" style="font-size:20px;font-weight:700;color:var(--red)">−$200</div>
+          <div id="rm_risk_pct_show" style="font-size:10px;color:var(--text3);margin-top:2px">2.0% capitale</div>
+        </div>
+        <div style="padding:12px;background:rgba(0,214,143,0.08);border:1px solid rgba(0,214,143,0.2);text-align:center">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:4px">PROFITTO ATTESO ($)</div>
+          <div id="rm_profit" style="font-size:20px;font-weight:700;color:var(--green)">+$420</div>
+          <div id="rm_profit_pct" style="font-size:10px;color:var(--text3);margin-top:2px">+34.5%</div>
+        </div>
+        <div style="padding:12px;background:rgba(0,229,255,0.06);border:1px solid rgba(0,229,255,0.15);text-align:center">
+          <div style="font-size:9px;color:var(--text3);letter-spacing:1px;margin-bottom:4px">RATIO R/R</div>
+          <div id="rm_rr" style="font-size:20px;font-weight:700;color:var(--cyan)">1 : 2.1</div>
+          <div id="rm_rr_verdict" style="font-size:10px;margin-top:2px;color:var(--green)">✓ Accettabile</div>
+        </div>
+      </div>
+
+      <!-- BARRA VISIVA R/R -->
+      <div style="margin-bottom:4px;font-size:10px;color:var(--text3)">Visualizzazione Risk/Reward</div>
+      <div style="height:14px;background:var(--bg4);border:1px solid var(--border);display:flex;overflow:hidden">
+        <div id="rm_risk_bar" style="width:32%;height:100%;background:rgba(255,71,87,0.7)"></div>
+        <div id="rm_reward_bar" style="width:68%;height:100%;background:rgba(0,214,143,0.5)"></div>
+      </div>
+      <div style="display:flex;justify-content:space-between;font-size:9px;color:var(--text3);margin-top:3px">
+        <span id="rm_bar_risk_label" style="color:var(--red)">◀ Rischio −$200</span>
+        <span id="rm_bar_reward_label" style="color:var(--green)">Reward +$420 ▶</span>
+      </div>
+    </div>
+
+    <!-- PROFILO RISCHIO OPFI -->
+    <div class="card">
+      <div class="card-title">Profilo Rischio OPFI — 6 Dimensioni</div>
+      <div style="height:260px">
+        <canvas id="riskRadarChart"></canvas>
+      </div>
+      <div style="margin-top:10px;font-size:11px">
+        <div class="indicator-row"><span class="ind-name">Rischio Credito</span><span style="color:var(--red)">ALTO · Charge-off 45%</span></div>
+        <div class="indicator-row"><span class="ind-name">Rischio Liquidità</span><span style="color:var(--yellow)">MEDIO · Vol basso</span></div>
+        <div class="indicator-row"><span class="ind-name">Rischio Valutazione</span><span style="color:var(--green)">BASSO · P/E 4.87x</span></div>
+        <div class="indicator-row"><span class="ind-name">Rischio Esecuzione</span><span style="color:var(--yellow)">MEDIO · LOLA migration</span></div>
+        <div class="indicator-row"><span class="ind-name">Rischio Regolatorio</span><span style="color:var(--red)">ALTO · Rate caps risk</span></div>
+        <div class="indicator-row"><span class="ind-name">Rischio Insider</span><span style="color:var(--red)">ALTO · 100% sell 90gg</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- P&L SCENARI GRAFICO + 9 REGOLE -->
+  <div class="grid-2">
+    <div class="card">
+      <div class="card-title">P&L Scenari — Bull / Base / Bear (per 138 azioni)</div>
+      <div class="chart-wrap" style="height:220px">
+        <canvas id="pnlChart"></canvas>
+      </div>
+      <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:10px">
+        <div style="padding:10px;background:rgba(0,214,143,0.08);border:1px solid rgba(0,214,143,0.2);text-align:center">
+          <div style="font-size:9px;color:var(--green);letter-spacing:1px;margin-bottom:4px">BULL · $14.25</div>
+          <div style="font-size:18px;font-weight:700;color:var(--green)">+$856</div>
+          <div style="font-size:10px;color:var(--text3)">+63.2% · P(30%)</div>
+        </div>
+        <div style="padding:10px;background:rgba(255,211,42,0.06);border:1px solid rgba(255,211,42,0.15);text-align:center">
+          <div style="font-size:9px;color:var(--yellow);letter-spacing:1px;margin-bottom:4px">BASE · $10.29</div>
+          <div style="font-size:18px;font-weight:700;color:var(--yellow)">+$207</div>
+          <div style="font-size:10px;color:var(--text3)">+17.9% · P(45%)</div>
+        </div>
+        <div style="padding:10px;background:rgba(255,71,87,0.08);border:1px solid rgba(255,71,87,0.2);text-align:center">
+          <div style="font-size:9px;color:var(--red);letter-spacing:1px;margin-bottom:4px">BEAR · $6.50</div>
+          <div style="font-size:18px;font-weight:700;color:var(--red)">−$278</div>
+          <div style="font-size:10px;color:var(--text3)">−25.5% · P(25%)</div>
+        </div>
+      </div>
+      <div style="margin-top:10px;padding:10px;background:var(--bg3);border:1px solid var(--border);font-size:11px;color:var(--text2)">
+        <strong style="color:var(--accent)">EV Ponderato:</strong>
+        <span id="ev_calc" style="color:var(--text)"> (+$856×0.30) + (+$207×0.45) + (−$278×0.25) = <strong style="color:var(--yellow)">+$280 atteso</strong></span>
+      </div>
+    </div>
+
+    <!-- 9 REGOLE OPERATIVE -->
+    <div class="card">
+      <div class="card-title">9 Regole Operative — Trading OPFI</div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:4px">
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(255,71,87,0.05);border-left:2px solid var(--red)">
+          <span style="font-size:14px;font-weight:800;color:var(--red);text-align:center">1</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Stop Loss Rigido a $7.10</div><div style="font-size:10px;color:var(--text3)">Chiusura immediata sotto $7.10 senza eccezioni. Il 52w low a $7.31 ha tenuto — $7.10 è il livello di sicurezza sotto quel supporto critico.</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(0,229,255,0.04);border-left:2px solid var(--cyan)">
+          <span style="font-size:14px;font-weight:800;color:var(--cyan);text-align:center">2</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Conferma Volume &gt;4.3M per Entrata Long</div><div style="font-size:10px;color:var(--text3)">Nessun ingresso long senza volume sopra la media 20gg (4.31M). Il rimbalzo attuale è ancora a volume basso (0.84M) — il MACD buy cross è un segnale, ma serve conferma volume per inversione sostenuta.</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(255,211,42,0.04);border-left:2px solid var(--yellow)">
+          <span style="font-size:14px;font-weight:800;color:var(--yellow);text-align:center">3</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">R/R Minimo 1:2 per Ogni Trade</div><div style="font-size:10px;color:var(--text3)">Non aprire posizioni con R/R inferiore a 1:2. Setup attuale: $8.73 entrata, $7.10 stop, $12.00 target = 1:2.0 ✓ → Target analisti $14.25 = 1:3.4 ✓✓</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(0,214,143,0.04);border-left:2px solid var(--green)">
+          <span style="font-size:14px;font-weight:800;color:var(--green);text-align:center">4</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Max 2% Capitale per Trade</div><div style="font-size:10px;color:var(--text3)">Rischiare mai più del 2% del capitale totale su un singolo trade. Su $10K = max $200 di rischio.</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(179,157,219,0.04);border-left:2px solid var(--purple)">
+          <span style="font-size:14px;font-weight:800;color:var(--purple);text-align:center">5</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Attendere Conferma Inversione (EMA20 a $8.98)</div><div style="font-size:10px;color:var(--text3)">Il trend D1 resta bearish ma il MACD ha incrociato al rialzo. Long confermato solo su chiusura sopra EMA20 ($8.98) con volume. Breakout sopra $9.41 (cloud Ichimoku) = segnale di inversione strutturale.</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(255,71,87,0.04);border-left:2px solid var(--red)">
+          <span style="font-size:14px;font-weight:800;color:var(--red);text-align:center">6</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Attenzione a Earnings del 7 Maggio</div><div style="font-size:10px;color:var(--text3)">Il titolo mostra pattern "sell the news" storico. Il 7 maggio 2026 è il catalizzatore chiave: se i charge-off Q1 sono normalizzati può innescare short squeeze. Posizione pre-earnings giustificata con stop rigido a $7.10.</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(0,229,255,0.04);border-left:2px solid var(--cyan)">
+          <span style="font-size:14px;font-weight:800;color:var(--cyan);text-align:center">7</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Trailing Stop dopo +15%</div><div style="font-size:10px;color:var(--text3)">Se il trade raggiunge +15%, spostare lo stop loss al breakeven e attivare trailing stop del 8% per proteggere i guadagni.</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(255,211,42,0.04);border-left:2px solid var(--yellow)">
+          <span style="font-size:14px;font-weight:800;color:var(--yellow);text-align:center">8</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Monitorare Insider Transactions (Form 4)</div><div style="font-size:10px;color:var(--text3)">Controllare i filing Form 4 settimanalmente. Qualsiasi acquisto insider sarebbe segnale rialzista forte. Vendite continuative → mantenere posizione ridotta.</div></div>
+        </div>
+
+        <div style="display:grid;grid-template-columns:28px 1fr;gap:10px;align-items:start;padding:8px;background:rgba(0,214,143,0.04);border-left:2px solid var(--green)">
+          <span style="font-size:14px;font-weight:800;color:var(--green);text-align:center">9</span>
+          <div><div style="font-size:11px;font-weight:700;color:var(--text);margin-bottom:2px">Target Parziale a Fibonacci 23.6% ($9.21)</div><div style="font-size:10px;color:var(--text3)">Chiudere 50% della posizione al primo target Fibonacci ($9.21 / +5.5%) e lasciare correre il resto verso $10.29 (Fib 38.2%) con stop a breakeven. Target finale analisti $14.25.</div></div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+</div><!-- /risk -->
+
+</div><!-- /content -->
+
+<!-- STATUS BAR -->
+<div class="status-bar">
+  <span class="status-item"><span class="live-dot"></span> NYSE OPFI · $8.73 · +1.75%</span>
+  <span class="status-item">52w: $7.31 – $15.03 · Mkt Cap: $229M · Volume: 0.84M</span>
+  <span class="status-item">EMA20 $8.98 test · RSI: 51.83 · MACD: +0.094 BUY</span>
+  <span class="status-item" style="color:var(--accent)">Earnings Q1: 7 Mag 2026</span>
+</div>
+
+<script>
+// ── TAB SYSTEM ────────────────────────────────────
+function showTab(id) {
+  document.querySelectorAll('.tab-panel').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + id).classList.add('active');
+  event.currentTarget.classList.add('active');
+  if (id === 'technical') setTimeout(initTechCharts, 100);
+  if (id === 'screener') setTimeout(initScreenerCharts, 100);
+  if (id === 'chart') setTimeout(initChartVisCharts, 100);
+  if (id === 'volume') setTimeout(initVolumeCharts, 100);
+  if (id === 'risk') setTimeout(initRiskCharts, 100);
+}
+
+// ── CHART DEFAULTS ────────────────────────────────
+Chart.defaults.color = '#4a6070';
+Chart.defaults.font.family = "'IBM Plex Mono', monospace";
+Chart.defaults.font.size = 10;
+
+// ── PRICE CHART ───────────────────────────────────
+const priceCtx = document.getElementById('priceChart').getContext('2d');
+const priceData = {
+  labels: ['Gen25','Feb25','Mar25','Apr25','Mag25','Giu25','Lug25','Ago25','Set25','Ott25','Nov25','Dic25','Gen26','Feb26','Mar26','Apr26'],
+  datasets: [{
+    label: 'OPFI Prezzo',
+    data: [7.20, 7.80, 8.40, 9.10, 10.50, 11.80, 13.20, 13.89, 13.10, 12.40, 11.60, 10.80, 10.20, 9.60, 8.12, 8.73],
+    borderColor: '#00e5ff',
+    borderWidth: 2,
+    fill: true,
+    backgroundColor: function(ctx) {
+      const c = ctx.chart.ctx;
+      const g = c.createLinearGradient(0,0,0,260);
+      g.addColorStop(0,'rgba(0,229,255,0.18)');
+      g.addColorStop(1,'rgba(0,229,255,0.00)');
+      return g;
+    },
+    tension: 0.4,
+    pointRadius: 3,
+    pointBackgroundColor: '#00e5ff',
+    pointHoverRadius: 6,
+  },{
+    label: 'MA50',
+    data: [null,null,null,null,null,null,null,null,null,null,11.80,11.60,11.30,10.90,10.60,10.30],
+    borderColor: 'rgba(255,211,42,0.7)',
+    borderWidth: 1,
+    borderDash: [4,4],
+    fill: false,
+    pointRadius: 0,
+    tension: 0.3,
+  },{
+    label: 'MA200',
+    data: [null,null,null,null,null,null,null,null,null,null,null,null,12.10,12.05,11.95,11.82],
+    borderColor: 'rgba(179,157,219,0.7)',
+    borderWidth: 1,
+    borderDash: [6,3],
+    fill: false,
+    pointRadius: 0,
+    tension: 0.3,
+  }]
+};
+
+new Chart(priceCtx, {
+  type: 'line',
+  data: priceData,
+  options: {
+    responsive: true,
+    maintainAspectRatio: false,
+    animation: { duration: 1200, easing: 'easeInOutCubic' },
+    interaction: { intersect: false, mode: 'index' },
+    plugins: {
+      legend: { display: true, labels: { boxWidth: 12, padding: 16, color: '#8fa8c0' } },
+      tooltip: {
+        backgroundColor: '#0d1318',
+        borderColor: '#1e2d3d',
+        borderWidth: 1,
+        titleColor: '#00e5ff',
+        bodyColor: '#8fa8c0',
+        callbacks: { label: ctx => ` ${ctx.dataset.label}: $${ctx.parsed.y.toFixed(2)}` }
+      }
+    },
+    scales: {
+      x: { grid: { color: 'rgba(30,45,61,0.6)' }, ticks: { color: '#4a6070', maxRotation: 0 } },
+      y: {
+        grid: { color: 'rgba(30,45,61,0.6)' },
+        ticks: { color: '#4a6070', callback: v => '$'+v },
+        min: 6.5, max: 15
+      }
+    }
+  }
+});
+
+// ── REVENUE CHART ─────────────────────────────────
+const revCtx = document.getElementById('revenueChart').getContext('2d');
+new Chart(revCtx, {
+  type: 'bar',
+  data: {
+    labels: ['Q1\'24','Q2\'24','Q3\'24','Q4\'24','Q1\'25','Q2\'25','Q3\'25','Q4\'25'],
+    datasets: [{
+      label: 'Revenue ($M)',
+      data: [118, 127, 138, 142, 133, 152, 164, 159],
+      backgroundColor: ctx => {
+        const colors = ['#00b37a','#00b37a','#00b37a','#00b37a','#00d68f','#00d68f','#00d68f','#00d68f'];
+        return colors[ctx.dataIndex];
+      },
+      borderWidth: 0,
+      borderRadius: 2,
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` $${ctx.parsed.y}M` } }
+    },
+    scales: {
+      x: { grid: { display: false }, ticks: { color: '#4a6070' } },
+      y: { grid: { color: 'rgba(30,45,61,0.6)' }, ticks: { color: '#4a6070', callback: v => '$'+v+'M' } }
+    }
+  }
+});
+
+// ── PERF COMPARATA ────────────────────────────────
+const perfCtx = document.getElementById('perfChart').getContext('2d');
+new Chart(perfCtx, {
+  type: 'line',
+  data: {
+    labels: ['Gen25','Mar25','Mag25','Lug25','Set25','Nov25','Gen26','Mar26','Apr26'],
+    datasets: [{
+      label: 'OPFI',
+      data: [100, 117, 146, 183, 182, 161, 142, 113, 121],
+      borderColor: '#00e5ff', borderWidth: 2, fill: false, tension: 0.3, pointRadius: 2
+    },{
+      label: 'S&P 500',
+      data: [100, 104, 109, 116, 118, 119, 116, 113, 112],
+      borderColor: '#8fa8c0', borderWidth: 1.5, fill: false, tension: 0.3, pointRadius: 2, borderDash: [4,4]
+    },{
+      label: 'KRE (Reg Banks)',
+      data: [100, 102, 106, 110, 104, 102, 98, 96, 95],
+      borderColor: '#b39ddb', borderWidth: 1.5, fill: false, tension: 0.3, pointRadius: 2, borderDash: [3,3]
+    }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: true, labels: { boxWidth: 10, padding: 14, color: '#8fa8c0' } },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}` } }
+    },
+    scales: {
+      x: { grid: { color: 'rgba(30,45,61,0.6)' }, ticks: { color: '#4a6070' } },
+      y: { grid: { color: 'rgba(30,45,61,0.6)' }, ticks: { color: '#4a6070', callback: v => v } }
+    }
+  }
+});
+
+// ── MIX RICAVI DOUGHNUT ──────────────────────────
+const mixCtx = document.getElementById('mixChart').getContext('2d');
+new Chart(mixCtx, {
+  type: 'doughnut',
+  data: {
+    labels: ['Finance Charges', 'Origination Fees', 'SalaryTap', 'Other'],
+    datasets: [{ data: [78, 12, 6, 4], backgroundColor: ['#00e5ff','#b39ddb','#ffd32a','#00d68f'], borderWidth: 0, hoverOffset: 6 }]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: {
+      legend: { display: false },
+      tooltip: { callbacks: { label: ctx => ` ${ctx.label}: ${ctx.parsed}%` } }
+    },
+    cutout: '68%'
+  }
+});
+
+// ── TECHNICAL CHARTS (lazy) ───────────────────────
+let techInit = false;
+function initTechCharts() {
+  if (techInit) return;
+  techInit = true;
+}
+
+// ── RADAR CHART (screener) ───────────────────────
+let radarInit = false;
+function initScreenerCharts() {
+  if (radarInit) return;
+  radarInit = true;
+  const rCtx = document.getElementById('radarChart').getContext('2d');
+  new Chart(rCtx, {
+    type: 'radar',
+    data: {
+      labels: ['Valutazione\n(P/E low=good)','Crescita Rev','ROE','Momentum\nPrezzo','Qualità\nCredito','Liquidità\nMercato'],
+      datasets: [{
+        label: 'OPFI',
+        data: [92, 68, 95, 12, 40, 30],
+        backgroundColor: 'rgba(0,229,255,0.12)',
+        borderColor: '#00e5ff',
+        borderWidth: 2,
+        pointBackgroundColor: '#00e5ff',
+        pointRadius: 4
+      },{
+        label: 'Peer Mediano',
+        data: [55, 65, 55, 60, 65, 70],
+        backgroundColor: 'rgba(179,157,219,0.08)',
+        borderColor: 'rgba(179,157,219,0.6)',
+        borderWidth: 1.5,
+        borderDash: [4,4],
+        pointBackgroundColor: '#b39ddb',
+        pointRadius: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { boxWidth: 10, padding: 14, color: '#8fa8c0' } },
+        tooltip: { backgroundColor: '#0d1318', borderColor: '#1e2d3d', borderWidth:1 }
+      },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(30,45,61,0.8)' },
+          angleLines: { color: 'rgba(30,45,61,0.8)' },
+          ticks: { display: false },
+          pointLabels: { color: '#8fa8c0', font: { size: 10, family: "'IBM Plex Mono',monospace" } }
+        }
+      }
+    }
+  });
+}
+
+// ── CHART VIS CHARTS (lazy) ───────────────────────
+let chartVisInit = false;
+function initChartVisCharts() {
+  if (chartVisInit) return;
+  chartVisInit = true;
+
+  // Prezzo aggiornato con EMA overlay
+  const cvCtx = document.getElementById('chartVisCanvas').getContext('2d');
+  new Chart(cvCtx, {
+    type: 'line',
+    data: {
+      labels: ['Gen26','7Gen','14Gen','21Gen','28Gen','4Feb','11Feb','18Feb','25Feb','4Mar','11Mar','18Mar','25Mar','1Apr','8Apr','15Apr','22Apr','28Apr'],
+      datasets: [{
+        label: 'OPFI Prezzo',
+        data: [10.20, 10.00, 9.80, 9.60, 9.40, 9.80, 9.60, 9.20, 9.50, 9.10, 8.90, 8.60, 7.71, 7.48, 8.10, 8.40, 8.60, 8.73],
+        borderColor: '#00e5ff', borderWidth: 2, fill: true,
+        backgroundColor: function(ctx) {
+          const g = ctx.chart.ctx.createLinearGradient(0,0,0,280);
+          g.addColorStop(0,'rgba(0,229,255,0.15)');
+          g.addColorStop(1,'rgba(0,229,255,0.00)');
+          return g;
+        },
+        tension: 0.35, pointRadius: 2, pointHoverRadius: 5, pointBackgroundColor: '#00e5ff'
+      },{
+        label: 'EMA20 $8.98',
+        data: [null,null,null,null,null,null,null,null,null,null,9.30,9.10,8.90,8.75,8.70,8.80,8.90,8.98],
+        borderColor: 'rgba(0,229,255,0.5)', borderWidth: 1.5, borderDash:[3,3], fill:false, pointRadius:0, tension:0.3
+      },{
+        label: 'EMA50 $9.88',
+        data: [null,null,null,null,null,null,null,null,null,9.80,9.70,9.60,9.50,9.40,9.30,9.20,9.10,9.00],
+        borderColor: 'rgba(255,211,42,0.6)', borderWidth: 1.5, borderDash:[4,4], fill:false, pointRadius:0, tension:0.3
+      },{
+        label: 'MA200 $11.82',
+        data: [12.10,12.05,12.00,11.95,11.90,11.88,11.86,11.84,11.82,11.80,11.78,11.76,11.74,11.72,11.70,11.68,11.65,11.82],
+        borderColor: 'rgba(255,71,87,0.5)', borderWidth: 1, borderDash:[6,3], fill:false, pointRadius:0, tension:0.2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      animation: { duration: 1000 },
+      interaction: { intersect: false, mode: 'index' },
+      plugins: {
+        legend: { display: true, labels: { boxWidth: 10, padding: 12, color: '#8fa8c0' } },
+        tooltip: { backgroundColor:'#0d1318', borderColor:'#1e2d3d', borderWidth:1, titleColor:'#00e5ff', bodyColor:'#8fa8c0' }
+      },
+      scales: {
+        x: { grid: { color: 'rgba(30,45,61,0.5)' }, ticks: { color: '#4a6070', maxRotation: 45 } },
+        y: { grid: { color: 'rgba(30,45,61,0.5)' }, ticks: { color: '#4a6070', callback: v => '$'+v }, min: 7, max: 13 }
+      }
+    }
+  });
+
+  // Net Income trimestrale
+  const niCtx = document.getElementById('netIncomeChart').getContext('2d');
+  new Chart(niCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Set24','Ott24','Dic24','Gen25','Mar25','Apr25','Giu25','Lug25','Set25','Ott25','Dic25','Gen26'],
+      datasets: [{
+        label: 'Utile Netto ($M)',
+        data: [-86.1, -10.7, -5.6, 51.8, -11.4, -22.6, -20.8, 1.6, 41.6, 198.8, 16.8, 104.5],
+        backgroundColor: ctx => ctx.parsed.y >= 0 ? 'rgba(0,214,143,0.7)' : 'rgba(255,71,87,0.7)',
+        borderWidth: 0, borderRadius: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` $${ctx.parsed.y}M` } }
+      },
+      scales: {
+        x: { grid: { display:false }, ticks: { color:'#4a6070', maxRotation: 45 } },
+        y: { grid: { color:'rgba(30,45,61,0.5)' }, ticks: { color:'#4a6070', callback: v => '$'+v+'M' } }
+      }
+    }
+  });
+
+  // Current Assets
+  const caCtx = document.getElementById('currentAssetsChart').getContext('2d');
+  new Chart(caCtx, {
+    type: 'line',
+    data: {
+      labels: ['Set24','Ott24','Dic24','Gen25','Mar25','Apr25','Giu25','Lug25','Set25','Ott25','Dic25','Gen26'],
+      datasets: [{
+        label: 'Attività Correnti ($B)',
+        data: [null, 2.097, 0.567, 2.256, 0.556, 2.026, 0.578, 1.947, 0.422, 2.008, 0.644, 2.160],
+        borderColor: '#b39ddb', borderWidth: 2, fill: true,
+        backgroundColor: 'rgba(179,157,219,0.08)',
+        tension: 0.4, pointRadius: 3, pointBackgroundColor: '#b39ddb'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: { legend: { display: false }, tooltip: { callbacks: { label: ctx => ` $${ctx.parsed.y}B` } } },
+      scales: {
+        x: { grid: { display:false }, ticks: { color:'#4a6070', maxRotation: 45 } },
+        y: { grid: { color:'rgba(30,45,61,0.5)' }, ticks: { color:'#4a6070', callback: v => '$'+v+'B' } }
+      }
+    }
+  });
+}
+
+// ── SCREENER FILTER ───────────────────────────────
+function filterTable(type, btn) {
+  document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+  btn.classList.add('active');
+  document.querySelectorAll('#screenerTable tbody tr').forEach(row => {
+    const rating = row.getAttribute('data-rating');
+    row.style.display = (type === 'all' || rating === type) ? '' : 'none';
+  });
+}
+
+// ── VOLUME & SENTIMENT CHARTS ─────────────────────
+let volInit = false;
+function initVolumeCharts() {
+  if (volInit) return;
+  volInit = true;
+
+  // Volume 10gg
+  const volCtx = document.getElementById('volChart').getContext('2d');
+  new Chart(volCtx, {
+    type: 'bar',
+    data: {
+      labels: ['14Apr','15Apr','16Apr','17Apr','22Apr','23Apr','24Apr','25Apr','28Apr'],
+      datasets: [{
+        label: 'Volume (K)',
+        data: [620, 480, 890, 430, 560, 410, 380, 840, 310],
+        backgroundColor: ctx => [620, 480, 890, 430, 560, 410, 380, 840, 310][ctx.dataIndex] > 430 ? 'rgba(0,229,255,0.7)' : 'rgba(143,168,192,0.4)',
+        borderWidth: 0, borderRadius: 2
+      },{
+        label: 'Media 20gg',
+        data: Array(9).fill(431),
+        type: 'line',
+        borderColor: 'rgba(255,211,42,0.8)',
+        borderWidth: 1.5,
+        borderDash: [5,4],
+        fill: false,
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { boxWidth: 10, padding: 12, color: '#8fa8c0' } },
+        tooltip: { callbacks: { label: ctx => ` ${ctx.dataset.label}: ${ctx.parsed.y}K` } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#4a6070' } },
+        y: { grid: { color: 'rgba(30,45,61,0.6)' }, ticks: { color: '#4a6070', callback: v => v+'K' } }
+      }
+    }
+  });
+
+  // OBV con divergenza
+  const obvCtx = document.getElementById('obvChart').getContext('2d');
+  new Chart(obvCtx, {
+    type: 'line',
+    data: {
+      labels: ['14Apr','15Apr','16Apr','17Apr','22Apr','23Apr','24Apr','25Apr','28Apr'],
+      datasets: [{
+        label: 'OBV (M)',
+        data: [264, 266, 268, 267, 269, 268, 267, 270, 271],
+        borderColor: '#b39ddb',
+        borderWidth: 2,
+        fill: true,
+        backgroundColor: 'rgba(179,157,219,0.08)',
+        tension: 0.3, pointRadius: 3, pointBackgroundColor: '#b39ddb',
+        yAxisID: 'y'
+      },{
+        label: 'Prezzo ($)',
+        data: [8.10, 8.20, 8.40, 8.35, 8.55, 8.60, 8.62, 8.68, 8.73],
+        borderColor: 'rgba(0,229,255,0.6)',
+        borderWidth: 1.5,
+        fill: false,
+        borderDash: [4,3],
+        tension: 0.3, pointRadius: 2, pointBackgroundColor: '#00e5ff',
+        yAxisID: 'y2'
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: true, labels: { boxWidth: 10, padding: 12, color: '#8fa8c0' } },
+        tooltip: { mode: 'index', intersect: false }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#4a6070' } },
+        y: { position: 'left', grid: { color: 'rgba(30,45,61,0.5)' }, ticks: { color: '#b39ddb', callback: v => v+'M' } },
+        y2: { position: 'right', grid: { display: false }, ticks: { color: '#00e5ff', callback: v => '$'+v } }
+      }
+    }
+  });
+
+  // Catalyst Impact Timeline
+  const catCtx = document.getElementById('catalystImpactChart').getContext('2d');
+  new Chart(catCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Div.Spec\nMar25','Insider\nSell','JMP\nUpgrade','Q1 Beat\nGuid+','Q2 Rec\nGuid+','Charge-off\nEstate','Q3+Buyback\nOtt25','Dilution\nRisk Feb26','FY25 Rec\n-5.3%','Stephens\nHold','Insider\nSell Mar26','52wLow\n→Rimbalzo'],
+      datasets: [{
+        label: 'Impatto Stimato (%)',
+        data: [+4, -8, +12, +7, +9, -11, +3, -9, -5, -4, -3, +6],
+        backgroundColor: ctx => {
+          const v = [4,-8,12,7,9,-11,3,-9,-5,-4,-3,6][ctx.dataIndex];
+          return v > 0 ? 'rgba(0,214,143,0.7)' : v < 0 ? 'rgba(255,71,87,0.7)' : 'rgba(255,211,42,0.5)';
+        },
+        borderWidth: 0, borderRadius: 2
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` Impatto: ${ctx.parsed.y > 0 ? '+' : ''}${ctx.parsed.y}%` } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#4a6070', font: { size: 9 } } },
+        y: {
+          grid: { color: 'rgba(30,45,61,0.5)' },
+          ticks: { color: '#4a6070', callback: v => (v > 0 ? '+' : '') + v + '%' },
+          suggestedMin: -15, suggestedMax: 15
+        }
+      }
+    }
+  });
+}
+
+// ── RISK MANAGER CHARTS ───────────────────────────
+let riskInit = false;
+function initRiskCharts() {
+  if (riskInit) return;
+  riskInit = true;
+
+  // Risk Radar
+  const rrCtx = document.getElementById('riskRadarChart').getContext('2d');
+  new Chart(rrCtx, {
+    type: 'radar',
+    data: {
+      labels: ['Rischio\nCredito','Rischio\nLiquidità','Rischio\nValutazione','Rischio\nEsecuzione','Rischio\nRegolatorio','Rischio\nInsider'],
+      datasets: [{
+        label: 'OPFI Risk Profile',
+        data: [72, 55, 15, 45, 75, 80],
+        backgroundColor: 'rgba(255,71,87,0.12)',
+        borderColor: '#ff4757',
+        borderWidth: 2,
+        pointBackgroundColor: '#ff4757',
+        pointRadius: 4
+      },{
+        label: 'Threshold Accettabile',
+        data: [40, 40, 40, 40, 40, 40],
+        backgroundColor: 'rgba(0,214,143,0.05)',
+        borderColor: 'rgba(0,214,143,0.4)',
+        borderWidth: 1,
+        borderDash: [4,4],
+        pointRadius: 0
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { labels: { boxWidth: 10, padding: 12, color: '#8fa8c0' } }
+      },
+      scales: {
+        r: {
+          min: 0, max: 100,
+          grid: { color: 'rgba(30,45,61,0.8)' },
+          angleLines: { color: 'rgba(30,45,61,0.8)' },
+          ticks: { display: false },
+          pointLabels: { color: '#8fa8c0', font: { size: 9, family: "'IBM Plex Mono'" } }
+        }
+      }
+    }
+  });
+
+  // P&L Scenari
+  const pnlCtx = document.getElementById('pnlChart').getContext('2d');
+  new Chart(pnlCtx, {
+    type: 'bar',
+    data: {
+      labels: ['Bear\n$6.50\nP:25%', 'Base\n$10.29\nP:45%', 'Bull\n$14.25\nP:30%'],
+      datasets: [{
+        label: 'P&L ($)',
+        data: [-278, 207, 856],
+        backgroundColor: ['rgba(255,71,87,0.7)', 'rgba(255,211,42,0.6)', 'rgba(0,214,143,0.7)'],
+        borderWidth: 0, borderRadius: 3
+      }]
+    },
+    options: {
+      responsive: true, maintainAspectRatio: false,
+      plugins: {
+        legend: { display: false },
+        tooltip: { callbacks: { label: ctx => ` P&L: ${ctx.parsed.y > 0 ? '+' : ''}$${ctx.parsed.y}` } }
+      },
+      scales: {
+        x: { grid: { display: false }, ticks: { color: '#4a6070', font: { size: 10 } } },
+        y: {
+          grid: { color: 'rgba(30,45,61,0.5)' },
+          ticks: { color: '#4a6070', callback: v => (v >= 0 ? '+' : '') + '$' + v },
+          suggestedMin: -400, suggestedMax: 800
+        }
+      }
+    }
+  });
+
+  calcPosition();
+}
+
+// ── POSITION SIZING CALCULATOR ────────────────────
+function calcPosition() {
+  const capital  = parseFloat(document.getElementById('rm_capital')?.value) || 10000;
+  const riskPct  = parseFloat(document.getElementById('rm_risk_pct')?.value) || 2;
+  const entry    = parseFloat(document.getElementById('rm_entry')?.value) || 8.73;
+  const stop     = parseFloat(document.getElementById('rm_stop')?.value) || 7.10;
+  const target   = parseFloat(document.getElementById('rm_target')?.value) || 12.00;
+  const fees     = parseFloat(document.getElementById('rm_fees')?.value) || 0;
+
+  const riskDollar = capital * (riskPct / 100);
+  const riskPerShare = Math.abs(entry - stop);
+  if (riskPerShare <= 0) return;
+
+  const shares     = Math.floor(riskDollar / riskPerShare);
+  const posValue   = shares * entry;
+  const pctCap     = (posValue / capital) * 100;
+  const profitGross= shares * (target - entry);
+  const profit     = profitGross - fees;
+  const profitPct  = ((target - entry) / entry) * 100;
+  const rr         = Math.abs((target - entry) / (entry - stop));
+  const totalRisk  = -(shares * riskPerShare + fees);
+
+  // risk/reward bar widths
+  const totalRange = Math.abs(totalRisk) + profit;
+  const riskW = totalRange > 0 ? (Math.abs(totalRisk) / totalRange * 100).toFixed(0) : 50;
+  const rewW  = totalRange > 0 ? (profit / totalRange * 100).toFixed(0) : 50;
+
+  const set = (id, val) => { const el = document.getElementById(id); if(el) el.textContent = val; };
+  const setStyle = (id, prop, val) => { const el = document.getElementById(id); if(el) el.style[prop] = val; };
+
+  set('rm_shares', shares.toLocaleString());
+  set('rm_pos_value', '$' + posValue.toLocaleString(undefined, {maximumFractionDigits:0}));
+  set('rm_pct_capital', pctCap.toFixed(1) + '%');
+  set('rm_risk_dollar', (totalRisk >= 0 ? '+' : '') + '$' + Math.round(totalRisk).toLocaleString());
+  set('rm_risk_pct_show', riskPct.toFixed(1) + '% capitale');
+  set('rm_profit', (profit >= 0 ? '+' : '') + '$' + Math.round(profit).toLocaleString());
+  set('rm_profit_pct', (profit >= 0 ? '+' : '') + profitPct.toFixed(1) + '%');
+  set('rm_rr', '1 : ' + rr.toFixed(1));
+  set('rm_rr_verdict', rr >= 2 ? '✓ Ottimo' : rr >= 1.5 ? '✓ Accettabile' : '⚠ Basso');
+
+  const rrEl = document.getElementById('rm_rr_verdict');
+  if (rrEl) rrEl.style.color = rr >= 2 ? 'var(--green)' : rr >= 1.5 ? 'var(--yellow)' : 'var(--red)';
+
+  setStyle('rm_risk_bar', 'width', riskW + '%');
+  setStyle('rm_reward_bar', 'width', rewW + '%');
+  set('rm_bar_risk_label', '◀ Rischio $' + Math.abs(Math.round(totalRisk)).toLocaleString());
+  set('rm_bar_reward_label', 'Reward +$' + Math.round(profit).toLocaleString() + ' ▶');
+}
+</script>
+</body>
+</html>
