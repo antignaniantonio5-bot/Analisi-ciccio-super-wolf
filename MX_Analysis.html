@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1.0"/>
-<title>NYSE:MX — MagnaChip Full Analysis</title>
+<title>NYSE:MX — MagnaChip Full Analysis · Post-Earnings 29 Apr 2026</title>
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
@@ -161,6 +161,16 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 </style>
 </head>
 <body>
+<div style="background:linear-gradient(90deg,#3a1a1a,#2a1010);border-bottom:2px solid #f85149;padding:8px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
+  <span style="color:#f85149;font-weight:800;font-size:.85rem">⚡ POST-EARNINGS UPDATE · 29 APR 2026</span>
+  <span style="color:#e6edf3;font-size:.82rem">EPS Q1: <strong style="color:#3fb950">-$0.11</strong> (Beat +50% vs -$0.22E)</span>
+  <span style="color:#8b949e;font-size:.82rem">|</span>
+  <span style="color:#e6edf3;font-size:.82rem">Revenue: <strong style="color:#3fb950">$46.2M</strong> (+3.3% YoY)</span>
+  <span style="color:#8b949e;font-size:.82rem">|</span>
+  <span style="color:#e6edf3;font-size:.82rem">Guidance Q2: <strong style="color:#f85149">$46.5M midpoint (-2.3% YoY)</strong></span>
+  <span style="color:#8b949e;font-size:.82rem">|</span>
+  <span style="color:#e6edf3;font-size:.82rem">Prezzo: <strong style="color:#f85149">$3.25 (-32.8%)</strong></span>
+</div>
 
 <!-- HEADER -->
 <header>
@@ -174,9 +184,9 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
     </div>
   </div>
   <div class="hd-right">
-    <div class="hd-price">$5.32</div>
-    <div class="hd-chg">▲ +$0.71 (+15.4%) YTD · +97.1% ultimi 30gg</div>
-    <div class="hd-meta"><span class="live"></span>Aggiornato · 27 Apr 2026 &nbsp;|&nbsp; 52W H: $5.53 &nbsp; L: $2.18 &nbsp; ⚠️ Earnings AMC 28 Apr</div>
+    <div class="hd-price" style="color:#f85149">$3.25</div>
+    <div class="hd-chg" style="color:#f85149">▼ -$2.07 (-38.7%) oggi · +21% YTD</div>
+    <div class="hd-meta"><span class="live" style="background:#f85149"></span>Aggiornato · 29 Apr 2026 &nbsp;|&nbsp; 52W H: $5.64 &nbsp; L: $2.18 &nbsp; ✅ Earnings Q1 2026 — EPS Beat · Guidance Q2 Deludente</div>
   </div>
 </header>
 
@@ -199,17 +209,17 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 
   <!-- KPI ROW -->
   <div class="g6">
-    <div class="card"><div class="ctitle">Prezzo</div><div class="cval green">$5.32</div><div class="csub">Close 27 Apr</div></div>
-    <div class="card"><div class="ctitle">Ultimi 30gg</div><div class="cval green">+97.1%</div><div class="csub">da ~$2.70</div></div>
-    <div class="card"><div class="ctitle">Market Cap</div><div class="cval">~$194M</div><div class="csub">~36.5M azioni</div></div>
-    <div class="card"><div class="ctitle">Volume medio</div><div class="cval">~2.1M</div><div class="csub"><span class="badge bg-g">+250% media</span></div></div>
-    <div class="card"><div class="ctitle">52W H / L</div><div class="cval" style="font-size:1rem">$5.53 <span style="color:#8b949e">/</span> $2.18</div><div class="csub">Range 154%</div></div>
-    <div class="card"><div class="ctitle">Earnings</div><div class="cval yellow" style="font-size:1rem">28 Apr</div><div class="csub"><span class="badge bg-y">⚠️ AMC Stasera</span></div></div>
+    <div class="card"><div class="ctitle">Prezzo</div><div class="cval red">$3.25</div><div class="csub">Close 29 Apr · Post-Earnings</div></div>
+    <div class="card"><div class="ctitle">Oggi</div><div class="cval red">-32.8%</div><div class="csub">Sell-the-news guidance Q2</div></div>
+    <div class="card"><div class="ctitle">Market Cap</div><div class="cval">~$118M</div><div class="csub">~36.4M azioni</div></div>
+    <div class="card"><div class="ctitle">Volume 29 Apr</div><div class="cval">~4.0M</div><div class="csub"><span class="badge bg-r">+524% media</span></div></div>
+    <div class="card"><div class="ctitle">52W H / L</div><div class="cval" style="font-size:1rem">$5.64 <span style="color:#8b949e">/</span> $2.18</div><div class="csub">-38.2% dal massimo</div></div>
+    <div class="card"><div class="ctitle">Earnings Q1</div><div class="cval green" style="font-size:1rem">BEAT EPS</div><div class="csub"><span class="badge bg-r">⚠️ Guidance Debole</span></div></div>
   </div>
 
   <!-- PRICE CHART -->
   <div class="card mb">
-    <div class="stitle">Andamento Prezzo &amp; Volume — Gen 2025 / Apr 2026 · ⚠️ Earnings AMC 28 Apr</div>
+    <div class="stitle">Andamento Prezzo &amp; Volume — Gen 2025 / Apr 2026 · ✅ Earnings Q1: EPS -$0.11 (Beat +50%) · ⚠️ -32.8% Post-Guidance Q2</div>
     <div style="height:280px;position:relative"><canvas id="cPrice"></canvas></div>
   </div>
 
@@ -268,8 +278,8 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
      TAB 2 – ANALISI TECNICA
 ===================================================== -->
 <div id="tech" class="pane">
-  <div class="alert al-g">✅ STRONG UPTREND — MX +97.1% ultimi 30gg · +56.8% YTD 2026 · Golden Cross attivo · Prezzo vicino ai massimi 52W ($5.53)</div>
-  <div class="alert al-y">⚠️ ATTENZIONE — RSI ancora elevato · Stochastic %K in calo · Prezzo $5.32 vicino resistenza · Earnings AMC 28 Apr (oscillazione attesa ±5.4%)</div>
+  <div class="alert al-b">📋 <strong>POST-EARNINGS UPDATE 29 Apr 2026</strong> — EPS Q1: -$0.11 (BEAT +50% vs -$0.22E) · Revenue $46.2M (+3.3% YoY) ✅ · Guidance Q2 deludente → MX -32.8% oggi a $3.25</div>
+  <div class="alert al-y">⚠️ SELL-THE-NEWS — Guidance Q2 $44.5–48.5M (-2.3% YoY) · Gross Margin Q2E 17–19% (in miglioramento ma sotto Q2 2025 20.4%) · Upgrade fab Gumi Q3 → impatto utilizzo H2 2026</div>
 
   <div class="g2">
     <!-- OSCILLATORI -->
@@ -304,29 +314,29 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 
     <!-- MEDIE MOBILI -->
     <div class="card">
-      <div class="stitle">Medie Mobili vs Prezzo $5.32</div>
+      <div class="stitle">Medie Mobili vs Prezzo $3.25</div>
       <table class="tbl">
         <thead><tr><th>Media</th><th>Valore</th><th>Distanza</th><th>Segnale</th></tr></thead>
         <tbody>
-          <tr><td>EMA 10</td><td>$3.89</td><td class="green">+38.0%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>EMA 20</td><td>$3.48</td><td class="green">+54.3%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>EMA 30</td><td>$3.30</td><td class="green">+62.7%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>EMA 50</td><td>$3.13</td><td class="green">+71.6%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>EMA 100</td><td>$3.01</td><td class="green">+78.4%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>EMA 200</td><td>$3.12</td><td class="green">+72.1%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>SMA 10</td><td>$3.66</td><td class="green">+46.7%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>SMA 20</td><td>$3.26</td><td class="green">+64.7%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>SMA 50</td><td>$2.97</td><td class="green">+80.8%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
-          <tr><td>SMA 200</td><td>$3.01</td><td class="green">+78.4%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 10</td><td>$3.89</td><td class="red">-16.5%</td><td><span class="badge bg-r">Sotto ↓</span></td></tr>
+          <tr><td>EMA 20</td><td>$3.48</td><td class="red">-6.6%</td><td><span class="badge bg-r">Sotto ↓</span></td></tr>
+          <tr><td>EMA 30</td><td>$3.30</td><td class="red">-1.5%</td><td><span class="badge bg-r">Sotto ↓</span></td></tr>
+          <tr><td>EMA 50</td><td>$3.13</td><td class="green">+3.8%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 100</td><td>$3.01</td><td class="green">+8.0%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>EMA 200</td><td>$3.12</td><td class="green">+4.2%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>SMA 10</td><td>$3.66</td><td class="red">-11.2%</td><td><span class="badge bg-r">Sotto ↓</span></td></tr>
+          <tr><td>SMA 20</td><td>$3.26</td><td class="red">-0.3%</td><td><span class="badge bg-r">Sotto ↓</span></td></tr>
+          <tr><td>SMA 50</td><td>$2.97</td><td class="green">+9.4%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
+          <tr><td>SMA 200</td><td>$3.01</td><td class="green">+8.0%</td><td><span class="badge bg-g">Sopra ↑</span></td></tr>
         </tbody>
       </table>
-      <div class="alert al-g" style="margin-top:11px;font-size:.77rem;padding:7px 11px">✅ Golden Cross — EMA50 ($3.13) &gt; EMA200 ($3.12)</div>
+      <div class="alert al-y" style="margin-top:11px;font-size:.77rem">⚠️ Prezzo ritornato sotto EMA10/20/30 e SMA10/20 dopo il crollo post-earnings. Golden Cross ancora attivo (EMA50 $3.13 &lt; EMA200 $3.12 — margine ridotto).</div>
     </div>
   </div>
 
   <!-- S/R CHART -->
   <div class="card mb">
-    <div class="stitle">Supporti &amp; Resistenze — Livelli chiave con prezzo corrente $5.32</div>
+    <div class="stitle">Supporti &amp; Resistenze — Livelli chiave con prezzo corrente $3.25 (post-earnings)</div>
     <div style="height:210px;position:relative"><canvas id="cSR"></canvas></div>
   </div>
 
@@ -419,7 +429,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
         <tr><th>Ticker</th><th>Azienda</th><th>Prezzo</th><th>Var%</th><th>RSI</th><th>MACD</th><th>ADX</th><th>EMA Cross</th><th>Trend</th><th>P/S</th><th>Rating</th></tr>
       </thead>
       <tbody>
-        <tr data-r="WATCH"><td><strong class="blue">MX</strong></td><td>MagnaChip Semi.</td><td><strong>$5.32</strong></td><td class="green">+97.1% (30gg)</td><td><span class="badge bg-y">~52</span></td><td><span class="badge bg-g">Bull</span></td><td>~28</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-g">Strong Up</span></td><td>0.54x</td><td><span class="badge bg-y">WATCH</span></td></tr>
+        <tr data-r="WATCH"><td><strong class="blue">MX</strong></td><td>MagnaChip Semi.</td><td><strong style="color:#f85149">$3.25</strong></td><td class="red">-32.8% (29 Apr)</td><td><span class="badge bg-g">~42</span></td><td><span class="badge bg-y">Neutral</span></td><td>~22</td><td><span class="badge bg-y">Golden X⚠️</span></td><td><span class="badge bg-r">Post-Sell</span></td><td>0.64x</td><td><span class="badge bg-y">WATCH</span></td></tr>
         <tr data-r="BUY"><td><strong>ON</strong></td><td>ON Semiconductor</td><td>$44.50</td><td class="green">+0.8%</td><td><span class="badge bg-x">52.1</span></td><td><span class="badge bg-g">Bull</span></td><td>22.5</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-b">Uptrend</span></td><td>2.1x</td><td><span class="badge bg-g">BUY</span></td></tr>
         <tr data-r="BUY"><td><strong>MPWR</strong></td><td>Monolithic Power Sys.</td><td>$398.20</td><td class="green">+1.5%</td><td><span class="badge bg-x">61.4</span></td><td><span class="badge bg-g">Bull</span></td><td>28.3</td><td><span class="badge bg-g">Golden X</span></td><td><span class="badge bg-b">Uptrend</span></td><td>8.7x</td><td><span class="badge bg-g">BUY</span></td></tr>
         <tr data-r="HOLD"><td><strong>DIOD</strong></td><td>Diodes Incorporated</td><td>$24.80</td><td class="red">-1.2%</td><td><span class="badge bg-x">48.3</span></td><td><span class="badge bg-r">Bear</span></td><td>18.2</td><td><span class="badge bg-r">Death X</span></td><td><span class="badge bg-x">Sideways</span></td><td>1.1x</td><td><span class="badge bg-y">HOLD</span></td></tr>
@@ -456,16 +466,16 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 ===================================================== -->
 <div id="report" class="pane">
 
-  <div class="alert al-b">📋 Report aggiornato al 27 Aprile 2026 — Earnings MX attesi AMC 28 Apr · Solo scopi informativi, non costituisce consulenza finanziaria</div>
+  <div class="alert al-b">📋 Report aggiornato al 29 Aprile 2026 — Earnings Q1 2026 pubblicati AMC 28 Apr · EPS -$0.11 (BEAT +50%) · Revenue $46.2M ✅ · Guidance Q2 debole → -32.8% · Solo scopi informativi, non costituisce consulenza finanziaria</div>
 
   <!-- EXECUTIVE SUMMARY -->
   <div class="mb">
     <div style="font-size:1rem;font-weight:700;margin-bottom:9px">📊 Executive Summary</div>
     <div style="font-size:.86rem;color:#8b949e;line-height:1.75">
       <p style="margin-bottom:7px">MagnaChip Semiconductor (NYSE: MX) è un produttore sudcoreano di circuiti integrati analogici e misti, specializzato in soluzioni di potenza (MOSFET, IGBT) e display (driver IC). Quotato al NYSE, opera principalmente nel segmento consumer electronics e automotive.</p>
-      <p style="margin-bottom:7px">Al 27 aprile 2026 il titolo quota <strong style="color:#3fb950">$5.32</strong>, con un rialzo di <strong style="color:#3fb950">+97.1%</strong> negli ultimi 30 giorni e <strong style="color:#3fb950">+56.8% YTD</strong>. Il principale catalizzatore è stato il lancio della linea MOSFET 8ª generazione per smartphone (Apr 22: +13.4%) — tecnologia con -48% on-resistance e +185% densità di corrente. Il titolo si avvicina ai massimi a 52 settimane ($5.53) con il prezzo target medio degli analisti a <strong style="color:#d29922">$7.00</strong> (range $6–$8, +31.6% upside).</p>
-      <p style="margin-bottom:7px"><strong style="color:#d29922">⚠️ EVENTO CHIAVE:</strong> MX riporta i risultati Q1 2026 <strong>stasera dopo la chiusura (AMC, 28 Apr 2026)</strong>. Il consensus attende EPS -$0.22 e revenue di $44–48M (+2.9% YoY). Il Q4 2025 aveva battuto le stime EPS di +$0.24 ($-0.08 vs -$0.32 atteso). L'oscillazione post-earnings attesa è ±5.4%, ma la storia recente mostra movimenti ben superiori.</p>
-      <p>Da un punto di vista tecnico il quadro è complesso: il trend di medio-lungo periodo è bullish (Golden Cross attivo, prezzo sopra tutte le EMA/SMA principali), ma il prezzo è reduce da un forte spike con ritracciamento. Lo screenshot del 27 Apr mostra il prezzo a $3.17 — sotto le SMA 3.53 e 3.71 — suggerendo una fase di distribuzione post-picco. La divergenza tra OBV positivo e Accum/Dist negativo è un segnale critico da monitorare.</p>
+      <p style="margin-bottom:7px">Al 29 aprile 2026 il titolo quota <strong style="color:#f85149">$3.25</strong>, in calo di <strong style="color:#f85149">-32.8%</strong> nella sessione odierna dopo la pubblicazione degli earnings Q1 2026 (AMC 28 Apr). Il EPS adjusted si è attestato a <strong style="color:#3fb950">-$0.11</strong> — un beat del 50% rispetto al consensus di -$0.22. Il revenue Q1 è stato di <strong style="color:#3fb950">$46.2M</strong> (+3.3% YoY, +13.9% QoQ), in linea con le stime. La reazione negativa del mercato (-32.8%) è interamente attribuibile alla guidance Q2 2026: management prevede ricavi di $44.5–$48.5M (-2.3% YoY al midpoint) e gross margin del 17–19% — deludente rispetto alle attese di una ripresa più sostenuta.</p>
+      <p style="margin-bottom:7px"><strong style="color:#d29922">⚠️ EVENTO COMPLETATO:</strong> MX ha riportato i risultati Q1 2026 il 28 Aprile 2026 AMC. EPS: -$0.11 (beat consensus -$0.22 di +50%). Revenue: $46.2M (+3.3% YoY). Gross margin: 15.6% (sopra guidance midpoint). Cash: $94.6M. Il beat EPS è stato eclissato dalla guidance Q2 debole e dal rischio di impatto sulla produzione nel Q3 (upgrade impianto elettrico stabilimento Gumi). Il titolo ha ceduto il -32.8% a $3.25, ritornando ai livelli pre-rally di marzo.</p>
+      <p>Da un punto di vista tecnico, il crollo ha riportato il prezzo al di sotto di EMA10 ($3.89), EMA20 ($3.48), EMA30 ($3.30) e SMA10/20. Il Golden Cross (EMA50 $3.13 vs EMA200 $3.12) è ancora tecnicamente attivo ma con margine minimo. I supporti chiave sono ora: EMA50 $3.13, SMA50 $2.97, e la zona $2.84 (pivot). Volume record di ~4M azioni (+524% media) nella sessione di sell-off. Nuovi massimi 52W a $5.64 prima del crollo.</p>
     </div>
   </div>
 
@@ -474,18 +484,18 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
   <div class="sgrid">
     <div class="scard sc-bull">
       <div class="stit">🚀 Scenario Rialzista</div>
-      <div class="sbody">Earnings 28 apr superano il consensus (-$0.22 EPS). Revenue Q1 sopra $48M con guidance Q2 positiva. Adozione MOSFET 8ª gen da OEM tier-1 confermata. MX tiene sopra $5.00 post-earnings e attacca i massimi $5.53. Analisti alzano target verso $8.00.<br><br><strong>Probabilità stimata: 30%</strong></div>
-      <div class="starget">Target: $7.00–$8.00</div>
+      <div class="sbody">Il mercato rivaluta la guidance Q2 come conservativa. New-gen products al 10% revenue entro Q4 2026 confermato. Gross margin Q2 17–19% batte le attese. MX rimbalza dalla zona $3.00–$3.25 (EMA50/SMA50) con volume calante. Target analisti $5.50 (avg) ancora valido come recovery play.<br><br><strong>Probabilità stimata: 30%</strong></div>
+      <div class="starget">Target recovery: $4.00–$4.50</div>
     </div>
     <div class="scard sc-base">
       <div class="stit">📊 Scenario Base</div>
-      <div class="sbody">Earnings in linea col consensus. Revenue $44–48M, EPS ~-$0.22. Pullback fisiologico verso zona $4.00–$4.50 dopo il forte rialzo (+97% in 30gg). Consolidamento nella fascia $4–$5.53. Recupero graduale verso target analisti $7.00 entro Q3 2026.<br><br><strong>Probabilità stimata: 45%</strong></div>
-      <div class="starget">Target: $4.50–$5.53</div>
+      <div class="sbody">Consolidamento post-sell off nella fascia $3.00–$3.80. Il Golden Cross (EMA50/EMA200) regge ma il momentum è neutralizzato. Guidance Q2 flat sequenziale ($46.5M midpoint). Gross margin in miglioramento Q2 (17–19%) ma impatto fab Gumi in H2. Recupero graduale in vista Q2 earnings (30 Jul 2026).<br><br><strong>Probabilità stimata: 45%</strong></div>
+      <div class="starget">Target: $3.50–$4.00</div>
     </div>
     <div class="scard sc-bear">
       <div class="stit">📉 Scenario Ribassista</div>
-      <div class="sbody">Earnings del 28 apr deludono significativamente. Revenue sotto $44M con guidance debole Q2. Sell-the-news dopo +97% in 30 giorni. Rischi supply chain semiconduttori (gas critici). Accum/Dist già negativo accelera la distribuzione. Rottura $3.53 apre a $2.50–$3.00.<br><br><strong>Probabilità stimata: 25%</strong></div>
-      <div class="starget">Target: $2.50–$3.50</div>
+      <div class="sbody">Il sell-off continua e rompe EMA50 ($3.13) / SMA50 ($2.97). Impatto upgrade fab Gumi Q3 peggiore delle attese. Pricing pressure su legacy products China accelera. Death Cross imminente se EMA50 scende sotto EMA200. Rottura $2.84 (pivot) apre a zona $2.33–$2.57.<br><br><strong>Probabilità stimata: 25%</strong></div>
+      <div class="starget">Target ribasso: $2.33–$2.84</div>
     </div>
   </div>
 
@@ -494,33 +504,115 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
     <div class="card">
       <div class="stitle">Dati Fondamentali Chiave</div>
       <table class="tbl">
-        <tr><td style="color:#8b949e">Market Cap</td><td><strong>~$194M</strong></td></tr>
-        <tr><td style="color:#8b949e">P/S Ratio</td><td><strong>0.54x</strong> <span class="badge bg-g" style="font-size:.67rem">Economico</span></td></tr>
-        <tr><td style="color:#8b949e">Revenue (ann.)</td><td><strong>~$178.9M</strong> <span class="badge bg-r" style="font-size:.67rem">CAGR -19%</span></td></tr>
-        <tr><td style="color:#8b949e">Gross Margin</td><td><strong>17.6%</strong> <span class="badge bg-y" style="font-size:.67rem">In miglioramento</span></td></tr>
-        <tr><td style="color:#8b949e">EPS Q4 2025</td><td class="green"><strong>Beat +$0.24</strong> (-$0.08 vs -$0.32E)</td></tr>
-        <tr><td style="color:#8b949e">EPS Q1 2026E</td><td class="red"><strong>-$0.22</strong> (consensus)</td></tr>
-        <tr><td style="color:#8b949e">Revenue Q1 2026E</td><td><strong>$44–48M</strong> (+2.9% YoY)</td></tr>
-        <tr><td style="color:#8b949e">Net Loss (ann.)</td><td class="red"><strong>-$29.72M</strong> (-45.3% YoY)</td></tr>
-        <tr><td style="color:#8b949e">Target analisti</td><td class="green"><strong>$7.00</strong> (range $6–$8)</td></tr>
-        <tr><td style="color:#8b949e">Rating analisti</td><td><span class="badge bg-g">Strong Buy</span> <span style="color:#8b949e;font-size:.77rem">(2 brokers)</span></td></tr>
-        <tr><td style="color:#8b949e">Prossimi earnings</td><td><strong style="color:#d29922">28 Apr 2026 AMC</strong></td></tr>
+        <tr><td style="color:#8b949e">Market Cap</td><td><strong>~$118M</strong></td></tr>
+        <tr><td style="color:#8b949e">P/S Ratio</td><td><strong>0.64x</strong> <span class="badge bg-g" style="font-size:.67rem">Economico</span></td></tr>
+        <tr><td style="color:#8b949e">Revenue Q1 2026</td><td><strong>$46.2M</strong> <span class="badge bg-g" style="font-size:.67rem">+3.3% YoY</span></td></tr>
+        <tr><td style="color:#8b949e">Gross Margin Q1</td><td><strong>15.6%</strong> <span class="badge bg-y" style="font-size:.67rem">Sopra guidance</span></td></tr>
+        <tr><td style="color:#8b949e">EPS Q1 2026</td><td class="green"><strong>-$0.11 adj.</strong> (Beat +50% vs -$0.22E)</td></tr>
+        <tr><td style="color:#8b949e">EPS Q1 GAAP</td><td class="red"><strong>-$0.13</strong> (Net loss $4.6M)</td></tr>
+        <tr><td style="color:#8b949e">Revenue Q2 2026E</td><td><strong>$44.5–$48.5M</strong> (-2.3% YoY midpoint)</td></tr>
+        <tr><td style="color:#8b949e">Gross Margin Q2E</td><td><strong>17–19%</strong> <span class="badge bg-y" style="font-size:.67rem">↑ QoQ, ↓ YoY</span></td></tr>
+        <tr><td style="color:#8b949e">Cash</td><td><strong>$94.6M</strong> (da $103.8M)</td></tr>
+        <tr><td style="color:#8b949e">Target analisti</td><td class="green"><strong>$5.50</strong> (avg, 1 Strong Buy)</td></tr>
+        <tr><td style="color:#8b949e">Prossimi earnings</td><td><strong style="color:#8b949e">30 Lug 2026</strong></td></tr>
       </table>
     </div>
     <div class="card">
       <div class="stitle">Catalyst &amp; Risk Factors</div>
       <table class="tbl">
-        <tr><td><span class="badge bg-g">+</span></td><td>MOSFET 8ª gen: -48% R_on, +185% densità corrente (Apr 22)</td></tr>
-        <tr><td><span class="badge bg-g">+</span></td><td>P/S 0.54x vs settore ~3x — forte sconto strutturale</td></tr>
-        <tr><td><span class="badge bg-g">+</span></td><td>EPS Q4 25: beat di $0.24 vs consensus</td></tr>
-        <tr><td><span class="badge bg-g">+</span></td><td>Target analisti $7.00 (+31.6% upside da $5.32)</td></tr>
-        <tr><td><span class="badge bg-g">+</span></td><td>Revenue Q1E +2.9% YoY — prima crescita dopo anni di cali</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>EPS Q1 2026 atteso negativo (-$0.22), perdite annuali -$29.7M</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>Rischi supply chain gas critici (He) — conflitti geopolitici</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>Small cap: rischio liquidità e alta volatilità (Beta ~4)</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>Accum/Dist negativo -14M → distribuzione professionale in corso</td></tr>
-        <tr><td><span class="badge bg-r">−</span></td><td>Revenue CAGR 3-5 anni: -19% — declino strutturale da invertire</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>EPS Q1 2026: -$0.11 adj. — BEAT del 50% vs consensus -$0.22</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>Revenue $46.2M +3.3% YoY, +13.9% QoQ — meglio della stagionalità tipica</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>Gross Margin 15.6% sopra guidance midpoint (14–16%)</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>55 nuovi prodotti new-gen lanciati nel 2025 · target 10% revenue in Q4 2026</td></tr>
+        <tr><td><span class="badge bg-g">+</span></td><td>Cash $94.6M · FCF migliorato a -$2.4M (da -$4.9M YoY)</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Guidance Q2 debole: $44.5–48.5M (-2.3% YoY) → sell-off -32.8%</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Gross Margin Q2E 17–19% (giù dal 20.4% Q2 2025)</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Upgrade fab Gumi Q3: impatto su utilizzo e margini H2 2026</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>Pricing pressure su legacy products in Cina (ASP erosion)</td></tr>
+        <tr><td><span class="badge bg-r">−</span></td><td>$26.4M term debt reclassificato come short-term (scadenza Mar 2027)</td></tr>
       </table>
+    </div>
+  </div>
+
+  <!-- GUIDANCE Q2 SPIEGAZIONE -->
+  <div class="card mb">
+    <div class="stitle">📉 Perché la Guidance Q2 è stata percepita come "Debole"</div>
+
+    <div style="font-size:.86rem;color:#8b949e;line-height:1.75;margin-bottom:14px">
+      La "guidance Q2 debole" significa che il management di MagnaChip ha comunicato <strong style="color:#e6edf3">previsioni per il secondo trimestre che hanno deluso il mercato</strong>, nonostante l'EPS Q1 abbia battuto le stime del 50%. Il sell-off di -32.8% è interamente attribuibile a questa lettura prospettica.
+    </div>
+
+    <div class="g2" style="margin-bottom:14px">
+      <div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:13px">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#58a6ff;margin-bottom:10px">📋 Cosa ha detto il management per Q2 2026</div>
+        <div style="display:flex;flex-direction:column;gap:7px;font-size:.82rem">
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #21262d">
+            <span style="color:#8b949e">Revenue guidance</span>
+            <strong style="color:#f85149">$44.5–48.5M</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #21262d">
+            <span style="color:#8b949e">Midpoint</span>
+            <strong style="color:#f85149">$46.5M (–2.3% YoY)</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0;border-bottom:1px solid #21262d">
+            <span style="color:#8b949e">Gross margin attesa</span>
+            <strong style="color:#d29922">17–19%</strong>
+          </div>
+          <div style="display:flex;justify-content:space-between;padding:6px 0">
+            <span style="color:#8b949e">Gross margin Q2 2025</span>
+            <strong style="color:#f85149">20.4% (era meglio)</strong>
+          </div>
+        </div>
+      </div>
+      <div style="background:#0d1117;border:1px solid #30363d;border-radius:8px;padding:13px">
+        <div style="font-size:.7rem;font-weight:700;text-transform:uppercase;letter-spacing:.07em;color:#f85149;margin-bottom:10px">⚠️ Perché il mercato ha reagito negativamente</div>
+        <div style="font-size:.82rem;color:#8b949e;line-height:1.8">
+          Gli investitori guardano sempre <strong style="color:#e6edf3">avanti</strong>, non ai dati passati — per quanto positivi. Il beat EPS del 50% è stato ignorato perché il quadro futuro non convinceva.
+        </div>
+      </div>
+    </div>
+
+    <!-- 4 MOTIVI -->
+    <div class="rules-grid" style="grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px">
+
+      <div class="rule-card">
+        <div class="rule-num" style="color:#f85149">1</div>
+        <div class="rule-text">
+          <strong>La crescita si ferma</strong>
+          Il Q1 aveva mostrato +3.3% YoY, dando speranza di una ripresa strutturale. La guidance Q2 segna invece <strong style="color:#f85149">–2.3% YoY</strong> al midpoint — si torna a perdere terreno rispetto all'anno scorso.
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num" style="color:#f85149">2</div>
+        <div class="rule-text">
+          <strong>Crescita Q1 "gonfiata"</strong>
+          Il management ha ammesso che parte del balzo Q1 (+13.9% QoQ) era dovuto a un <strong style="color:#d29922">programma incentivi una tantum</strong> per ridurre le scorte nei canali distributivi — non domanda reale organica. Il mercato ha capito che la ripresa non era così solida.
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num" style="color:#f85149">3</div>
+        <div class="rule-text">
+          <strong>Margini ancora compressi</strong>
+          La gross margin Q2E (17–19%) migliora rispetto al 15.6% di Q1, ma rimane <strong style="color:#f85149">sotto il 20.4% del Q2 2025</strong>. Nessun recupero di redditività strutturale in vista. In più, pricing pressure sui legacy products in Cina continua a erodere gli ASP.
+        </div>
+      </div>
+
+      <div class="rule-card">
+        <div class="rule-num" style="color:#f85149">4</div>
+        <div class="rule-text">
+          <strong>Ostacolo operativo in H2</strong>
+          Nel <strong style="color:#d29922">Q3 è pianificato un upgrade dell'impianto elettrico</strong> nello stabilimento di Gumi (Korea). Questo ridurrà l'utilizzo della fabbrica e comprimerà ulteriormente i margini nella seconda metà dell'anno — proprio quando ci si aspetterebbe un'accelerazione.
+        </div>
+      </div>
+
+    </div>
+
+    <!-- SINTESI FINALE -->
+    <div style="background:linear-gradient(135deg,#1a1a2e,#16213e);border:1px solid #30363d;border-left:3px solid #58a6ff;border-radius:8px;padding:13px 16px;font-size:.83rem;color:#8b949e;line-height:1.75">
+      <strong style="color:#e6edf3;display:block;margin-bottom:5px">📌 In sintesi</strong>
+      Il mercato si aspettava segnali di una <strong style="color:#3fb950">ripresa solida e progressiva</strong>. Invece ha trovato: crescita piatta, margini ancora compressi, crescita Q1 parzialmente artificiale e un ostacolo produttivo in arrivo. Nonostante l'EPS abbia battuto le stime del 50%, il giudizio prospettico ha prevalso. Risultato: <strong style="color:#f85149">–32.8% in una sola seduta</strong>, con il titolo che è tornato ai livelli pre-rally di marzo (~$3.25).
     </div>
   </div>
 
@@ -530,15 +622,15 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
     <table class="tbl">
       <thead><tr><th>Scenario d'ingresso</th><th>Zona prezzo</th><th>Condizione</th><th>R/R stimato</th></tr></thead>
       <tbody>
-        <tr><td>⚠️ Pre-earnings (oggi)</td><td>$5.00–$5.32</td><td>Solo con size &lt;1% portafoglio · ±5.4% oscillazione attesa</td><td>Alto rischio</td></tr>
-        <tr><td>🟡 Pullback post-earnings</td><td>$4.20–$4.60</td><td>RSI &lt; 65, volume in calo, candela di conferma</td><td>1:2.5</td></tr>
-        <tr><td>🟢 Pullback profondo</td><td>$3.50–$3.80 (EMA20)</td><td>RSI &lt; 55, Accum/Dist che gira positivo</td><td>1:3.5</td></tr>
-        <tr><td>🔴 Short / Hedge</td><td>&gt;$5.53 (52W High)</td><td>Solo su mancato breakout + breakdown &lt;$5.00</td><td>1:2.0</td></tr>
+        <tr><td>🔴 No Entry ora</td><td>$3.00–$3.30</td><td>Volume sell-off ancora elevato · attendere stabilizzazione</td><td>Da evitare</td></tr>
+        <tr><td>🟡 Rimbalzo tecnico</td><td>$3.10–$3.30 (EMA50)</td><td>Candela di reversal + volume in calo + RSI &lt; 40</td><td>1:2.0</td></tr>
+        <tr><td>🟢 Pullback profondo</td><td>$2.84–$3.00 (Pivot/SMA50)</td><td>RSI &lt; 35, volume capitolazione, conferma inversione</td><td>1:3.0</td></tr>
+        <tr><td>🔴 Short / Hedge</td><td>&lt;$3.13 (EMA50)</td><td>Breakdown confermato con volume + Death Cross imminente</td><td>1:2.0</td></tr>
       </tbody>
     </table>
-    <div class="alert al-y" style="margin-top:11px;font-size:.79rem">⚠️ <strong>EVENTO IMMINENTE:</strong> Earnings Q1 2026 — <strong>28 Aprile 2026 AMC (stasera)</strong>. Consensus EPS: -$0.22 · Revenue: $44–48M. Oscillazione attesa post-earnings: ±5.4%. Gestire il rischio di posizione prima della chiusura odierna.</div>
+    <div class="alert al-y" style="margin-top:11px;font-size:.79rem">⚠️ <strong>POST-EARNINGS SELL-OFF:</strong> MX -32.8% a $3.25 il 29 Apr 2026. EPS Q1 beat del 50% (-$0.11 vs -$0.22E) ma guidance Q2 deludente ($44.5–48.5M, -2.3% YoY). Prossimi earnings: <strong>30 Luglio 2026</strong>. Attendere conferma supporto EMA50 $3.13 prima di entrare.</div>
     <div style="margin-top:10px;font-size:.7rem;color:#6e7681;border-top:1px solid #21262d;padding-top:9px">
-      Fonti: <a href="https://stockstory.org/us/stocks/nyse/mx/news/why-up-down/why-magnachip-mx-stock-is-up-today-3">StockStory</a> · <a href="https://markets.financialcontent.com/stocks/article/stockstory-2026-4-22-why-magnachip-mx-stock-is-up-today">FinancialContent</a> · <a href="https://www.marketbeat.com/instant-alerts/magnachip-semiconductor-mx-projected-to-post-earnings-on-tuesday-2026-04-21/">MarketBeat</a> · TradingView Real-time Data
+      Fonti: <a href="https://stockstory.org/us/stocks/nyse/mx/news/earnings/magnachip-nysemx-reports-q1-in-line-with-expectations-inventory-levels-improve">StockStory</a> · <a href="https://markets.financialcontent.com/stocks/article/stockstory-2026-4-29-why-magnachip-mx-shares-are-falling-today">FinancialContent — Why MX Falling</a> · <a href="https://www.stocktitan.net/news/MX/magnachip-reports-results-for-first-quarter-be1idihtjm90.html">StockTitan Press Release</a> · <a href="https://www.fool.com/earnings/call-transcripts/2026/04/28/magnachip-mx-q1-2026-earnings-transcript/">Motley Fool Transcript</a> · TradingView Real-time Data
     </div>
   </div>
 
@@ -549,7 +641,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 ===================================================== -->
 <div id="volsent" class="pane">
 
-  <div class="alert al-b" style="margin-bottom:16px">🔬 <strong>Indicatori Avanzati</strong> — 12 card espandibili al click · Dati aggiornati al 27 Apr 2026 · ⚠️ Earnings AMC stasera 28 Apr · Clicca su ogni card per dettagli</div>
+  <div class="alert al-b" style="margin-bottom:16px">🔬 <strong>Indicatori Avanzati — POST-EARNINGS</strong> · Dati aggiornati al 29 Apr 2026 · ✅ EPS Q1 Beat +50% · ⚠️ -32.8% per guidance Q2 debole · Clicca su ogni card per dettagli</div>
 
   <!-- GROUP 1: Volume & Volatilità -->
   <div class="exp-group">
@@ -562,7 +654,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
           <div class="expcard-icon">⚖️</div>
           <div class="expcard-meta">
             <div class="expcard-name">VWAP</div>
-            <div class="expcard-val blue">$4.88 <span class="badge bg-r" style="font-size:.65rem;vertical-align:middle">Sopra ↑</span></div>
+            <div class="expcard-val red">$3.64 <span class="badge bg-r" style="font-size:.65rem;vertical-align:middle">Sotto ↓</span></div>
             <div class="expcard-sub">Price weighted average volume</div>
           </div>
           <div class="expcard-arrow">▼</div>
@@ -1793,14 +1885,14 @@ Chart.defaults.font.size=11;
 new Chart(document.getElementById('cPrice'),{
   type:'bar',
   data:{
-    labels:['Gen 25','Feb 25','Mar 25','Apr 25','Mag 25','Giu 25','Lug 25','Ago 25','Set 25','Ott 25','Nov 25','Dic 25','Gen 26','Feb 26','Mar 26','Apr 26'],
+    labels:['Gen 25','Feb 25','Mar 25','Apr 25','Mag 25','Giu 25','Lug 25','Ago 25','Set 25','Ott 25','Nov 25','Dic 25','Gen 26','Feb 26','Mar 26','27 Apr','29 Apr'],
     datasets:[
-      {type:'line',label:'Prezzo ($)',data:[4.20,3.80,3.40,3.00,2.60,2.20,1.90,1.85,2.10,2.50,2.90,3.20,3.50,3.75,3.95,5.37],
+      {type:'line',label:'Prezzo ($)',data:[4.20,3.80,3.40,3.00,2.60,2.20,1.90,1.85,2.10,2.50,2.90,3.20,3.50,3.75,3.95,5.37,3.25],
        borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.07)',borderWidth:2.5,tension:.4,fill:true,
-       pointBackgroundColor:[...[...Array(15)].map(()=>'#58a6ff'),'#3fb950'],
-       pointRadius:[...[...Array(15)].map(()=>3),7],yAxisID:'y',order:1},
-      {type:'bar',label:'Volume (K)',data:[850,780,920,840,710,660,580,540,620,750,880,920,980,1050,1120,3940],
-       backgroundColor:[...[...Array(15)].map(()=>'rgba(88,166,255,.18)'),'rgba(63,185,80,.5)'],
+       pointBackgroundColor:[...[...Array(15)].map(()=>'#58a6ff'),'#3fb950','#f85149'],
+       pointRadius:[...[...Array(15)].map(()=>3),7,8],yAxisID:'y',order:1},
+      {type:'bar',label:'Volume (K)',data:[850,780,920,840,710,660,580,540,620,750,880,920,980,1050,1120,3940,4025],
+       backgroundColor:[...[...Array(15)].map(()=>'rgba(88,166,255,.18)'),'rgba(63,185,80,.5)','rgba(248,81,73,.55)'],
        borderWidth:0,yAxisID:'y2',order:2}
     ]
   },
@@ -1820,27 +1912,27 @@ new Chart(document.getElementById('cPrice'),{
 new Chart(document.getElementById('cRev'),{
   type:'bar',
   data:{
-    labels:['Q1 25','Q2 25','Q3 25','Q4 25','Q1 26E'],
-    datasets:[{label:'Revenue (M$)',data:[62.5,58.3,60.1,71.2,68.5],
-      backgroundColor:['#21262d','#21262d','#21262d','#3fb950','rgba(88,166,255,.35)'],
-      borderColor:['#30363d','#30363d','#30363d','#3fb950','#58a6ff'],
+    labels:['Q1 25','Q2 25','Q3 25','Q4 25','Q1 26A','Q2 26E'],
+    datasets:[{label:'Revenue (M$)',data:[44.7,47.6,43.1,40.6,46.2,46.5],
+      backgroundColor:['#21262d','#21262d','#21262d','#21262d','#3fb950','rgba(88,166,255,.35)'],
+      borderColor:['#30363d','#30363d','#30363d','#30363d','#3fb950','#58a6ff'],
       borderWidth:1,borderRadius:4}]
   },
   options:{responsive:true,maintainAspectRatio:false,
     plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>` $${c.parsed.y}M`}}},
-    scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+v+'M'},min:50}}}
+    scales:{y:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+v+'M'},min:35}}}
 });
 
 // PERFORMANCE
 new Chart(document.getElementById('cPerf'),{
   type:'line',
   data:{
-    labels:['Gen 26','Feb 26','Mar 26','Apr 26'],
+    labels:['Gen 26','Feb 26','Mar 26','27 Apr','29 Apr'],
     datasets:[
-      {label:'MX',data:[100,107,113,153],borderColor:'#3fb950',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,tension:.3},
-      {label:'SOX Index',data:[100,103,101,108],borderColor:'#58a6ff',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[4,4]},
-      {label:'S&P 500',data:[100,102,104,105],borderColor:'#8b949e',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[2,4]},
-      {label:'DIOD',data:[100,98,96,97],borderColor:'#f85149',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[4,4]}
+      {label:'MX',data:[100,107,113,153,93],borderColor:'#f85149',backgroundColor:'transparent',borderWidth:2.5,pointRadius:4,tension:.3},
+      {label:'SOX Index',data:[100,103,101,108,109],borderColor:'#58a6ff',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[4,4]},
+      {label:'S&P 500',data:[100,102,104,105,106],borderColor:'#8b949e',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[2,4]},
+      {label:'DIOD',data:[100,98,96,97,97],borderColor:'#d29922',backgroundColor:'transparent',borderWidth:1.5,pointRadius:3,tension:.3,borderDash:[4,4]}
     ]
   },
   options:{responsive:true,maintainAspectRatio:false,
@@ -1869,11 +1961,11 @@ new Chart(document.getElementById('cGauge'),{
 new Chart(document.getElementById('cSR'),{
   type:'bar',
   data:{
-    labels:['S3 $1.82','S2 $2.33','S1 $2.57','Pivot $2.84','R1 $3.08','R2 $3.35','R3 $3.86','EMA20 $3.48','BB Sup $4.57','Prezzo $5.37'],
+    labels:['S3 $1.82','S2 $2.33','S1 $2.57','Pivot $2.84','EMA50 $3.13','Prezzo $3.25','R1 $3.48','R2 $3.86','EMA10 $3.89','R3 $5.64'],
     datasets:[{label:'Livello ($)',
-      data:[1.82,2.33,2.57,2.84,3.08,3.35,3.86,3.48,4.57,5.37],
-      backgroundColor:['rgba(63,185,80,.25)','rgba(63,185,80,.35)','rgba(63,185,80,.45)','rgba(139,148,158,.3)','rgba(248,81,73,.35)','rgba(248,81,73,.45)','rgba(248,81,73,.55)','rgba(88,166,255,.4)','rgba(210,153,34,.4)','rgba(63,185,80,.85)'],
-      borderColor:['#3fb950','#3fb950','#3fb950','#8b949e','#f85149','#f85149','#f85149','#58a6ff','#d29922','#3fb950'],
+      data:[1.82,2.33,2.57,2.84,3.13,3.25,3.48,3.86,3.89,5.64],
+      backgroundColor:['rgba(63,185,80,.25)','rgba(63,185,80,.35)','rgba(63,185,80,.45)','rgba(139,148,158,.3)','rgba(88,166,255,.3)','rgba(248,81,73,.85)','rgba(248,81,73,.35)','rgba(248,81,73,.45)','rgba(248,81,73,.35)','rgba(248,81,73,.2)'],
+      borderColor:['#3fb950','#3fb950','#3fb950','#8b949e','#58a6ff','#f85149','#f85149','#f85149','#f85149','#f85149'],
       borderWidth:2,borderRadius:4}]
   },
   options:{indexAxis:'y',responsive:true,maintainAspectRatio:false,
@@ -1922,7 +2014,7 @@ new Chart(document.getElementById('cRadar'),{
   data:{
     labels:['Rev. Growth','Gross Margin','EPS','Momentum','Valuation','Innovazione'],
     datasets:[
-      {label:'MX',data:[4,4,2,9,8,8],borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.12)',pointBackgroundColor:'#58a6ff',borderWidth:2},
+      {label:'MX',data:[5,4,3,3,9,8],borderColor:'#58a6ff',backgroundColor:'rgba(88,166,255,.12)',pointBackgroundColor:'#58a6ff',borderWidth:2},
       {label:'ON Semi',data:[5,7,6,5,5,7],borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,.08)',pointBackgroundColor:'#3fb950',borderWidth:2},
       {label:'MPWR',data:[7,9,8,6,3,8],borderColor:'#d29922',backgroundColor:'rgba(210,153,34,.08)',pointBackgroundColor:'#d29922',borderWidth:2},
       {label:'DIOD',data:[4,6,6,3,6,4],borderColor:'#f85149',backgroundColor:'rgba(248,81,73,.08)',pointBackgroundColor:'#f85149',borderWidth:2}
