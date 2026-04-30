@@ -7,7 +7,9 @@
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0}
-body{font-family:'Segoe UI',system-ui,sans-serif;background:#0d1117;color:#e6edf3;font-size:14px}
+html,body{background:#0d1117}
+body{font-family:'Segoe UI',system-ui,sans-serif;color:#e6edf3;font-size:14px}
+.page-wrap{max-width:1280px;margin:0 auto;background:#0d1117;box-shadow:0 0 60px rgba(0,0,0,.6);min-height:100vh}
 a{color:#58a6ff;text-decoration:none}a:hover{text-decoration:underline}
 canvas{max-width:100%}
 
@@ -33,6 +35,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 /* PANES */
 .pane{display:none;padding:22px 28px}
 .pane.active{display:block}
+.pane-centered{max-width:1100px;margin:0 auto}
 
 /* LAYOUT */
 .g2{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:14px}
@@ -161,6 +164,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 </style>
 </head>
 <body>
+<div class="page-wrap">
 <div style="background:linear-gradient(90deg,#3a1a1a,#2a1010);border-bottom:2px solid #f85149;padding:8px 28px;display:flex;align-items:center;gap:14px;flex-wrap:wrap">
   <span style="color:#f85149;font-weight:800;font-size:.85rem">⚡ POST-EARNINGS UPDATE · 29 APR 2026</span>
   <span style="color:#e6edf3;font-size:.82rem">EPS Q1: <strong style="color:#3fb950">-$0.11</strong> (Beat +50% vs -$0.22E)</span>
@@ -193,6 +197,7 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
 <!-- TABS -->
 <div class="tabs">
   <button class="tab-btn active"  onclick="T('dash',this)">📊 Dashboard</button>
+  <button class="tab-btn"         onclick="T('visual',this)">🎯 Visual</button>
   <button class="tab-btn"         onclick="T('tech',this)">📈 Analisi Tecnica</button>
   <button class="tab-btn"         onclick="T('screen',this)">🔍 Screener</button>
   <button class="tab-btn"         onclick="T('report',this)">📋 Report</button>
@@ -409,6 +414,261 @@ header{background:linear-gradient(135deg,#161b22,#1c2128);border-bottom:1px soli
     </div>
   </div>
 </div>
+
+<!-- ====================================================
+     TAB 2b – VISUAL CENTRALE
+===================================================== -->
+<div id="visual" class="pane">
+<div class="pane-centered">
+
+  <!-- TOP BANNER -->
+  <div class="alert al-b" style="margin-bottom:18px">
+    🎯 <strong>Visualizzazione Centrale — MX Post-Earnings 29 Apr 2026</strong>
+    &nbsp;·&nbsp; EPS Q1: <strong>-$0.11 (Beat +50%)</strong>
+    &nbsp;·&nbsp; Prezzo: <strong style="color:#f85149">$3.25 (–32.8%)</strong>
+    &nbsp;·&nbsp; Prossimi earnings: <strong>30 Lug 2026</strong>
+  </div>
+
+  <!-- ROW 1: Earnings Radar + Waterfall -->
+  <div class="g2" style="margin-bottom:16px">
+
+    <!-- RADAR EARNINGS -->
+    <div class="card">
+      <div class="stitle">Radar Qualità Earnings Q1 2026</div>
+      <div style="position:relative;height:280px">
+        <canvas id="cRadar" role="img" aria-label="Radar chart dei fattori di qualità degli earnings MX Q1 2026">Radar qualità earnings.</canvas>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:10px;margin-top:10px;font-size:.73rem">
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#3fb950"></span>Risultati Q1 Reali</span>
+        <span style="display:flex;align-items:center;gap:4px"><span style="width:10px;height:10px;border-radius:2px;background:#58a6ff;opacity:.5"></span>Consensus atteso</span>
+      </div>
+    </div>
+
+    <!-- EARNINGS WATERFALL -->
+    <div class="card">
+      <div class="stitle">Waterfall Revenue — Q4 2025 → Q1 2026 ($M)</div>
+      <div style="position:relative;height:280px">
+        <canvas id="cWater" role="img" aria-label="Waterfall chart revenue MX da Q4 2025 a Q1 2026">Waterfall revenue MX.</canvas>
+      </div>
+      <div style="font-size:.73rem;color:#8b949e;margin-top:8px">+13.9% QoQ (+$5.6M) · +3.3% YoY</div>
+    </div>
+
+  </div>
+
+  <!-- ROW 2: Timeline catalizzatori + Gauge sentiment -->
+  <div class="g2" style="margin-bottom:16px">
+
+    <!-- TIMELINE CATALIZZATORI -->
+    <div class="card">
+      <div class="stitle">Timeline Catalizzatori 2026</div>
+      <div style="position:relative;padding:0 8px">
+
+        <div style="position:absolute;left:32px;top:0;bottom:0;width:2px;background:#30363d;border-radius:1px"></div>
+
+        <!-- Item: MOSFET launch -->
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;position:relative">
+          <div style="width:18px;height:18px;border-radius:50%;background:#3fb950;border:2px solid #0d1117;flex-shrink:0;margin-top:2px;position:relative;z-index:1;margin-left:23px"></div>
+          <div>
+            <div style="font-size:.78rem;font-weight:700;color:#e6edf3">22 Apr — Launch MOSFET 8ª gen</div>
+            <div style="font-size:.73rem;color:#8b949e">–48% R_on · +185% densità corrente · titolo +13.4%</div>
+          </div>
+        </div>
+
+        <!-- Item: Earnings Q1 -->
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;position:relative">
+          <div style="width:18px;height:18px;border-radius:50%;background:#f85149;border:2px solid #0d1117;flex-shrink:0;margin-top:2px;position:relative;z-index:1;margin-left:23px"></div>
+          <div>
+            <div style="font-size:.78rem;font-weight:700;color:#e6edf3">28 Apr — Earnings Q1 2026 (AMC)</div>
+            <div style="font-size:.73rem;color:#8b949e">EPS -$0.11 (beat +50%) · Guidance Q2 debole → -32.8% il 29 Apr</div>
+          </div>
+        </div>
+
+        <!-- Item: atteso Q2 guidance impact -->
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:18px;position:relative">
+          <div style="width:18px;height:18px;border-radius:50%;background:#d29922;border:2px solid #0d1117;flex-shrink:0;margin-top:2px;position:relative;z-index:1;margin-left:23px"></div>
+          <div>
+            <div style="font-size:.78rem;font-weight:700;color:#e6edf3">Q3 2026 — Upgrade fab Gumi</div>
+            <div style="font-size:.73rem;color:#8b949e">Aggiornamento impianto elettrico · impatto su utilizzo e margini H2</div>
+          </div>
+        </div>
+
+        <!-- Item: Earnings Q2 -->
+        <div style="display:flex;gap:14px;align-items:flex-start;margin-bottom:4px;position:relative">
+          <div style="width:18px;height:18px;border-radius:50%;background:#30363d;border:2px solid #58a6ff;flex-shrink:0;margin-top:2px;position:relative;z-index:1;margin-left:23px"></div>
+          <div>
+            <div style="font-size:.78rem;font-weight:700;color:#58a6ff">30 Lug 2026 — Earnings Q2 2026</div>
+            <div style="font-size:.73rem;color:#8b949e">Revenue atteso $44.5–48.5M · Gross Margin 17–19%</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- GAUGE SENTIMENT + SCORE -->
+    <div class="card">
+      <div class="stitle">Score Tecnico Post-Earnings</div>
+
+      <!-- Semicircle gauge SVG -->
+      <div style="display:flex;justify-content:center;margin:8px 0 4px">
+        <svg width="220" height="130" viewBox="0 0 220 130">
+          <defs>
+            <linearGradient id="gaugeBg" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%"   stop-color="#f85149"/>
+              <stop offset="40%"  stop-color="#d29922"/>
+              <stop offset="70%"  stop-color="#3fb950"/>
+              <stop offset="100%" stop-color="#3fb950"/>
+            </linearGradient>
+          </defs>
+          <!-- Track -->
+          <path d="M20 110 A90 90 0 0 1 200 110" fill="none" stroke="#21262d" stroke-width="16" stroke-linecap="round"/>
+          <!-- Fill (score = 38/100 → ~68° on 180° arc → progress arc) -->
+          <path d="M20 110 A90 90 0 0 1 200 110" fill="none" stroke="url(#gaugeBg)" stroke-width="16" stroke-linecap="round"
+                stroke-dasharray="283" stroke-dashoffset="175"/>
+          <!-- Needle -->
+          <line x1="110" y1="110" x2="62" y2="52" stroke="#e6edf3" stroke-width="2.5" stroke-linecap="round"/>
+          <circle cx="110" cy="110" r="6" fill="#e6edf3"/>
+          <!-- Labels -->
+          <text x="14" y="128" font-size="10" fill="#f85149" font-family="sans-serif">SELL</text>
+          <text x="93" y="20" text-anchor="middle" font-size="10" fill="#d29922" font-family="sans-serif">NEUTRAL</text>
+          <text x="193" y="128" text-anchor="end" font-size="10" fill="#3fb950" font-family="sans-serif">BUY</text>
+          <!-- Score number -->
+          <text x="110" y="95" text-anchor="middle" font-size="26" font-weight="700" fill="#e6edf3" font-family="sans-serif">38</text>
+          <text x="110" y="110" text-anchor="middle" font-size="9" fill="#8b949e" font-family="sans-serif">/100</text>
+        </svg>
+      </div>
+
+      <!-- Score breakdown grid -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:7px;margin-top:4px">
+        <div style="background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:9px 11px">
+          <div style="font-size:.67rem;text-transform:uppercase;color:#8b949e;margin-bottom:4px">Trend</div>
+          <div style="font-size:1.15rem;font-weight:700;color:#d29922">45<span style="font-size:.7rem;color:#8b949e">/100</span></div>
+          <div style="font-size:.7rem;color:#8b949e">Golden Cross attivo<br>EMA10/20/30 → sotto prezzo</div>
+        </div>
+        <div style="background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:9px 11px">
+          <div style="font-size:.67rem;text-transform:uppercase;color:#8b949e;margin-bottom:4px">Momentum</div>
+          <div style="font-size:1.15rem;font-weight:700;color:#f85149">22<span style="font-size:.7rem;color:#8b949e">/100</span></div>
+          <div style="font-size:.7rem;color:#8b949e">RSI in calo<br>Prezzo sotto VWAP</div>
+        </div>
+        <div style="background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:9px 11px">
+          <div style="font-size:.67rem;text-transform:uppercase;color:#8b949e;margin-bottom:4px">Fondamentali</div>
+          <div style="font-size:1.15rem;font-weight:700;color:#3fb950">55<span style="font-size:.7rem;color:#8b949e">/100</span></div>
+          <div style="font-size:.7rem;color:#8b949e">EPS beat +50%<br>Guidance debole</div>
+        </div>
+        <div style="background:#0d1117;border:1px solid #30363d;border-radius:7px;padding:9px 11px">
+          <div style="font-size:.67rem;text-transform:uppercase;color:#8b949e;margin-bottom:4px">Sentiment</div>
+          <div style="font-size:1.15rem;font-weight:700;color:#f85149">28<span style="font-size:.7rem;color:#8b949e">/100</span></div>
+          <div style="font-size:.7rem;color:#8b949e">Volume sell +524%<br>Sell-the-news</div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ROW 3: Guidance Q2 breakdown orizzontale + Scenario probabilità -->
+  <div class="g2" style="margin-bottom:16px">
+
+    <!-- GUIDANCE BRIDGE CHART -->
+    <div class="card">
+      <div class="stitle">Confronto Revenue — Q2 2025 vs Q2 2026E ($M)</div>
+      <div style="position:relative;height:250px">
+        <canvas id="cBridge" role="img" aria-label="Confronto revenue Q2 2025 vs guidance Q2 2026">Confronto revenue Q2.</canvas>
+      </div>
+      <div style="font-size:.73rem;color:#8b949e;margin-top:8px">Guidance Q2 2026E: $46.5M midpoint (–2.3% YoY da $47.6M Q2 2025) · Gross Margin: 17–19% vs 20.4% YoY</div>
+    </div>
+
+    <!-- SCENARIO DONUT -->
+    <div class="card">
+      <div class="stitle">Probabilità Scenari — Prossime 8 settimane</div>
+      <div style="position:relative;height:220px">
+        <canvas id="cDonut" role="img" aria-label="Donut chart probabilità scenari MX">Probabilità scenari MX.</canvas>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:6px;margin-top:10px;font-size:.78rem">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#f85149"></span>Bearish — breakdown $2.84</span>
+          <strong style="color:#f85149">25%</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#d29922"></span>Base — consolidamento $3–3.80</span>
+          <strong style="color:#d29922">45%</strong>
+        </div>
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <span style="display:flex;align-items:center;gap:6px"><span style="width:10px;height:10px;border-radius:2px;background:#3fb950"></span>Bullish — rimbalzo $4–4.50</span>
+          <strong style="color:#3fb950">30%</strong>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ROW 4: Livelli S/R orizzontali -->
+  <div class="card mb">
+    <div class="stitle">Mappa Prezzi — Supporti, Resistenze &amp; Prezzo Corrente $3.25</div>
+    <div style="position:relative;height:88px;margin:10px 0 6px">
+
+      <!-- Track bar -->
+      <div style="position:absolute;top:38px;left:40px;right:40px;height:6px;background:#21262d;border-radius:3px"></div>
+
+      <!-- S3 -->
+      <div style="position:absolute;left:calc(40px + (1.82/6)*100% - 120px);top:0;text-align:center;width:60px">
+        <div style="font-size:.67rem;color:#3fb950">S3</div>
+        <div style="font-size:.75rem;font-weight:700;color:#3fb950">$1.82</div>
+        <div style="width:2px;height:26px;background:#3fb950;border-radius:1px;margin:2px auto"></div>
+      </div>
+      <!-- S2 -->
+      <div style="position:absolute;left:calc(40px + (2.33/6)*100% - 120px);top:0;text-align:center;width:60px">
+        <div style="font-size:.67rem;color:#3fb950">S2</div>
+        <div style="font-size:.75rem;font-weight:700;color:#3fb950">$2.33</div>
+        <div style="width:2px;height:26px;background:#3fb950;border-radius:1px;margin:2px auto"></div>
+      </div>
+      <!-- S1 pivot -->
+      <div style="position:absolute;left:calc(40px + (2.84/6)*100% - 120px);top:0;text-align:center;width:64px">
+        <div style="font-size:.67rem;color:#8b949e">Pivot</div>
+        <div style="font-size:.75rem;font-weight:700;color:#8b949e">$2.84</div>
+        <div style="width:2px;height:26px;background:#8b949e;border-radius:1px;margin:2px auto"></div>
+      </div>
+      <!-- EMA50 -->
+      <div style="position:absolute;left:calc(40px + (3.13/6)*100% - 120px);top:0;text-align:center;width:64px">
+        <div style="font-size:.67rem;color:#58a6ff">EMA50</div>
+        <div style="font-size:.75rem;font-weight:700;color:#58a6ff">$3.13</div>
+        <div style="width:2px;height:26px;background:#58a6ff;border-radius:1px;margin:2px auto"></div>
+      </div>
+
+      <!-- CURRENT PRICE MARKER -->
+      <div style="position:absolute;left:calc(40px + (3.25/6)*100% - 120px);top:-4px;text-align:center;width:64px;z-index:2">
+        <div style="font-size:.67rem;color:#f85149;font-weight:800">▼ NOW</div>
+        <div style="font-size:.82rem;font-weight:800;color:#f85149">$3.25</div>
+        <div style="width:3px;height:30px;background:#f85149;border-radius:1px;margin:2px auto"></div>
+      </div>
+
+      <!-- R1 -->
+      <div style="position:absolute;left:calc(40px + (3.86/6)*100% - 120px);top:0;text-align:center;width:64px">
+        <div style="font-size:.67rem;color:#f85149">R1</div>
+        <div style="font-size:.75rem;font-weight:700;color:#f85149">$3.86</div>
+        <div style="width:2px;height:26px;background:#f85149;border-radius:1px;margin:2px auto"></div>
+      </div>
+      <!-- R2 EMA10 -->
+      <div style="position:absolute;left:calc(40px + (3.89/6)*100% - 120px);top:48px;text-align:center;width:64px">
+        <div style="width:2px;height:22px;background:#f85149;border-radius:1px;margin:0 auto 2px"></div>
+        <div style="font-size:.67rem;color:#f85149">EMA10</div>
+        <div style="font-size:.75rem;font-weight:700;color:#f85149">$3.89</div>
+      </div>
+      <!-- R3 52W High -->
+      <div style="position:absolute;left:calc(40px + (5.64/6)*100% - 120px);top:0;text-align:center;width:72px">
+        <div style="font-size:.67rem;color:#f85149">52W H</div>
+        <div style="font-size:.75rem;font-weight:700;color:#f85149">$5.64</div>
+        <div style="width:2px;height:26px;background:#f85149;border-radius:1px;margin:2px auto"></div>
+      </div>
+
+    </div>
+    <div style="display:flex;gap:16px;font-size:.72rem;color:#8b949e;margin-top:8px;flex-wrap:wrap">
+      <span style="color:#3fb950">● Supporti: S3 $1.82 · S2 $2.33 · Pivot $2.84</span>
+      <span style="color:#58a6ff">● EMA50 $3.13 (supporto chiave)</span>
+      <span style="color:#f85149">● Resistenze: R1 $3.86 · EMA10 $3.89 · 52W H $5.64</span>
+    </div>
+  </div>
+
+</div><!-- /pane-centered -->
+</div><!-- /visual pane -->
 
 <!-- ====================================================
      TAB 3 – SCREENER
@@ -2024,6 +2284,99 @@ new Chart(document.getElementById('cRadar'),{
     plugins:{legend:{display:false}},
     scales:{r:{beginAtZero:true,max:10,grid:{color:'#30363d'},angleLines:{color:'#30363d'},ticks:{display:false,stepSize:2},pointLabels:{font:{size:11},color:'#8b949e'}}}}
 });
+
+// ============================================================
+// VISUAL TAB CHARTS
+// ============================================================
+
+// RADAR EARNINGS Q1 2026
+new Chart(document.getElementById('cRadar'),{
+  type:'radar',
+  data:{
+    labels:['EPS vs Consensus','Revenue YoY','Gross Margin','Cash Flow','Guidance Q2','Sentiment'],
+    datasets:[
+      {label:'Q1 Reali',data:[95,55,62,60,30,25],
+       borderColor:'#3fb950',backgroundColor:'rgba(63,185,80,.15)',
+       pointBackgroundColor:'#3fb950',borderWidth:2,pointRadius:4},
+      {label:'Consensus atteso',data:[50,50,55,50,50,50],
+       borderColor:'rgba(88,166,255,.5)',backgroundColor:'rgba(88,166,255,.07)',
+       pointBackgroundColor:'#58a6ff',borderWidth:1.5,borderDash:[4,4],pointRadius:3}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false}},
+    scales:{r:{beginAtZero:true,max:100,
+      grid:{color:'#21262d'},angleLines:{color:'#21262d'},
+      ticks:{display:false},
+      pointLabels:{font:{size:11},color:'#8b949e'}}}}
+});
+
+// WATERFALL REVENUE Q4 2025 → Q1 2026
+new Chart(document.getElementById('cWater'),{
+  type:'bar',
+  data:{
+    labels:['Q4 2025','Stagionalità','Incentivi canale','Domanda organica','Q1 2026'],
+    datasets:[
+      {label:'Base',data:[40.6,0,0,0,40.6],backgroundColor:'transparent',borderColor:'transparent',borderWidth:0},
+      {label:'Variazione',data:[0,2.1,2.2,1.3,0],
+       backgroundColor:['transparent','#3fb950','#3fb950','#3fb950','transparent'],
+       borderColor:['transparent','#3fb950','#3fb950','#3fb950','transparent'],borderWidth:1,borderRadius:3},
+      {label:'Totale',data:[40.6,0,0,0,46.2],
+       backgroundColor:['rgba(88,166,255,.35)','transparent','transparent','transparent','rgba(63,185,80,.35)'],
+       borderColor:['#58a6ff','transparent','transparent','transparent','#3fb950'],borderWidth:1.5,borderRadius:4}
+    ]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>{
+        if(c.dataset.label==='Base')return null;
+        if(c.parsed.y===0)return null;
+        return c.dataset.label+': $'+c.parsed.y.toFixed(1)+'M';
+      }}}},
+    scales:{x:{grid:{color:'#21262d'},ticks:{color:'#8b949e',font:{size:10}}},
+            y:{grid:{color:'#21262d'},ticks:{callback:v=>'$'+v+'M',color:'#8b949e'},min:38,max:50}},
+    datasets:{bar:{categoryPercentage:.7,barPercentage:.85}}}
+});
+
+// BRIDGE Q2 2025 vs Q2 2026E
+new Chart(document.getElementById('cBridge'),{
+  type:'bar',
+  data:{
+    labels:['Revenue Q2 2025A','Guidance Q2 2026E (mid)','Gross Margin Q2 2025A','Gross Margin Q2 2026E'],
+    datasets:[{label:'Valore',
+      data:[47.6,46.5,20.4,18.0],
+      backgroundColor:['rgba(88,166,255,.35)','rgba(248,81,73,.35)','rgba(88,166,255,.35)','rgba(248,81,73,.35)'],
+      borderColor:['#58a6ff','#f85149','#58a6ff','#f85149'],
+      borderWidth:1.5,borderRadius:5}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    indexAxis:'y',
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>{
+        const isMargin=c.label.includes('Margin');
+        return isMargin?' '+c.parsed.x.toFixed(1)+'%':' $'+c.parsed.x.toFixed(1)+'M';
+      }}}},
+    scales:{
+      x:{grid:{color:'#21262d'},ticks:{color:'#8b949e'}},
+      y:{grid:{display:false},ticks:{color:'#8b949e',font:{size:10}}}}}
+});
+
+// DONUT SCENARI
+new Chart(document.getElementById('cDonut'),{
+  type:'doughnut',
+  data:{
+    labels:['Bearish (-32% →$2.84)','Base (consolidamento $3–3.80)','Bullish (rimbalzo $4–4.50)'],
+    datasets:[{data:[25,45,30],
+      backgroundColor:['#3a1a1a','#2d2010','#1a3a2a'],
+      borderColor:['#f85149','#d29922','#3fb950'],
+      borderWidth:2,hoverOffset:6}]
+  },
+  options:{responsive:true,maintainAspectRatio:false,
+    cutout:'68%',
+    plugins:{legend:{display:false},
+      tooltip:{callbacks:{label:c=>` ${c.label}: ${c.parsed}%`}}}}
+});
+
 </script>
-</body>
-</html>
+</div><!-- /page-wrap -->
+</body></html>
