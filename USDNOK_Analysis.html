@@ -1,0 +1,994 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USD/NOK · Terminal Analysis</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=Space+Mono:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #0C0E12;
+    --bg2: #111418;
+    --bg3: #181C22;
+    --border: rgba(255,255,255,0.06);
+    --border2: rgba(255,255,255,0.1);
+    --text: #E8EAF0;
+    --muted: #6B7280;
+    --accent: #C8F135;
+    --red: #F14D4D;
+    --red-dim: rgba(241,77,77,0.12);
+    --green: #3DCB76;
+    --green-dim: rgba(61,203,118,0.12);
+    --amber: #F59E0B;
+    --blue: #60A5FA;
+    --mono: 'Space Mono', monospace;
+    --sans: 'DM Sans', sans-serif;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--sans);
+    min-height: 100vh;
+    position: relative;
+    overflow-x: hidden;
+  }
+
+  /* Background grid */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      linear-gradient(rgba(200,241,53,0.015) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(200,241,53,0.015) 1px, transparent 1px);
+    background-size: 48px 48px;
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  .container {
+    max-width: 1120px;
+    margin: 0 auto;
+    padding: 32px 24px;
+    position: relative;
+    z-index: 1;
+  }
+
+  /* ── Header ── */
+  .header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    margin-bottom: 28px;
+    padding-bottom: 24px;
+    border-bottom: 1px solid var(--border2);
+  }
+
+  .header-left { display: flex; flex-direction: column; gap: 8px; }
+
+  .breadcrumb {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+
+  .pair-title {
+    font-family: var(--mono);
+    font-size: 36px;
+    font-weight: 700;
+    letter-spacing: -1px;
+    color: var(--text);
+    line-height: 1;
+  }
+
+  .pair-title span { color: var(--accent); }
+
+  .pair-subtitle {
+    font-size: 13px;
+    color: var(--muted);
+    font-weight: 300;
+    letter-spacing: 0.5px;
+  }
+
+  .header-right { text-align: right; }
+
+  .price-display {
+    font-family: var(--mono);
+    font-size: 48px;
+    font-weight: 700;
+    color: var(--text);
+    line-height: 1;
+    letter-spacing: -2px;
+  }
+
+  .price-change {
+    font-family: var(--mono);
+    font-size: 14px;
+    color: var(--red);
+    margin-top: 6px;
+  }
+
+  .badges { display: flex; gap: 8px; justify-content: flex-end; margin-top: 10px; }
+
+  .badge {
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+    padding: 4px 12px;
+    border-radius: 2px;
+    text-transform: uppercase;
+  }
+  .badge-sell { background: var(--red-dim); color: var(--red); border: 1px solid rgba(241,77,77,0.3); }
+  .badge-trend { background: rgba(245,158,11,0.12); color: var(--amber); border: 1px solid rgba(245,158,11,0.25); }
+
+  /* ── Metrics strip ── */
+  .metrics {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 1px;
+    background: var(--border);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    overflow: hidden;
+    margin-bottom: 20px;
+  }
+
+  .metric {
+    background: var(--bg2);
+    padding: 14px 18px;
+  }
+
+  .metric-label {
+    font-family: var(--mono);
+    font-size: 9px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    margin-bottom: 6px;
+  }
+
+  .metric-val {
+    font-family: var(--mono);
+    font-size: 17px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .metric-val.neg { color: var(--red); }
+  .metric-val.pos { color: var(--green); }
+  .metric-sub { font-size: 11px; color: var(--muted); margin-top: 3px; }
+
+  /* ── Grid layout ── */
+  .main-grid {
+    display: grid;
+    grid-template-columns: 1fr 340px;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .panel {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 10px;
+    overflow: hidden;
+  }
+
+  .panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .panel-title {
+    font-family: var(--mono);
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  .panel-tag {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    letter-spacing: 0.5px;
+  }
+
+  .panel-body { padding: 16px 18px; }
+
+  /* ── Chart ── */
+  .chart-wrap { position: relative; height: 260px; }
+
+  /* ── Sub indicators ── */
+  .sub-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+  .sub-chart { height: 110px; position: relative; }
+
+  /* ── Levels ── */
+  .level-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .level-row:last-child { border-bottom: none; }
+  .level-label { color: var(--muted); font-size: 12px; }
+  .level-val { font-family: var(--mono); font-weight: 700; }
+  .level-val.res { color: var(--red); }
+  .level-val.sup { color: var(--green); }
+  .level-val.cur {
+    font-size: 16px;
+    color: var(--accent);
+    text-shadow: 0 0 12px rgba(200,241,53,0.3);
+  }
+  .level-current {
+    background: rgba(200,241,53,0.04);
+    border: 1px solid rgba(200,241,53,0.15);
+    border-radius: 6px;
+    padding: 10px 12px;
+    margin: 4px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+
+  /* ── Patterns ── */
+  .pattern-item {
+    display: flex;
+    gap: 12px;
+    padding: 12px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .pattern-item:last-child { border-bottom: none; }
+  .dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; margin-top: 5px; }
+  .dot.bear { background: var(--red); box-shadow: 0 0 6px rgba(241,77,77,0.5); }
+  .dot.neutral { background: var(--amber); box-shadow: 0 0 6px rgba(245,158,11,0.4); }
+  .dot.bull { background: var(--green); box-shadow: 0 0 6px rgba(61,203,118,0.4); }
+  .pattern-name { font-size: 13px; font-weight: 600; color: var(--text); }
+  .pattern-desc { font-size: 12px; color: var(--muted); margin-top: 3px; line-height: 1.5; }
+
+  /* ── Timeframe bar ── */
+  .tf-bar {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+  .tf-cell {
+    background: var(--bg2);
+    border: 1px solid var(--border2);
+    border-radius: 8px;
+    padding: 12px 8px;
+    text-align: center;
+  }
+  .tf-label {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--muted);
+    margin-bottom: 6px;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .tf-signal {
+    font-family: var(--mono);
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--red);
+  }
+  .tf-signal.buy { color: var(--green); }
+  .tf-signal.neu { color: var(--amber); }
+
+  /* ── News / Sentiment ── */
+  .news-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+    margin-bottom: 16px;
+  }
+
+  .sentiment-gauge { padding: 8px 18px 20px; }
+
+  .gauge-wrap {
+    position: relative;
+    width: 180px;
+    height: 100px;
+    margin: 0 auto 12px;
+  }
+
+  .gauge-value {
+    position: absolute;
+    bottom: -4px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-family: var(--mono);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--red);
+    text-align: center;
+  }
+  .gauge-label {
+    position: absolute;
+    bottom: -22px;
+    left: 50%;
+    transform: translateX(-50%);
+    font-size: 11px;
+    color: var(--muted);
+    white-space: nowrap;
+    font-family: var(--mono);
+    letter-spacing: 0.5px;
+    text-transform: uppercase;
+  }
+
+  .sentiment-bars { display: flex; flex-direction: column; gap: 8px; margin-top: 24px; }
+  .sbar-row { display: flex; align-items: center; gap: 10px; font-size: 12px; }
+  .sbar-label { color: var(--muted); min-width: 60px; font-family: var(--mono); font-size: 11px; }
+  .sbar-track { flex: 1; height: 6px; background: var(--bg3); border-radius: 3px; overflow: hidden; }
+  .sbar-fill { height: 100%; border-radius: 3px; transition: width 1s ease; }
+  .sbar-pct { font-family: var(--mono); font-size: 11px; min-width: 32px; text-align: right; }
+
+  /* News items */
+  .news-list { display: flex; flex-direction: column; gap: 1px; }
+  .news-item {
+    padding: 14px 18px;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .news-item:last-child { border-bottom: none; }
+  .news-item:hover { background: var(--bg3); }
+  .news-meta { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+  .news-source {
+    font-family: var(--mono);
+    font-size: 10px;
+    color: var(--accent);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .news-time { font-size: 11px; color: var(--muted); }
+  .news-sentiment-badge {
+    margin-left: auto;
+    font-family: var(--mono);
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 8px;
+    border-radius: 2px;
+  }
+  .news-sentiment-badge.bear { background: var(--red-dim); color: var(--red); }
+  .news-sentiment-badge.bull { background: var(--green-dim); color: var(--green); }
+  .news-sentiment-badge.neu { background: rgba(245,158,11,0.1); color: var(--amber); }
+  .news-headline { font-size: 13px; font-weight: 500; color: var(--text); line-height: 1.5; }
+  .news-body { font-size: 12px; color: var(--muted); margin-top: 4px; line-height: 1.5; }
+
+  /* ── Market positioning ── */
+  .positioning-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 8px 0;
+    font-size: 13px;
+    border-bottom: 1px solid var(--border);
+  }
+  .positioning-row:last-child { border-bottom: none; }
+  .pos-label { color: var(--muted); font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px; }
+  .pos-bar-wrap { flex: 1; margin: 0 16px; height: 4px; background: var(--bg3); border-radius: 2px; overflow: hidden; }
+  .pos-fill { height: 100%; border-radius: 2px; }
+
+  /* ── Footer ── */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding-top: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-note { font-size: 12px; color: var(--muted); font-family: var(--mono); }
+  .live-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    background: var(--accent);
+    border-radius: 50%;
+    margin-right: 6px;
+    animation: pulse 2s infinite;
+  }
+  @keyframes pulse {
+    0%, 100% { opacity: 1; }
+    50% { opacity: 0.3; }
+  }
+
+  /* Fade-in animation */
+  @keyframes fadeUp {
+    from { opacity: 0; transform: translateY(16px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+  .panel, .metrics, .tf-bar, .tf-cell {
+    animation: fadeUp 0.5s ease both;
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+  <!-- HEADER -->
+  <div class="header">
+    <div class="header-left">
+      <div class="breadcrumb">FOREX · ANALISI TECNICA · 05 MAG 2026</div>
+      <div class="pair-title">USD<span>/</span>NOK</div>
+      <div class="pair-subtitle">Dollaro Americano · Corona Norvegese</div>
+    </div>
+    <div class="header-right">
+      <div class="price-display">9.2845</div>
+      <div class="price-change">▼ −0.0042 · −0.04% (24h)</div>
+      <div class="badges">
+        <span class="badge badge-sell">⬇ Strong Sell</span>
+        <span class="badge badge-trend">↙ Trend Ribassista</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- METRICS -->
+  <div class="metrics">
+    <div class="metric">
+      <div class="metric-label">Var. 24h</div>
+      <div class="metric-val neg">−0.04%</div>
+      <div class="metric-sub">−0.0042</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Var. 1 Mese</div>
+      <div class="metric-val neg">−4.67%</div>
+      <div class="metric-sub">−0.4535</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Var. 12 Mesi</div>
+      <div class="metric-val neg">−11.01%</div>
+      <div class="metric-sub">da 10.43</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Range 52W</div>
+      <div class="metric-val" style="font-size:14px;">9.28 – 10.98</div>
+      <div class="metric-sub">spread: 1.70</div>
+    </div>
+    <div class="metric">
+      <div class="metric-label">Differenz. Tassi</div>
+      <div class="metric-val pos">+25 bp</div>
+      <div class="metric-sub">NOK favorita</div>
+    </div>
+  </div>
+
+  <!-- MAIN GRID: chart + levels -->
+  <div class="main-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Andamento Prezzi · 6 Mesi</span>
+        <span class="panel-tag">· DAILY ·</span>
+      </div>
+      <div class="panel-body">
+        <div class="chart-wrap">
+          <canvas id="priceChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Livelli Chiave</span>
+        <span class="panel-tag">· S/R ·</span>
+      </div>
+      <div class="panel-body">
+        <div class="level-row">
+          <span class="level-label">Resistenza Forte</span>
+          <span class="level-val res">10.43</span>
+        </div>
+        <div class="level-row">
+          <span class="level-label">EMA 200 (Res.)</span>
+          <span class="level-val res">10.20</span>
+        </div>
+        <div class="level-row">
+          <span class="level-label">EMA 50</span>
+          <span class="level-val res">9.75</span>
+        </div>
+        <div class="level-row">
+          <span class="level-label">Neckline H&S</span>
+          <span class="level-val res">9.55</span>
+        </div>
+        <div class="level-current">
+          <span style="font-family:var(--mono); font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:1px;">Prezzo Attuale</span>
+          <span class="level-val cur">9.2845</span>
+        </div>
+        <div class="level-row">
+          <span class="level-label">Supporto 1</span>
+          <span class="level-val sup">9.20</span>
+        </div>
+        <div class="level-row">
+          <span class="level-label">Supporto Swing</span>
+          <span class="level-val sup">9.00</span>
+        </div>
+        <div class="level-row">
+          <span class="level-label">Obiettivo H&S</span>
+          <span class="level-val sup">8.60</span>
+        </div>
+        <div class="level-row" style="border:none;">
+          <span class="level-label">Supporto Critico</span>
+          <span class="level-val sup">8.50</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- RSI + MACD -->
+  <div class="sub-grid">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">RSI · 14 Periodi</span>
+        <span class="panel-tag">38.4 · Neutro/Ipervenduto</span>
+      </div>
+      <div class="panel-body">
+        <div class="sub-chart"><canvas id="rsiChart"></canvas></div>
+      </div>
+    </div>
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">MACD · 12,26,9</span>
+        <span class="panel-tag">Bearish Cross</span>
+      </div>
+      <div class="panel-body">
+        <div class="sub-chart"><canvas id="macdChart"></canvas></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- PATTERNS + TF -->
+  <div class="main-grid" style="margin-bottom:16px;">
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Pattern Tecnici Identificati</span>
+        <span class="panel-tag">· DAILY &amp; WEEKLY ·</span>
+      </div>
+      <div class="panel-body">
+        <div class="pattern-item">
+          <div class="dot bear"></div>
+          <div>
+            <div class="pattern-name">Head &amp; Shoulders (Daily)</div>
+            <div class="pattern-desc">Pattern completato con rottura della neckline a 9.55. Conferma strutturale del trend ribassista. Obiettivo teorico proiettato a ~8.60.</div>
+          </div>
+        </div>
+        <div class="pattern-item">
+          <div class="dot bear"></div>
+          <div>
+            <div class="pattern-name">Death Cross EMA 50/200</div>
+            <div class="pattern-desc">EMA 50 ha incrociato al ribasso EMA 200 sul timeframe settimanale. Segnale ribassista strutturale di medio-lungo periodo.</div>
+          </div>
+        </div>
+        <div class="pattern-item">
+          <div class="dot bear"></div>
+          <div>
+            <div class="pattern-name">Canale Discendente</div>
+            <div class="pattern-desc">Sequenza di massimi e minimi decrescenti da novembre 2025. Il prezzo si muove all'interno del canale senza segnali di rottura. Inversione solo sopra 10.20.</div>
+          </div>
+        </div>
+        <div class="pattern-item">
+          <div class="dot neutral"></div>
+          <div>
+            <div class="pattern-name">RSI in zona neutro/oversold</div>
+            <div class="pattern-desc">RSI a 38.4: zona di potenziale rimbalzo tecnico. Possibile recupero verso 9.50–9.75 prima di riprendere il trend principale.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Segnali per Timeframe</span>
+      </div>
+      <div class="panel-body" style="padding: 12px 18px;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div class="tf-cell"><div class="tf-label">1 Ora</div><div class="tf-signal">S. SELL</div></div>
+          <div class="tf-cell"><div class="tf-label">4 Ore</div><div class="tf-signal">S. SELL</div></div>
+          <div class="tf-cell"><div class="tf-label">Daily</div><div class="tf-signal">S. SELL</div></div>
+          <div class="tf-cell"><div class="tf-label">Weekly</div><div class="tf-signal">S. SELL</div></div>
+          <div class="tf-cell"><div class="tf-label">Monthly</div><div class="tf-signal">SELL</div></div>
+          <div class="tf-cell"><div class="tf-label">MA (0/12)</div><div class="tf-signal">0 BUY</div></div>
+        </div>
+        <div style="margin-top:16px; padding-top:14px; border-top:1px solid var(--border);">
+          <div class="panel-title" style="margin-bottom:10px;">Fibonacci Retracement</div>
+          <div class="level-row"><span class="level-label">0% (min swing)</span><span class="level-val sup">9.20</span></div>
+          <div class="level-row"><span class="level-label">38.2%</span><span class="level-val" style="font-family:var(--mono);">9.65</span></div>
+          <div class="level-row"><span class="level-label">50%</span><span class="level-val" style="font-family:var(--mono);">9.83</span></div>
+          <div class="level-row" style="border:none;"><span class="level-label">61.8% (Golden)</span><span class="level-val res">10.01</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- NEWS / SENTIMENT SECTION -->
+  <div class="news-grid">
+    <!-- Sentiment gauge -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">Sentiment di Mercato</span>
+        <span class="panel-tag">· RETAIL &amp; ISTITUZIONALE ·</span>
+      </div>
+      <div class="sentiment-gauge">
+        <div class="gauge-wrap">
+          <canvas id="gaugeChart" width="180" height="100"></canvas>
+          <div class="gauge-value">28</div>
+          <div class="gauge-label">BEARISH</div>
+        </div>
+        <div class="sentiment-bars" style="margin-top:48px;">
+          <div class="sbar-row">
+            <div class="sbar-label">SELL</div>
+            <div class="sbar-track"><div class="sbar-fill" style="width:72%; background:var(--red);"></div></div>
+            <div class="sbar-pct" style="color:var(--red);">72%</div>
+          </div>
+          <div class="sbar-row">
+            <div class="sbar-label">NEUTRO</div>
+            <div class="sbar-track"><div class="sbar-fill" style="width:16%; background:var(--amber);"></div></div>
+            <div class="sbar-pct" style="color:var(--amber);">16%</div>
+          </div>
+          <div class="sbar-row">
+            <div class="sbar-label">BUY</div>
+            <div class="sbar-track"><div class="sbar-fill" style="width:12%; background:var(--green);"></div></div>
+            <div class="sbar-pct" style="color:var(--green);">12%</div>
+          </div>
+        </div>
+        <div style="margin-top:20px; display:grid; grid-template-columns:1fr 1fr; gap:8px;">
+          <div style="background:var(--bg3); border-radius:6px; padding:10px; text-align:center;">
+            <div style="font-size:10px; color:var(--muted); font-family:var(--mono); margin-bottom:4px; text-transform:uppercase;">Posizioni Retail</div>
+            <div style="font-family:var(--mono); font-size:14px; color:var(--red); font-weight:700;">69% Short</div>
+          </div>
+          <div style="background:var(--bg3); border-radius:6px; padding:10px; text-align:center;">
+            <div style="font-size:10px; color:var(--muted); font-family:var(--mono); margin-bottom:4px; text-transform:uppercase;">COT Report</div>
+            <div style="font-family:var(--mono); font-size:14px; color:var(--red); font-weight:700;">Net Short</div>
+          </div>
+        </div>
+        <div style="margin-top:12px; padding:12px; background:rgba(200,241,53,0.04); border:1px solid rgba(200,241,53,0.1); border-radius:6px;">
+          <div style="font-size:11px; color:var(--muted); font-family:var(--mono); text-transform:uppercase; letter-spacing:0.5px; margin-bottom:4px;">Fear & Greed USD</div>
+          <div style="font-size:13px; color:var(--amber);">⚠ Greed in diminuzione — dollaro sotto pressione geopolitica e dati macro deboli.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- News feed -->
+    <div class="panel">
+      <div class="panel-header">
+        <span class="panel-title">News &amp; Catalyst Recenti</span>
+        <span class="panel-tag"><span class="live-dot"></span>LIVE FEED</span>
+      </div>
+      <div class="news-list">
+
+        <div class="news-item">
+          <div class="news-meta">
+            <span class="news-source">Reuters</span>
+            <span class="news-time">05 Mag 2026 · 09:14</span>
+            <span class="news-sentiment-badge bear">BEARISH USD</span>
+          </div>
+          <div class="news-headline">Fed mantiene tassi: Powell segnala incertezza prolungata</div>
+          <div class="news-body">La Federal Reserve lascia invariato il target sui fed funds. Powell sottolinea che i dati sull'inflazione rimangono "insufficienti" per tagliare. Il dollaro perde terreno contro le valute commodity.</div>
+        </div>
+
+        <div class="news-item">
+          <div class="news-meta">
+            <span class="news-source">Norges Bank</span>
+            <span class="news-time">02 Mag 2026 · 11:00</span>
+            <span class="news-sentiment-badge bull">BULLISH NOK</span>
+          </div>
+          <div class="news-headline">Norges Bank mantiene tasso al 4.50%, tono hawkish</div>
+          <div class="news-body">La banca centrale norvegese conferma politica restrittiva. Le aspettative di taglio posticipate al Q4 2026. Il differenziale di rendimento supporta il NOK nel breve-medio periodo.</div>
+        </div>
+
+        <div class="news-item">
+          <div class="news-meta">
+            <span class="news-source">Bloomberg</span>
+            <span class="news-time">30 Apr 2026 · 14:32</span>
+            <span class="news-sentiment-badge bull">BULLISH NOK</span>
+          </div>
+          <div class="news-headline">Petrolio Brent in recupero: +3.2% sull'accordo OPEC+</div>
+          <div class="news-body">Il prezzo del Brent risale a $84. La corona norvegese, altamente correlata al petrolio, si apprezza contro tutte le principali valute. Impatto diretto sul cambio USD/NOK.</div>
+        </div>
+
+        <div class="news-item">
+          <div class="news-meta">
+            <span class="news-source">WSJ</span>
+            <span class="news-time">28 Apr 2026 · 16:05</span>
+            <span class="news-sentiment-badge bear">BEARISH USD</span>
+          </div>
+          <div class="news-headline">GDP USA Q1 2026: +1.2% vs. attese +1.8% — dollaro in calo</div>
+          <div class="news-body">Il PIL americano cresce meno del previsto nel primo trimestre. I dati deludenti aumentano le aspettative di allentamento Fed. L'indice DXY scende sotto 99, minimo da 3 anni.</div>
+        </div>
+
+        <div class="news-item">
+          <div class="news-meta">
+            <span class="news-source">Macroaxis</span>
+            <span class="news-time">25 Apr 2026 · 09:55</span>
+            <span class="news-sentiment-badge neu">NEUTRO</span>
+          </div>
+          <div class="news-headline">CPI Norvegia: +2.8% annuo — in linea con target Norges Bank</div>
+          <div class="news-body">L'inflazione norvegese rimane moderata. Il dato riduce pressioni per tagli urgenti, confermando stance neutro-restrittiva della banca centrale.</div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER -->
+  <div class="footer">
+    <div class="footer-note"><span class="live-dot"></span>Analisi aggiornata al 05/05/2026 · Solo a scopo informativo · Non costituisce consulenza finanziaria</div>
+    <div class="footer-note" style="color:var(--accent);">USD/NOK TERMINAL v2.0</div>
+  </div>
+
+</div>
+
+<script>
+// ── Generate price data ──
+function generatePrices(n, startP, trend, vol) {
+  const arr = [];
+  let p = startP;
+  for (let i = 0; i < n; i++) {
+    p += trend + (Math.random() - 0.52) * vol;
+    arr.push(parseFloat(p.toFixed(4)));
+  }
+  arr[arr.length-1] = 9.2845;
+  return arr;
+}
+
+function generateLabels(n) {
+  const arr = [];
+  const s = new Date('2024-11-01');
+  for (let i = 0; i < n; i++) {
+    const d = new Date(s);
+    d.setDate(s.getDate() + i);
+    arr.push(d.toLocaleDateString('it-IT', {day:'2-digit', month:'short'}));
+  }
+  return arr;
+}
+
+const N = 130;
+const labels = generateLabels(N);
+const prices = generatePrices(N, 10.58, -0.0045, 0.055);
+
+// EMA helper
+function ema(data, period) {
+  const k = 2/(period+1);
+  const out = [data[0]];
+  for (let i=1; i<data.length; i++) out.push(data[i]*k + out[i-1]*(1-k));
+  return out;
+}
+
+const ema50 = ema(prices, 50);
+const ema200 = ema(prices, 100); // shortened for 130 bars
+
+const gridColor = 'rgba(255,255,255,0.05)';
+const textColor = '#4B5563';
+
+// ── Price Chart ──
+new Chart(document.getElementById('priceChart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      {
+        label: 'USD/NOK',
+        data: prices,
+        borderColor: '#F14D4D',
+        borderWidth: 1.5,
+        pointRadius: 0,
+        tension: 0.3,
+        fill: true,
+        backgroundColor: (ctx) => {
+          const g = ctx.chart.ctx.createLinearGradient(0,0,0,240);
+          g.addColorStop(0, 'rgba(241,77,77,0.15)');
+          g.addColorStop(1, 'rgba(241,77,77,0)');
+          return g;
+        }
+      },
+      {
+        label: 'EMA 50',
+        data: ema50,
+        borderColor: '#60A5FA',
+        borderWidth: 1.2,
+        borderDash: [4,3],
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false
+      },
+      {
+        label: 'EMA 200',
+        data: ema200,
+        borderColor: '#C8F135',
+        borderWidth: 1,
+        borderDash: [2,4],
+        pointRadius: 0,
+        tension: 0.3,
+        fill: false,
+        borderDashOffset: 2
+      }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    interaction: { mode: 'index', intersect: false },
+    plugins: {
+      legend: {
+        display: true,
+        labels: { color: '#6B7280', font: { family: 'Space Mono', size: 10 }, boxWidth: 20, padding: 14 }
+      },
+      tooltip: {
+        backgroundColor: '#181C22',
+        borderColor: 'rgba(255,255,255,0.1)',
+        borderWidth: 1,
+        titleColor: '#C8F135',
+        bodyColor: '#9CA3AF',
+        titleFont: { family: 'Space Mono', size: 11 },
+        bodyFont: { family: 'Space Mono', size: 10 }
+      }
+    },
+    scales: {
+      x: {
+        ticks: { color: textColor, font: { family: 'Space Mono', size: 9 }, maxRotation: 0, autoSkip: true, maxTicksLimit: 8 },
+        grid: { color: gridColor }
+      },
+      y: {
+        ticks: { color: textColor, font: { family: 'Space Mono', size: 9 } },
+        grid: { color: gridColor },
+        afterDataLimits: sc => { sc.min -= 0.04; sc.max += 0.04; }
+      }
+    }
+  }
+});
+
+// ── RSI ──
+function rsi(data, period=14) {
+  const out = new Array(period).fill(50);
+  for (let i=period; i<data.length; i++) {
+    let gains=0, losses=0;
+    for (let j=i-period+1; j<=i; j++) {
+      const d = data[j]-data[j-1];
+      if (d>0) gains+=d; else losses-=d;
+    }
+    const rs = gains/(losses||0.001);
+    out.push(parseFloat((100-100/(1+rs)).toFixed(1)));
+  }
+  return out;
+}
+
+const rsiData = rsi(prices, 14);
+const overbought = new Array(N).fill(70);
+const oversold   = new Array(N).fill(30);
+
+new Chart(document.getElementById('rsiChart'), {
+  type: 'line',
+  data: {
+    labels,
+    datasets: [
+      { data: rsiData, borderColor: '#F59E0B', borderWidth: 1.5, pointRadius: 0, tension: 0.3, fill: false },
+      { data: overbought, borderColor: 'rgba(241,77,77,0.3)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false },
+      { data: oversold, borderColor: 'rgba(61,203,118,0.3)', borderWidth: 1, borderDash: [3,3], pointRadius: 0, fill: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: {
+      x: { display: false },
+      y: {
+        min: 0, max: 100,
+        ticks: { color: textColor, font: { family: 'Space Mono', size: 9 }, stepSize: 25 },
+        grid: { color: gridColor }
+      }
+    }, animation: false
+  }
+});
+
+// ── MACD ──
+const ema12 = ema(prices, 12);
+const ema26 = ema(prices, 26);
+const macdLine = ema12.map((v,i) => parseFloat((v - ema26[i]).toFixed(4)));
+const signalLine = ema(macdLine, 9);
+const histogram = macdLine.map((v,i) => parseFloat((v - signalLine[i]).toFixed(4)));
+
+new Chart(document.getElementById('macdChart'), {
+  type: 'bar',
+  data: {
+    labels,
+    datasets: [
+      { type:'bar', data: histogram, backgroundColor: histogram.map(v => v>=0 ? 'rgba(61,203,118,0.6)' : 'rgba(241,77,77,0.6)'), borderWidth: 0 },
+      { type:'line', data: macdLine, borderColor: '#60A5FA', borderWidth: 1.2, pointRadius: 0, tension: 0.3, fill: false },
+      { type:'line', data: signalLine, borderColor: '#F14D4D', borderWidth: 1.2, borderDash: [3,2], pointRadius: 0, tension: 0.3, fill: false }
+    ]
+  },
+  options: {
+    responsive: true, maintainAspectRatio: false,
+    plugins: { legend: { display: false }, tooltip: { enabled: false } },
+    scales: {
+      x: { display: false },
+      y: { ticks: { color: textColor, font: { family: 'Space Mono', size: 9 } }, grid: { color: gridColor } }
+    }, animation: false
+  }
+});
+
+// ── Sentiment Gauge (semicircle) ──
+const gCanvas = document.getElementById('gaugeChart');
+const gCtx = gCanvas.getContext('2d');
+gCanvas.width = 180; gCanvas.height = 100;
+
+function drawGauge(ctx, value) {
+  const cx = 90, cy = 95, r = 78, lw = 14;
+  ctx.clearRect(0,0,180,100);
+  // track
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, Math.PI, 2*Math.PI, false);
+  ctx.strokeStyle = '#1E2530';
+  ctx.lineWidth = lw;
+  ctx.lineCap = 'butt';
+  ctx.stroke();
+  // zones
+  const zones = [
+    {start:0, end:0.25, color:'#F14D4D'},
+    {start:0.25, end:0.5, color:'#F59E0B'},
+    {start:0.5, end:0.75, color:'#3DCB76'},
+    {start:0.75, end:1, color:'#3DCB76'},
+  ];
+  zones.forEach(z => {
+    const sa = Math.PI + z.start*Math.PI;
+    const ea = Math.PI + z.end*Math.PI;
+    ctx.beginPath();
+    ctx.arc(cx, cy, r, sa, ea, false);
+    ctx.strokeStyle = z.color;
+    ctx.lineWidth = lw;
+    ctx.globalAlpha = 0.25;
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+  });
+  // filled arc
+  const pct = value/100;
+  const startAngle = Math.PI;
+  const endAngle = Math.PI + pct*Math.PI;
+  const gradient = ctx.createLinearGradient(cx-r, cy, cx+r, cy);
+  gradient.addColorStop(0, '#F14D4D');
+  gradient.addColorStop(0.5, '#F59E0B');
+  gradient.addColorStop(1, '#3DCB76');
+  ctx.beginPath();
+  ctx.arc(cx, cy, r, startAngle, endAngle, false);
+  ctx.strokeStyle = gradient;
+  ctx.lineWidth = lw;
+  ctx.globalAlpha = 1;
+  ctx.stroke();
+  // needle
+  const angle = Math.PI + pct*Math.PI;
+  const nx = cx + (r-7)*Math.cos(angle);
+  const ny = cy + (r-7)*Math.sin(angle);
+  ctx.beginPath();
+  ctx.moveTo(cx, cy);
+  ctx.lineTo(nx, ny);
+  ctx.strokeStyle = '#E8EAF0';
+  ctx.lineWidth = 2;
+  ctx.lineCap = 'round';
+  ctx.stroke();
+  ctx.beginPath();
+  ctx.arc(cx, cy, 5, 0, 2*Math.PI);
+  ctx.fillStyle = '#E8EAF0';
+  ctx.fill();
+  // labels
+  ctx.font = '9px Space Mono';
+  ctx.fillStyle = '#6B7280';
+  ctx.textAlign = 'center';
+  ctx.fillText('BEAR', cx-62, cy-2);
+  ctx.fillText('BULL', cx+62, cy-2);
+}
+drawGauge(gCtx, 28);
+</script>
+</body>
+</html>
