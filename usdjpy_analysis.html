@@ -1,0 +1,758 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>USD/JPY — Analisi Tecnica | 29 Giu 2026</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:wght@400;700&display=swap');
+
+  :root {
+    --bg: #0a0c10;
+    --surface: #10141c;
+    --surface2: #161c28;
+    --border: #1e2a3a;
+    --accent: #f0a500;
+    --accent2: #e05050;
+    --accent3: #3ecf8e;
+    --text: #c8d8e8;
+    --muted: #5a7a9a;
+    --white: #eaf2ff;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'Space Grotesk', sans-serif;
+    min-height: 100vh;
+    padding: 24px;
+  }
+
+  /* HEADER */
+  .header {
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 20px;
+    margin-bottom: 24px;
+  }
+  .header-left .pair {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.6rem;
+    font-weight: 700;
+    color: var(--white);
+    letter-spacing: -1px;
+    line-height: 1;
+  }
+  .header-left .subtitle {
+    font-size: 0.75rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    margin-top: 6px;
+  }
+  .header-right {
+    text-align: right;
+  }
+  .price-main {
+    font-family: 'Space Mono', monospace;
+    font-size: 2.8rem;
+    font-weight: 700;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .price-change {
+    font-size: 0.8rem;
+    color: var(--accent2);
+    margin-top: 4px;
+    font-family: 'Space Mono', monospace;
+  }
+  .price-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    margin-top: 2px;
+  }
+
+  /* GRID */
+  .grid-3 {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .grid-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 16px;
+  }
+  .grid-full {
+    margin-bottom: 16px;
+  }
+
+  /* CARD */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 18px;
+  }
+  .card-title {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--muted);
+    margin-bottom: 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .card-title::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: var(--border);
+  }
+
+  /* METRIC CARDS */
+  .metric-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--white);
+    line-height: 1.1;
+  }
+  .metric-label {
+    font-size: 0.7rem;
+    color: var(--muted);
+    margin-top: 4px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .metric-badge {
+    display: inline-block;
+    font-size: 0.65rem;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-top: 6px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .badge-bull { background: rgba(62,207,142,0.15); color: var(--accent3); }
+  .badge-bear { background: rgba(224,80,80,0.15); color: var(--accent2); }
+  .badge-neutral { background: rgba(240,165,0,0.15); color: var(--accent); }
+
+  /* LEVELS TABLE */
+  .levels-table {
+    width: 100%;
+    border-collapse: collapse;
+  }
+  .levels-table tr {
+    border-bottom: 1px solid var(--border);
+  }
+  .levels-table tr:last-child { border-bottom: none; }
+  .levels-table td {
+    padding: 10px 0;
+    font-size: 0.85rem;
+  }
+  .levels-table .lvl-price {
+    font-family: 'Space Mono', monospace;
+    font-weight: 700;
+    color: var(--white);
+    font-size: 1rem;
+  }
+  .levels-table .lvl-type {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-align: right;
+    color: var(--muted);
+  }
+  .lvl-res { color: var(--accent2) !important; }
+  .lvl-sup { color: var(--accent3) !important; }
+  .lvl-crit { color: var(--accent) !important; }
+  .lvl-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    display: inline-block;
+    margin-right: 8px;
+    vertical-align: middle;
+  }
+
+  /* PRICE LADDER (visual) */
+  .ladder {
+    position: relative;
+    padding: 10px 0;
+  }
+  .ladder-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 4px;
+    position: relative;
+  }
+  .ladder-line {
+    position: absolute;
+    left: 59px;
+    top: 0;
+    bottom: 0;
+    width: 2px;
+    background: var(--border);
+  }
+  .ladder-price {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--text);
+    width: 56px;
+    text-align: right;
+    flex-shrink: 0;
+  }
+  .ladder-dot-wrap {
+    width: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    z-index: 1;
+  }
+  .ladder-dot {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid;
+    background: var(--bg);
+  }
+  .ladder-desc {
+    font-size: 0.75rem;
+    color: var(--muted);
+    flex: 1;
+  }
+  .ladder-cur {
+    background: var(--accent) !important;
+    border-color: var(--accent) !important;
+    box-shadow: 0 0 8px var(--accent);
+  }
+  .dot-res { border-color: var(--accent2); }
+  .dot-sup { border-color: var(--accent3); }
+  .dot-key { border-color: var(--accent); }
+  .ladder-cur-label {
+    font-size: 0.6rem;
+    background: var(--accent);
+    color: #000;
+    padding: 1px 6px;
+    border-radius: 10px;
+    font-weight: 700;
+    letter-spacing: 1px;
+  }
+
+  /* INDICATORS */
+  .indicators-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .ind-item {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 12px;
+    border: 1px solid var(--border);
+  }
+  .ind-name {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 6px;
+  }
+  .ind-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 1.1rem;
+    font-weight: 700;
+  }
+  .ind-sig {
+    font-size: 0.65rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    margin-top: 4px;
+  }
+  .sig-buy { color: var(--accent3); }
+  .sig-sell { color: var(--accent2); }
+  .sig-neutral { color: var(--accent); }
+
+  /* RSI BAR */
+  .rsi-bar-wrap {
+    margin-top: 8px;
+    position: relative;
+    height: 6px;
+    background: var(--border);
+    border-radius: 3px;
+    overflow: visible;
+  }
+  .rsi-bar-fill {
+    height: 100%;
+    border-radius: 3px;
+    background: linear-gradient(90deg, var(--accent3), var(--accent), var(--accent2));
+    width: 46.7%;
+  }
+  .rsi-pointer {
+    position: absolute;
+    top: -3px;
+    left: 46.7%;
+    width: 12px;
+    height: 12px;
+    background: var(--white);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    border: 2px solid var(--accent);
+  }
+  .rsi-labels {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 8px;
+  }
+  .rsi-label { font-size: 0.6rem; color: var(--muted); }
+
+  /* MACRO */
+  .macro-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    gap: 12px;
+  }
+  .macro-row:last-child { border-bottom: none; }
+  .macro-key {
+    font-size: 0.75rem;
+    color: var(--text);
+    flex: 1;
+  }
+  .macro-val {
+    font-family: 'Space Mono', monospace;
+    font-size: 0.85rem;
+    font-weight: 700;
+    color: var(--white);
+    text-align: right;
+  }
+  .macro-imp {
+    font-size: 0.65rem;
+    color: var(--muted);
+    text-align: right;
+    width: 80px;
+    flex-shrink: 0;
+  }
+
+  /* ALERT BOX */
+  .alert-box {
+    background: rgba(224,80,80,0.08);
+    border: 1px solid rgba(224,80,80,0.3);
+    border-radius: 8px;
+    padding: 16px 18px;
+    margin-bottom: 16px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .alert-icon {
+    font-size: 1.4rem;
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+  .alert-title {
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    color: var(--accent2);
+    margin-bottom: 5px;
+    font-weight: 600;
+  }
+  .alert-text {
+    font-size: 0.8rem;
+    color: var(--text);
+    line-height: 1.6;
+  }
+
+  /* BIAS SECTION */
+  .bias-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 10px;
+  }
+  .bias-item {
+    background: var(--surface2);
+    border-radius: 6px;
+    padding: 14px;
+    border: 1px solid var(--border);
+    text-align: center;
+  }
+  .bias-period {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--muted);
+    margin-bottom: 8px;
+  }
+  .bias-direction {
+    font-size: 1rem;
+    font-weight: 700;
+    margin-bottom: 6px;
+  }
+  .bias-text {
+    font-size: 0.72rem;
+    color: var(--muted);
+    line-height: 1.5;
+  }
+
+  /* MA TABLE */
+  .ma-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--border);
+  }
+  .ma-row:last-child { border-bottom: none; }
+  .ma-name { font-size: 0.75rem; color: var(--muted); flex: 1; }
+  .ma-val { font-family: 'Space Mono', monospace; font-size: 0.85rem; color: var(--white); width: 70px; text-align: right; }
+  .ma-sig { font-size: 0.65rem; font-weight: 700; width: 50px; text-align: right; letter-spacing: 0.5px; }
+
+  /* FOOTER */
+  .footer {
+    border-top: 1px solid var(--border);
+    padding-top: 14px;
+    margin-top: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .footer-note {
+    font-size: 0.65rem;
+    color: var(--muted);
+  }
+
+  /* TREND CHART */
+  .mini-chart {
+    width: 100%;
+    height: 80px;
+    margin-top: 8px;
+  }
+
+  /* SCENARIO */
+  .scenario-row {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 10px;
+  }
+  .scenario-item {
+    flex: 1;
+    border-radius: 6px;
+    padding: 14px;
+    border: 1px solid;
+  }
+  .scenario-bull {
+    background: rgba(62,207,142,0.06);
+    border-color: rgba(62,207,142,0.25);
+  }
+  .scenario-bear {
+    background: rgba(224,80,80,0.06);
+    border-color: rgba(224,80,80,0.25);
+  }
+  .scenario-title {
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    font-weight: 700;
+    margin-bottom: 8px;
+  }
+  .scenario-bull .scenario-title { color: var(--accent3); }
+  .scenario-bear .scenario-title { color: var(--accent2); }
+  .scenario-text {
+    font-size: 0.78rem;
+    line-height: 1.6;
+    color: var(--text);
+  }
+  .scenario-target {
+    margin-top: 8px;
+    font-family: 'Space Mono', monospace;
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+  .scenario-bull .scenario-target { color: var(--accent3); }
+  .scenario-bear .scenario-target { color: var(--accent2); }
+
+  @media (max-width: 680px) {
+    .grid-3, .bias-grid { grid-template-columns: 1fr; }
+    .grid-2 { grid-template-columns: 1fr; }
+    .indicators-grid { grid-template-columns: 1fr; }
+    .header { flex-direction: column; gap: 12px; }
+    .header-right { text-align: left; }
+    .price-main { font-size: 2rem; }
+    .pair { font-size: 1.8rem !important; }
+    .scenario-row { flex-direction: column; }
+  }
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-left">
+    <div class="pair">USD / JPY</div>
+    <div class="subtitle">Analisi Tecnica · 29 Giugno 2026 · Forex</div>
+  </div>
+  <div class="header-right">
+    <div class="price-main">161.67</div>
+    <div class="price-change">▼ −0.04% dal precedente</div>
+    <div class="price-label">Prezzo corrente (JPY per 1 USD)</div>
+  </div>
+</div>
+
+<!-- METRICHE TOP -->
+<div class="grid-3">
+  <div class="card">
+    <div class="card-title">Trend Principale</div>
+    <div class="metric-val">Rialzista</div>
+    <div class="metric-label">USD forte · JPY debole</div>
+    <span class="metric-badge badge-bull">Long Bias</span>
+  </div>
+  <div class="card">
+    <div class="card-title">Max 40 Anni</div>
+    <div class="metric-val">~162.00</div>
+    <div class="metric-label">Resistenza psicologica chiave</div>
+    <span class="metric-badge badge-bear">Zona Intervento</span>
+  </div>
+  <div class="card">
+    <div class="card-title">Spread Tassi USA–JP</div>
+    <div class="metric-val">+2.74%</div>
+    <div class="metric-label">Dal 2.46% di 3 mesi fa</div>
+    <span class="metric-badge badge-bear">Pressione su JPY</span>
+  </div>
+</div>
+
+<!-- ALERT INTERVENTO -->
+<div class="alert-box">
+  <div class="alert-icon">⚠️</div>
+  <div>
+    <div class="alert-title">Rischio Intervento Valutario — Massima Attenzione</div>
+    <div class="alert-text">
+      Il Giappone ha già speso circa <strong>70 miliardi di dollari</strong> in due interventi negli ultimi due anni. L'intervento più recente (30 aprile 2026) ha generato un crollo di oltre 5 figure in poche ore. Il Ministro delle Finanze Katayama ha riaffermato la disponibilità a coordinarsi con il Tesoro USA. <strong>Zona critica sopra 162.00.</strong> Prossima decisione BOJ: <strong>31 luglio 2026</strong>.
+    </div>
+  </div>
+</div>
+
+<!-- PRICE LADDER + INDICATORI -->
+<div class="grid-2">
+  <!-- LIVELLI CHIAVE -->
+  <div class="card">
+    <div class="card-title">Livelli Chiave</div>
+    <div class="ladder">
+      <div class="ladder-line"></div>
+
+      <div class="ladder-item">
+        <div class="ladder-price" style="color:var(--accent2)">163.00</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot dot-res"></div></div>
+        <div class="ladder-desc">Target rialzista esteso</div>
+      </div>
+
+      <div class="ladder-item">
+        <div class="ladder-price" style="color:var(--accent2)">162.00</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot dot-res"></div></div>
+        <div class="ladder-desc"><strong style="color:var(--accent2)">RESISTENZA</strong> — max 40 anni · zona intervento</div>
+      </div>
+
+      <div class="ladder-item" style="background:rgba(240,165,0,0.04); border-radius:6px; margin: 4px -8px; padding: 6px 8px;">
+        <div class="ladder-price" style="color:var(--accent); font-size:0.95rem; font-weight:700">161.67</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot ladder-cur"></div></div>
+        <div class="ladder-desc" style="color:var(--white)"><strong>PREZZO ATTUALE</strong></div>
+        <div class="ladder-cur-label">LIVE</div>
+      </div>
+
+      <div class="ladder-item">
+        <div class="ladder-price" style="color:var(--accent3)">161.63</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot dot-sup"></div></div>
+        <div class="ladder-desc">Supporto immediato</div>
+      </div>
+
+      <div class="ladder-item">
+        <div class="ladder-price" style="color:var(--accent3)">160.74</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot dot-sup"></div></div>
+        <div class="ladder-desc">SMA 100 (4h) — pivot supporto</div>
+      </div>
+
+      <div class="ladder-item">
+        <div class="ladder-price" style="color:var(--accent3)">159.00</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot dot-sup"></div></div>
+        <div class="ladder-desc">Supporto intermedio</div>
+      </div>
+
+      <div class="ladder-item">
+        <div class="ladder-price" style="color:var(--accent)">157.50</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot dot-key"></div></div>
+        <div class="ladder-desc"><strong style="color:var(--accent)">SUPPORTO CRITICO</strong> — canale bullish LT</div>
+      </div>
+
+      <div class="ladder-item">
+        <div class="ladder-price" style="color:var(--accent2)">155.00</div>
+        <div class="ladder-dot-wrap"><div class="ladder-dot dot-res"></div></div>
+        <div class="ladder-desc">Min post-intervento aprile 2026</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- INDICATORI -->
+  <div class="card">
+    <div class="card-title">Indicatori Tecnici</div>
+    <div class="indicators-grid">
+      <div class="ind-item">
+        <div class="ind-name">RSI (14)</div>
+        <div class="ind-val" style="color:var(--accent)">46.69</div>
+        <div class="ind-sig sig-neutral">● NEUTRALE</div>
+        <div class="rsi-bar-wrap">
+          <div class="rsi-bar-fill"></div>
+          <div class="rsi-pointer"></div>
+        </div>
+        <div class="rsi-labels">
+          <span class="rsi-label">OS 30</span>
+          <span class="rsi-label">OB 70</span>
+        </div>
+      </div>
+
+      <div class="ind-item">
+        <div class="ind-name">MACD</div>
+        <div class="ind-val" style="color:var(--accent2)">−0.17</div>
+        <div class="ind-sig sig-sell">● SELL</div>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:8px; line-height:1.5">
+          Momentum in<br>indebolimento — no rev. piena
+        </div>
+      </div>
+
+      <div class="ind-item">
+        <div class="ind-name">SMA 5</div>
+        <div class="ind-val">156.34</div>
+        <div class="ind-sig sig-buy">● BUY</div>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:8px">Prezzo sopra MA breve</div>
+      </div>
+
+      <div class="ind-item">
+        <div class="ind-name">SMA 50</div>
+        <div class="ind-val">156.94</div>
+        <div class="ind-sig sig-sell">● SELL</div>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:8px">Pendenza al ribasso</div>
+      </div>
+
+      <div class="ind-item">
+        <div class="ind-name">SMA 200 (est.)</div>
+        <div class="ind-val">~158.81</div>
+        <div class="ind-sig sig-buy">● BUY (LT)</div>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:8px">Target luglio 2026</div>
+      </div>
+
+      <div class="ind-item">
+        <div class="ind-name">Pivot Fib.</div>
+        <div class="ind-val">156.38</div>
+        <div class="ind-sig sig-neutral">● PIVOT</div>
+        <div style="font-size:0.7rem; color:var(--muted); margin-top:8px">Livello di equilibrio</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- MACRO FONDAMENTALI -->
+<div class="grid-full">
+  <div class="card">
+    <div class="card-title">Driver Fondamentali</div>
+    <div class="macro-row">
+      <div class="macro-key">Tasso BOJ (attuale)</div>
+      <div class="macro-val">0.75%</div>
+      <div class="macro-imp" style="color:var(--accent2)">▲ Rialzo atteso lug</div>
+    </div>
+    <div class="macro-row">
+      <div class="macro-key">Spread tassi USA–Giappone</div>
+      <div class="macro-val">+2.74%</div>
+      <div class="macro-imp" style="color:var(--accent2)">Penalizza JPY</div>
+    </div>
+    <div class="macro-row">
+      <div class="macro-key">Stance FED</div>
+      <div class="macro-val">Hawkish</div>
+      <div class="macro-imp" style="color:var(--accent2)">3 dissensi pro-rialzo</div>
+    </div>
+    <div class="macro-row">
+      <div class="macro-key">Interventi valutari (spesa totale)</div>
+      <div class="macro-val">~$70 mld</div>
+      <div class="macro-imp" style="color:var(--accent)">Riserve ridotte</div>
+    </div>
+    <div class="macro-row">
+      <div class="macro-key">Inflazione Tokyo (core)</div>
+      <div class="macro-val">In ↑</div>
+      <div class="macro-imp" style="color:var(--accent3)">Supporta BOJ hike</div>
+    </div>
+    <div class="macro-row">
+      <div class="macro-key">Prossima decisione BOJ</div>
+      <div class="macro-val">31 Lug 2026</div>
+      <div class="macro-imp" style="color:var(--accent)">Evento chiave</div>
+    </div>
+  </div>
+</div>
+
+<!-- SCENARI -->
+<div class="grid-full">
+  <div class="card">
+    <div class="card-title">Scenari Operativi</div>
+    <div class="scenario-row">
+      <div class="scenario-item scenario-bull">
+        <div class="scenario-title">🟢 Scenario Rialzista</div>
+        <div class="scenario-text">
+          Tenuta sopra 160.74 (SMA 100 · 4h) con re-test di 162.00. Rottura convincente della resistenza con volumi elevati potrebbe aprire la strada verso 163–165. Condizione: Fed mantiene stance hawkish, BOJ non interviene.
+        </div>
+        <div class="scenario-target">Target: 162.00 → 163.50 → 165.00</div>
+      </div>
+      <div class="scenario-item scenario-bear">
+        <div class="scenario-title">🔴 Scenario Ribassista</div>
+        <div class="scenario-text">
+          Rottura decisa sotto 159.00 con chiusura giornaliera al di sotto del livello. Intervento BoJ/MoF combinato a rialzo tassi potrebbe innescare un crollo rapido verso 155–157. Canale bullish invalido sotto 157.50.
+        </div>
+        <div class="scenario-target">Target: 157.50 → 155.00 → 152.00</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- BIAS DIREZIONALE -->
+<div class="grid-full">
+  <div class="card">
+    <div class="card-title">Bias Direzionale</div>
+    <div class="bias-grid">
+      <div class="bias-item">
+        <div class="bias-period">Breve Termine</div>
+        <div class="bias-direction" style="color:var(--accent)">⟷ Laterale</div>
+        <div class="bias-text">Compressione tra 160–162. Momentum in calo. Rischio intervento sopra 162 limita l'upside immediato.</div>
+      </div>
+      <div class="bias-item">
+        <div class="bias-period">Medio Termine</div>
+        <div class="bias-direction" style="color:var(--accent3)">↑ Rialzista</div>
+        <div class="bias-text">Trend intatto sopra 159–160. Differenziale tassi ampio favorisce USD. Attesa BOJ 31 luglio.</div>
+      </div>
+      <div class="bias-item">
+        <div class="bias-period">Lungo Termine</div>
+        <div class="bias-direction" style="color:var(--accent2)">⚠ Attenzione</div>
+        <div class="bias-text">Livelli da 40 anni → rischio mean reversion strutturale se BOJ accelera i rialzi e Fed pivota.</div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- FOOTER -->
+<div class="footer">
+  <div class="footer-note">Dati aggiornati al 29 Giugno 2026 · Fonti: TradingEconomics, FXStreet, MarketPulse, Investing.com</div>
+  <div class="footer-note" style="color:var(--accent2)">⚠ Solo scopo informativo · Non costituisce consulenza finanziaria</div>
+</div>
+
+</body>
+</html>
