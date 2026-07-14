@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>EUR/AUD — Terminal Tecnico</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+  :root{
+    --bg:#0a0e14;
+    --panel:#10151f;
+    --panel-2:#141b26;
+    --border:#1f2938;
+    --text:#c9d1d9;
+    --muted:#6b7684;
+    --accent:#39d98a;
+    --accent-dim:#1f8f5a;
+    --red:#ff5f6d;
+    --amber:#e8b339;
+    --blue:#4fa3f7;
+    --mono: 'SF Mono', 'Consolas', 'Menlo', monospace;
+  }
+  *{box-sizing:border-box; margin:0; padding:0;}
+  body{
+    background:
+      radial-gradient(circle at 20% -10%, rgba(57,217,138,0.06), transparent 40%),
+      var(--bg);
+    color:var(--text);
+    font-family:var(--mono);
+    padding:24px;
+    min-height:100vh;
+  }
+  .wrap{max-width:1180px; margin:0 auto;}
+
+  header{
+    display:flex; justify-content:space-between; align-items:flex-end;
+    border-bottom:1px solid var(--border);
+    padding-bottom:16px; margin-bottom:20px; flex-wrap:wrap; gap:12px;
+  }
+  .pair{font-size:28px; font-weight:700; letter-spacing:1px;}
+  .pair span{color:var(--accent);}
+  .sub{color:var(--muted); font-size:12px; margin-top:4px;}
+  .price-block{text-align:right;}
+  .price{font-size:32px; font-weight:700; color:var(--accent);}
+  .chg{font-size:13px; color:var(--accent);}
+  .ts{color:var(--muted); font-size:11px; margin-top:6px;}
+
+  .grid{display:grid; grid-template-columns: 2fr 1fr; gap:16px; margin-bottom:16px;}
+  @media(max-width:900px){.grid{grid-template-columns:1fr;}}
+
+  .panel{
+    background:var(--panel);
+    border:1px solid var(--border);
+    border-radius:6px;
+    padding:16px 18px;
+  }
+  .panel h2{
+    font-size:11px; text-transform:uppercase; letter-spacing:1.5px;
+    color:var(--muted); margin-bottom:14px; font-weight:600;
+    display:flex; justify-content:space-between; align-items:center;
+  }
+  .tag{
+    font-size:10px; padding:2px 8px; border-radius:3px; letter-spacing:0.5px;
+  }
+  .tag.bear{background:rgba(255,95,109,0.12); color:var(--red); border:1px solid rgba(255,95,109,0.3);}
+  .tag.bull{background:rgba(57,217,138,0.12); color:var(--accent); border:1px solid rgba(57,217,138,0.3);}
+  .tag.neutral{background:rgba(232,179,57,0.12); color:var(--amber); border:1px solid rgba(232,179,57,0.3);}
+
+  canvas{max-height:340px;}
+
+  .levels{display:flex; flex-direction:column; gap:6px;}
+  .level-row{
+    display:flex; justify-content:space-between; align-items:center;
+    padding:8px 10px; border-radius:4px; font-size:12.5px;
+    border-left:3px solid transparent;
+  }
+  .level-row .lbl{color:var(--muted);}
+  .level-row .val{font-weight:700;}
+  .r-strong{background:rgba(255,95,109,0.08); border-left-color:var(--red);}
+  .r-strong .val{color:var(--red);}
+  .r{background:rgba(255,95,109,0.04); border-left-color:rgba(255,95,109,0.5);}
+  .r .val{color:var(--red);}
+  .pivot{background:rgba(232,179,57,0.1); border-left-color:var(--amber);}
+  .pivot .val{color:var(--amber);}
+  .s{background:rgba(57,217,138,0.04); border-left-color:rgba(57,217,138,0.5);}
+  .s .val{color:var(--accent);}
+  .s-strong{background:rgba(57,217,138,0.08); border-left-color:var(--accent);}
+  .s-strong .val{color:var(--accent);}
+
+  .signals{display:grid; grid-template-columns:repeat(2,1fr); gap:10px;}
+  .sig{
+    background:var(--panel-2); border:1px solid var(--border); border-radius:4px;
+    padding:10px 12px;
+  }
+  .sig .tf{font-size:10px; color:var(--muted); text-transform:uppercase; letter-spacing:1px;}
+  .sig .val{font-size:13px; font-weight:700; margin-top:4px;}
+  .val.sell{color:var(--red);}
+  .val.buy{color:var(--accent);}
+  .val.neu{color:var(--amber);}
+
+  .notes{font-size:12.5px; line-height:1.75; color:var(--text);}
+  .notes b{color:var(--accent);}
+  .notes .warn{color:var(--red);}
+
+  .bottom-grid{display:grid; grid-template-columns:1fr 1fr; gap:16px;}
+  @media(max-width:900px){.bottom-grid{grid-template-columns:1fr;}}
+
+  footer{
+    margin-top:20px; padding-top:14px; border-top:1px solid var(--border);
+    color:var(--muted); font-size:10.5px; text-align:center;
+  }
+
+  .macro-row{display:flex; justify-content:space-between; padding:7px 0; border-bottom:1px dashed var(--border); font-size:12px;}
+  .macro-row:last-child{border-bottom:none;}
+  .macro-row .k{color:var(--muted);}
+  .macro-row .v{font-weight:600;}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <div>
+      <div class="pair">EUR<span>/</span>AUD</div>
+      <div class="sub">Euro / Dollaro Australiano — Terminal Tecnico</div>
+    </div>
+    <div class="price-block">
+      <div class="price">1.6450</div>
+      <div class="chg">▲ +0.20% (24h)</div>
+      <div class="ts">14 LUG 2026 · dati indicativi</div>
+    </div>
+  </header>
+
+  <div class="grid">
+    <div class="panel">
+      <h2>Struttura Prezzo — Daily <span class="tag neutral">BIAS MISTO</span></h2>
+      <canvas id="priceChart"></canvas>
+    </div>
+
+    <div class="panel">
+      <h2>Livelli Chiave</h2>
+      <div class="levels">
+        <div class="level-row r-strong"><span class="lbl">Res. strutturale</span><span class="val">1.6842</span></div>
+        <div class="level-row r"><span class="lbl">Resistenza</span><span class="val">1.6636</span></div>
+        <div class="level-row r"><span class="lbl">Res. immediata</span><span class="val">1.6516</span></div>
+        <div class="level-row pivot"><span class="lbl">Pivot / prezzo</span><span class="val">1.6450</span></div>
+        <div class="level-row s"><span class="lbl">Supporto imm.</span><span class="val">1.6306</span></div>
+        <div class="level-row s"><span class="lbl">Supporto</span><span class="val">1.6108</span></div>
+        <div class="level-row s-strong"><span class="lbl">Target ribasso (61.8%)</span><span class="val">1.5913</span></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="bottom-grid">
+    <div class="panel">
+      <h2>Segnali per Timeframe</h2>
+      <div class="signals">
+        <div class="sig"><div class="tf">1H — 5H</div><div class="val sell">STRONG SELL</div></div>
+        <div class="sig"><div class="tf">Daily</div><div class="val neu">NEUTRALE</div></div>
+        <div class="sig"><div class="tf">Weekly</div><div class="val neu">NEUTRALE / SELL LEGGERO</div></div>
+        <div class="sig"><div class="tf">Monthly</div><div class="val buy">STRONG BUY</div></div>
+      </div>
+      <h2 style="margin-top:18px;">Contesto Macro</h2>
+      <div class="macro-row"><span class="k">BCE Deposit Rate</span><span class="v">2.00%</span></div>
+      <div class="macro-row"><span class="k">Bias BCE</span><span class="v">Steady hand — inflazione al target</span></div>
+      <div class="macro-row"><span class="k">Bias RBA</span><span class="v">Restrittivo — core CPI &gt;3%</span></div>
+      <div class="macro-row"><span class="k">Driver dominante</span><span class="v">Divergenza tassi BCE/RBA</span></div>
+    </div>
+
+    <div class="panel">
+      <h2>Note Operative</h2>
+      <div class="notes">
+        <p><b>Trend primario:</b> ribassista dal massimo 2025 (1.8554), parte di una gamba discendente di lungo periodo (da 1.9799 → 2.1127). Finché <b>1.6842</b> regge da resistenza, il bias strutturale resta bearish, target teorico <b>1.5913</b>.</p>
+        <br>
+        <p><b>Rimbalzo in corso:</b> da 1.6108, rottura di 1.6516 apre spazio verso <b>1.6636</b>. Sopra 1.6842 → possibile bottoming di medio periodo.</p>
+        <br>
+        <p><b>Pattern in osservazione:</b> potenziale H&S ribassista su 4H — <span class="warn">non confermato</span>, serve chiusura sotto neckline.</p>
+        <br>
+        <p><b>Scenario operativo:</b><br>
+        › Sopra 1.6516 → long verso 1.6636 / 1.6842<br>
+        › Sotto 1.6306 → riattivazione ribasso verso 1.6108 / 1.5913</p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    Dashboard generata da Claude · dati indicativi da fonti pubbliche (TradingView, ActionForex, Investing.com) · non è consulenza finanziaria
+  </footer>
+
+</div>
+
+<script>
+const ctx = document.getElementById('priceChart').getContext('2d');
+
+const labels = ['Gen','Feb','Mar','Apr','Mag','Giu 10','Giu 20','Giu 30','Lug 5','Lug 10','Lug 14'];
+const data = [1.7300,1.7050,1.6850,1.6950,1.7100,1.6700,1.6400,1.6108,1.6300,1.6480,1.6450];
+
+new Chart(ctx, {
+  type:'line',
+  data:{
+    labels: labels,
+    datasets:[
+      {
+        label:'EUR/AUD',
+        data:data,
+        borderColor:'#39d98a',
+        backgroundColor:'rgba(57,217,138,0.08)',
+        borderWidth:2,
+        pointRadius:3,
+        pointBackgroundColor:'#39d98a',
+        tension:0.3,
+        fill:true
+      },
+      {
+        label:'Res. 1.6842',
+        data:Array(labels.length).fill(1.6842),
+        borderColor:'rgba(255,95,109,0.5)',
+        borderWidth:1,
+        borderDash:[6,4],
+        pointRadius:0,
+      },
+      {
+        label:'Res. 1.6516',
+        data:Array(labels.length).fill(1.6516),
+        borderColor:'rgba(255,95,109,0.3)',
+        borderWidth:1,
+        borderDash:[4,4],
+        pointRadius:0,
+      },
+      {
+        label:'Sup. 1.6108',
+        data:Array(labels.length).fill(1.6108),
+        borderColor:'rgba(57,217,138,0.4)',
+        borderWidth:1,
+        borderDash:[4,4],
+        pointRadius:0,
+      },
+      {
+        label:'Target 1.5913',
+        data:Array(labels.length).fill(1.5913),
+        borderColor:'rgba(57,217,138,0.6)',
+        borderWidth:1,
+        borderDash:[6,4],
+        pointRadius:0,
+      }
+    ]
+  },
+  options:{
+    responsive:true,
+    maintainAspectRatio:true,
+    interaction:{mode:'index', intersect:false},
+    plugins:{
+      legend:{
+        labels:{color:'#6b7684', font:{size:10, family:'monospace'}, boxWidth:12}
+      },
+      tooltip:{
+        backgroundColor:'#10151f',
+        borderColor:'#1f2938',
+        borderWidth:1,
+        titleColor:'#c9d1d9',
+        bodyColor:'#c9d1d9',
+        titleFont:{family:'monospace'},
+        bodyFont:{family:'monospace'}
+      }
+    },
+    scales:{
+      x:{ ticks:{color:'#6b7684', font:{family:'monospace', size:10}}, grid:{color:'#1f2938'} },
+      y:{ ticks:{color:'#6b7684', font:{family:'monospace', size:10}}, grid:{color:'#1f2938'} }
+    }
+  }
+});
+</script>
+
+</body>
+</html>
