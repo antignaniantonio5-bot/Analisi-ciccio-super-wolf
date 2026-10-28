@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Semafori delle banche centrali</title>
+<style>
+:root{--bg:#0a0e14;--panel:#111821;--line:#1f2a38;--text:#d7dee8;--mute:#7b8896;--off:#1a222d;--r:#ff4d4d;--y:#ffc933;--g:#2ee08a;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:light){:root:not([data-theme="dark"]){--bg:#0a0e14}}
+html{scroll-padding-top:env(safe-area-inset-top,0px)}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--text);font-family:"JetBrains Mono","SF Mono",Consolas,Menlo,monospace;line-height:1.5}
+main{max-width:1000px;margin:0 auto;padding:24px 16px 40px}
+h1{font-size:1.25rem;margin:0 0 4px;font-weight:700}
+.sub{color:var(--mute);font-size:.8rem;margin:0 0 20px}
+.legend{display:flex;flex-wrap:wrap;gap:16px;margin:0 0 24px;font-size:.8rem}
+.legend span{display:flex;align-items:center;gap:8px}
+.dot{width:12px;height:12px;border-radius:50%;display:inline-block}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:6px;padding:16px;display:flex;gap:16px;align-items:center}
+.light{background:#05080c;border:1px solid var(--line);border-radius:30px;padding:10px 8px;display:flex;flex-direction:column;gap:8px;flex:none}
+.lamp{width:30px;height:30px;border-radius:50%;background:var(--off)}
+.lamp.on.r{background:var(--r);box-shadow:0 0 16px var(--r)}
+.lamp.on.y{background:var(--y);box-shadow:0 0 16px var(--y)}
+.lamp.on.g{background:var(--g);box-shadow:0 0 16px var(--g)}
+.info{min-width:0}
+.bank{font-weight:700;font-size:1rem}
+.sig{font-size:.85rem;margin:2px 0 6px;font-weight:700}
+.sig.r{color:var(--r)}.sig.y{color:var(--y)}.sig.g{color:var(--g)}
+.rate{font-size:.85rem}
+.meta{font-size:.75rem;color:var(--mute);margin-top:4px}
+.next{font-size:.8rem;margin-top:8px;padding-top:8px;border-top:1px solid var(--line)}
+.next b{color:var(--text)}
+.key{display:flex;flex-wrap:wrap;gap:4px 12px;margin-top:8px;font-size:.75rem}
+.key span{display:flex;align-items:center;gap:6px;color:var(--mute);opacity:.45}
+.key span.act{opacity:1;color:var(--text);font-weight:700}
+.key i{width:10px;height:10px;border-radius:50%;display:inline-block}
+footer{margin-top:24px;color:var(--mute);font-size:.72rem;border-top:1px solid var(--line);padding-top:12px}
+</style>
+</head>
+<body>
+<main>
+<h1>Semafori delle banche centrali</h1>
+<p class="sub">Ultima decisione di politica monetaria, aggiornata al 28 ottobre 2026</p>
+<div class="legend">
+<span><i class="dot" style="background:var(--r)"></i>Rosso: ha alzato i tassi</span>
+<span><i class="dot" style="background:var(--y)"></i>Giallo: ha lasciato i tassi invariati</span>
+<span><i class="dot" style="background:var(--g)"></i>Verde: ha tagliato i tassi</span>
+</div>
+<div class="grid" id="grid"></div>
+<footer>Fonti: comunicati ufficiali di Fed, BCE, BoJ, BoE, BoC e PBoC e agenzie finanziarie. I dati cambiano a ogni riunione: verifica sempre il comunicato più recente. Non è una consulenza finanziaria.</footer>
+</main>
+<script>
+var banks=[
+{n:"Federal Reserve (USA)",p:"28 ottobre 2026 (oggi, annuncio 14:00 ET)",c:"r",s:"Ha alzato i tassi",r:"3,75%–4,00% (+0,25 pp)",m:"Decisione del 16 settembre 2026, voto 12-0. Primo rialzo dal 2023. Nuova decisione in programma oggi."},
+{n:"BCE (Eurozona)",p:"29 ottobre 2026",c:"r",s:"Ha alzato i tassi",r:"Tasso sui depositi 2,50% (+0,25 pp)",m:"Decisione del 10 settembre 2026, in vigore dal 16 settembre."},
+{n:"Banca del Giappone",p:"30 ottobre 2026",c:"r",s:"Ha alzato i tassi",r:"1,25% (da 1,00%)",m:"Decisione del 18 settembre 2026, voto 7-2. Livello più alto dal 1995."},
+{n:"Banca d'Inghilterra",p:"5 novembre 2026",c:"y",s:"Ha lasciato i tassi invariati",r:"3,75%",m:"Decisione del 17 settembre 2026, voto 6-3: tre membri volevano alzare a 4%. Per novembre si attende un rialzo."},
+{n:"Banca del Canada",p:"28 ottobre 2026 (oggi, 9:45 ET)",c:"y",s:"Ha lasciato i tassi invariati",r:"2,25%",m:"Ultima decisione disponibile: 2 settembre 2026 (settima conferma). Oggi è attesa la nuova decisione: i mercati scontano un rialzo a 2,50%."},
+{n:"Banca popolare cinese",p:"20 novembre 2026 (LPR mensile)",c:"y",s:"Ha lasciato i tassi invariati",r:"LPR 1 anno 3,00% / 5 anni 3,50%",m:"Decisione del 20 ottobre 2026: LPR invariata per il diciassettesimo mese consecutivo."}
+];
+var grid=document.getElementById("grid");
+function key(c){var t=[["r","Rosso: frena","var(--r)"],["y","Giallo: aspetta","var(--y)"],["g","Verde: aiuta i mercati","var(--g)"]];
+return '<div class="key">'+t.map(function(x){return '<span'+(x[0]===c?' class="act"':'')+'><i style="background:'+x[2]+'"></i>'+x[1]+'</span>'}).join("")+'</div>'}
+banks.forEach(function(b){
+var lamps=["r","y","g"].map(function(k){return '<div class="lamp '+k+(k===b.c?' on':'')+'"></div>'}).join("");
+var d=document.createElement("div");d.className="card";
+d.innerHTML='<div class="light" role="img" aria-label="Semaforo: '+b.s+'">'+lamps+'</div><div class="info"><div class="bank">'+b.n+'</div><div class="sig '+b.c+'">'+b.s+'</div><div class="rate">'+b.r+'</div><div class="meta">'+b.m+'</div><div class="next"><span style="color:var(--mute)">Prossima riunione: </span><b>'+b.p+'</b></div>'+key(b.c)+'</div>';
+grid.appendChild(d);
+});
+</script>
+</body>
+</html>
